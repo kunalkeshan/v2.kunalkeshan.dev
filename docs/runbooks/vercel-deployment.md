@@ -1,45 +1,45 @@
-# Runbook: Vercel Deployment (apps/web)
+# Runbook: Vercel Deployment
 
 Deploying to Vercel is a deliberate, manually-triggered action — it is **not** part of the Definition of Done for every change, and should not be run automatically at the end of unrelated tasks. Only deploy when explicitly asked.
 
-## One-time setup: linking the project
+This repo may host more than one deployable app under `apps/*` over time (currently just `apps/web`; `apps/studio` deploys via the Sanity CLI instead, see `docs/runbooks/sanity-workflow.md`, not Vercel). Each deployable app under `apps/*` gets its **own** Vercel project, linked and configured the same way, described once below.
 
-Because this is a Turborepo monorepo, the Vercel project must be linked from inside `apps/web`, not the repo root — this is what sets Vercel's **Root Directory** to `apps/web` automatically.
+## One-time setup: linking a new app's Vercel project
 
-```bash
-cd apps/web
-vercel link --project v2-kunalkeshan-dev
-```
+**Confirmed limitation (tested 2026-07-08):** the Vercel CLI (`vercel link`, from either the repo root or the app subdirectory) always creates the project with **Root Directory = `.`** (repo root) — there is no CLI flag or `vercel.json` key to set Root Directory. `vercel project inspect <name>` was used to confirm this after linking both ways. Root Directory is a **dashboard-only** setting.
 
-This creates `apps/web/.vercel/project.json` (gitignored) tying this local checkout to the Vercel project. Requires an active Vercel CLI login (`vercel login` — interactive, must be run by a human) under the correct account/scope.
+Steps for `apps/<name>`:
 
-Vercel auto-detects, for a linked Turborepo project:
+1. From inside `apps/<name>`, run:
+   ```bash
+   cd apps/<name>
+   vercel link --project <project-name>
+   ```
+   This creates the Vercel project and `apps/<name>/.vercel/project.json` (gitignored).
+2. Go to `vercel.com/<scope>/<project-name>/settings` (General tab) and set **Root Directory** to `apps/<name>`. Save.
+3. Framework Preset, Build Command, Install Command, Output Directory can stay on their auto-detected defaults once Root Directory is correct — Vercel then reads `pnpm-lock.yaml`/`pnpm-workspace.yaml` from the true repo root and correctly detects the pnpm workspace, scoping the build to `apps/<name>` via `turbo build`.
 
-| Setting | Value |
-|---|---|
-| Framework Preset | Next.js |
-| Root Directory | `apps/web` |
-| Build Command | `turbo build` (global `turbo`, auto-scoped to `web` via inferred root directory) |
-| Install Command | auto-detected (pnpm, from `pnpm-lock.yaml`) |
-| Output Directory | framework default (`.next`) |
+Without step 2, the build fails: Vercel defaults to `npm install` at the repo root, which errors on pnpm's `workspace:*` protocol in `package.json` (`npm error code EUNSUPPORTEDPROTOCOL`).
 
-No `vercel.json` is required unless overriding these defaults.
+### This project: `apps/web` → `v2-kunalkeshan-dev`
+
+Linked, Root Directory set to `apps/web`, env vars configured, and promoted to production. **Live at https://v2-kunalkeshan-dev.vercel.app.**
 
 ## Environment variables
 
-Set these in the Vercel dashboard (Project → Settings → Environment Variables) for Production (and Preview if desired) — see `apps/web/env.sample` for the full list and `docs/infra/deployment.md` for what each one means:
+Set per-project in the Vercel dashboard (Project → Settings → Environment Variables) for Production (and Preview if desired). For `apps/web`, see `apps/web/env.sample` for the full list and `docs/infra/deployment.md` for what each one means:
 
 - `NEXT_PUBLIC_SANITY_PROJECT_ID`
 - `NEXT_PUBLIC_SANITY_DATASET`
 - `NEXT_PUBLIC_SANITY_API_VERSION`
 - `NEXT_PUBLIC_SANITY_STUDIO_URL` — production value: `https://kunalkeshan.sanity.studio`
-- `SITE_URL`
-- `SANITY_WEBHOOK_SECRET`
+- `SITE_URL` — production value: `https://v2-kunalkeshan-dev.vercel.app`
+- `SANITY_WEBHOOK_SECRET` — not yet set (no Sanity webhook configured yet)
 
 ## Deploying
 
 ```bash
-cd apps/web
+cd apps/<name>
 
 # Preview deployment (safe default — does not touch production domain)
 vercel
@@ -48,7 +48,7 @@ vercel
 vercel --prod
 ```
 
-Both commands must be run from `apps/web` (or anywhere, using `vercel [path-to-project]`) since that's where the project is linked.
+Run from inside the linked app's directory (or use `vercel [path-to-project]` from elsewhere), since that's where `.vercel/project.json` lives.
 
 ## Turborepo remote caching (optional)
 
