@@ -55,6 +55,8 @@ Fonts are defined once in `packages/ui/src/lib/fonts.ts`, exporting `rootBodyCla
 
 shadcn/ui primitives (button, form, accordion, etc.) live in `packages/ui/src/components` and are added via `pnpm dlx shadcn@latest add <name> -c apps/web` — the CLI auto-routes base components to `packages/ui`. App-specific composed components (layouts, page sections) stay in the consuming app.
 
+**Design system:** `packages/ui`'s tokens and components implement a neobrutalist visual language (thick borders, hard offset shadows, press-into-shadow interaction) — see `docs/ui/design-system.md` for the full token model, and `docs/ui/font-stack.md` for the font pipeline. Component work in `packages/ui` should follow the conventions there rather than introducing new ad-hoc styling.
+
 ## Common commands
 
 ```bash

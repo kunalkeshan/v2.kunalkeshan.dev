@@ -1,4 +1,4 @@
-import { Nunito_Sans, Montserrat, Space_Mono } from "next/font/google";
+import { Nunito_Sans, Montserrat, Ubuntu_Mono } from "next/font/google";
 
 export const fontSans = Nunito_Sans({
   subsets: ["latin"],
@@ -12,7 +12,7 @@ export const fontSerif = Montserrat({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-export const fontMono = Space_Mono({
+export const fontMono = Ubuntu_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   weight: ["400", "700"],

@@ -21,6 +21,7 @@ Deployment, hosting, and operational topology.
 ## UI docs (`docs/ui/`)
 
 - [`font-stack.md`](./ui/font-stack.md) — shared font package convention
+- [`design-system.md`](./ui/design-system.md) — token model, shadow/radius/motion scales, and the neobrutalism visual language
 
 ## Runbooks (`docs/runbooks/`)
 

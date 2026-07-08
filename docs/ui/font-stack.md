@@ -5,7 +5,7 @@ Fonts are defined once, in `packages/ui/src/lib/fonts.ts`:
 ```ts
 export const fontSans = Nunito_Sans({ variable: "--font-sans", ... });
 export const fontSerif = Montserrat({ variable: "--font-serif", ... });
-export const fontMono = Space_Mono({ variable: "--font-mono", ... });
+export const fontMono = Ubuntu_Mono({ variable: "--font-mono", ... });
 
 export const rootBodyClassName = `${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} font-sans antialiased`;
 ```
@@ -28,3 +28,5 @@ import { rootBodyClassName } from "@workspace/ui/lib/fonts";
 ## Adding or changing a font
 
 Edit `packages/ui/src/lib/fonts.ts` directly, then update the CSS variable references in `packages/ui/src/styles/globals.css` (`--font-sans`, `--font-serif`, `--font-mono` under `:root`/`@theme inline`) if the variable names change. No changes needed in consuming apps unless `rootBodyClassName`'s shape changes.
+
+Note: Tailwind's `font-heading` utility does not read directly from `fonts.ts` — it resolves via `globals.css`'s `@theme inline` block, which maps `--font-heading: var(--font-serif)` (i.e. Montserrat). If you change which loaded font backs a given role, check that mapping too, not just the `next/font/google` call. See `design-system.md` for the full token model this feeds into.
