@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@sanity/client": "^7.23.0",
+    "@sanity/client": "^8.6.1",
     "@sanity/image-url": "^2.1.1",
     "@workspace/env": "workspace:*",
     "next-sanity": "^13.3.4",

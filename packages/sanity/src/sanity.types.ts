@@ -134,12 +134,7 @@ export type SiteConfig = {
   }
   socialMedia?: Array<{
     platform?:
-      | "twitter"
-      | "youtube"
-      | "instagram"
-      | "facebook"
-      | "whatsapp"
-      | "linkedin"
+      "twitter" | "youtube" | "instagram" | "facebook" | "whatsapp" | "linkedin"
     url?: string
     label?: string
     _key: string
@@ -423,8 +418,7 @@ export type LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT = {
 } | null
 
 // Query TypeMap
-import "@sanity/client"
-declare module "@sanity/client" {
+declare global {
   interface SanityQueries {
     '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      alt\n    },\n    twitterImage {\n      asset->,\n      alt\n    },\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0].footerLegalLinks[]-> {\n    _id,\n    title,\n    slug,\n    description,\n    _updatedAt\n  }\n': FOOTER_LEGAL_LINKS_QUERY_RESULT
@@ -432,4 +426,8 @@ declare module "@sanity/client" {
     '\n  *[_type == "legal"] | order(_updatedAt desc) {\n    _id,\n    title,\n    slug,\n    description,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENTS_QUERY_RESULT
     '\n  *[_type == "legal" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    description,\n    content,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT
   }
+}
+// Lets @sanity/client releases that predate the global registry read it too
+declare module "@sanity/client" {
+  interface SanityQueries extends globalThis.SanityQueries {}
 }
