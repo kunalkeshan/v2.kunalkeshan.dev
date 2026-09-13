@@ -12,7 +12,7 @@
     "@sanity/client": "^7.23.0",
     "@sanity/image-url": "^2.1.1",
     "@workspace/env": "workspace:*",
-    "next-sanity": "^13.1.1",
+    "next-sanity": "^13.3.4",
     "server-only": "^0.0.1"
   },
   "devDependencies": {
@@ -20,7 +20,7 @@
     "@types/react": "^19",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "^9",
-    "next": "16.2.6",
+    "next": "16.3.5",
     "typescript": "^5"
   },
   "exports": {
