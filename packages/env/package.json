@@ -15,8 +15,8 @@
   "devDependencies": {
     "@types/node": "^20",
     "@workspace/typescript-config": "workspace:*",
-    "eslint": "^9",
-    "typescript": "^5"
+    "eslint": "^9.39.5",
+    "typescript": "^5.9.3"
   },
   "exports": {
     "./client": "./src/client.ts",

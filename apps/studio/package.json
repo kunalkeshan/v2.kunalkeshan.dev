@@ -27,7 +27,7 @@
     "@types/react-dom": "^19",
     "@workspace/typescript-config": "workspace:*",
     "dotenv": "^17.4.2",
-    "eslint": "^9",
-    "typescript": "^5"
+    "eslint": "^9.39.5",
+    "typescript": "^5.9.3"
   }
 }
