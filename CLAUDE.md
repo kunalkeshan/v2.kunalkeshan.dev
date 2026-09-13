@@ -57,6 +57,10 @@ shadcn/ui primitives (button, form, accordion, etc.) live in `packages/ui/src/co
 
 **Design system:** `packages/ui`'s tokens and components implement a neobrutalist visual language (thick borders, hard offset shadows, press-into-shadow interaction) — see `docs/ui/design-system.md` for the full token model, and `docs/ui/font-stack.md` for the font pipeline. Component work in `packages/ui` should follow the conventions there rather than introducing new ad-hoc styling.
 
+## Content voice & persona
+
+This site's content reflects Kunal's current life stage — a working software engineer who also freelances independently — not the student persona from the previous portfolio version (`kunalkeshan.dev` v1, written while he was an ECE student at SRMIST). Any new or edited page/section copy must be checked against `docs/content/persona-and-tone.md` before being considered done, and the AI must ask the user before applying any student → professional reframing rather than assuming it silently. See the doc for what's in scope (factual/life-stage framing) versus explicitly out of scope (personal values language, existing personality touches like kaomoji or the footer easter egg).
+
 ## Common commands
 
 ```bash

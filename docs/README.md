@@ -12,6 +12,10 @@ Per-feature deep dives — what the feature does, where its code lives, and any 
 
 - [`sanity-cms.md`](./feature/sanity-cms.md) — content modeling, the Studio app, and how `apps/web` consumes it
 
+## Content docs (`docs/content/`)
+
+- [`persona-and-tone.md`](./content/persona-and-tone.md) — current professional/freelancer persona for page copy, and the old student-era framing to avoid reintroducing
+
 ## Infra docs (`docs/infra/`)
 
 Deployment, hosting, and operational topology.

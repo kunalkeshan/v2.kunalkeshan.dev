@@ -17,6 +17,7 @@ Before considering any change complete:
 - [ ] `pnpm typecheck` passes for every affected package/app
 - [ ] `pnpm build` succeeds for every affected app
 - [ ] **If a Sanity schema field or GROQ query changed** (`apps/studio/schemaTypes/**`, `apps/studio/structure.ts`, or `packages/sanity/src/query.ts`): typegen was regenerated (`pnpm --filter studio extract && pnpm --filter studio type`) and every consumer of the changed type/query in `apps/web` was updated to match. This is a **strict, blocking rule** — never mark a task done with stale generated types. See `docs/runbooks/sanity-workflow.md`.
+- [ ] **If new or edited page/section copy was written** (hero/intro, bio, meta descriptions, experience/resume entries, project write-ups, values or services copy): checked against `docs/content/persona-and-tone.md` and any student-era framing reframed only after asking the user — never applied silently. This is a **strict, blocking rule**, same severity as the Sanity typegen rule above.
 - [ ] UI components reuse `@workspace/ui` primitives rather than redefining them locally
 - [ ] New/restyled components in `packages/ui` follow the token model and conventions in `docs/ui/design-system.md` (border widths, shadow scale, radius scale, focus rings) rather than inventing ad-hoc values
 - [ ] Fonts are sourced from `@workspace/ui/lib/fonts` (`rootBodyClassName`), never loaded inline in an app's `layout.tsx`
