@@ -39,6 +39,8 @@ pnpm build       # apps/web and apps/studio both build
 
 Sanity's typegen (as of `sanity@6.x`) names generated result types with a `_RESULT` suffix, e.g. `SITE_CONFIG_QUERY_RESULT` — not the older `SITE_CONFIG_QUERYResult` convention. Check the actual generated name in `packages/sanity/src/sanity.types.ts` rather than assuming.
 
+As of `@sanity/client@8.x`, the generated file's `SanityQueries` type-map registration switched from `declare module "@sanity/client"` to a `declare global` block (with a back-compat `declare module` shim for older `@sanity/client` versions). This is purely a typegen implementation detail — no `apps/web` consumer references `SanityQueries` directly — but if a future typegen run produces an unexpected diff limited to this block, it's expected and not a sign of a schema/query change.
+
 ## 2. Deploying the Studio
 
 The Studio deploys to Sanity's own hosting, independent of `apps/web`/Vercel.
