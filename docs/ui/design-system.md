@@ -295,14 +295,26 @@ transition={sectionRevealTransition} viewport={sectionRevealViewport}`. Import f
   needs the same section-reveal pattern, promote this file to
   `packages/ui/src/lib/motion.ts` (same "genuinely shared vs. app-local" test used for
   `packages/ui/src/hooks`) — don't duplicate it into a second app-local copy.
-- **Scroll-driven navbar morph** (see `apps/web/components/layouts/navbar.tsx`) is a
-  new pattern not present in v1: `useScroll` (a small hysteresis-based scroll-position
-  hook, `packages/ui/src/hooks/use-scroll.ts`) drives a `motion.nav`'s `animate` prop
-  between two plain-object keyframe configs (`default`/`scrolled`), transitioning with
-  `springTransition` from `apps/web/lib/motion.ts`
-  (`stiffness: 200, damping: 20, mass: 0.6`). Always gate this kind of transform
-  animation behind `useReducedMotion()` (from `motion/react`) and fall back to a
-  `{ duration: 0 }` transition — see the navbar for the exact pattern.
+  `apps/web/components/layouts/footer.tsx` is the working reference implementation —
+  copy its `motion.footer` wrapper (and its `"use client"` directive, required for any
+  component using `motion.*`) for new sections rather than re-deriving the pattern.
+- **Scroll-driven navbar morph + mount entrance** (see
+  `apps/web/components/layouts/navbar.tsx`): `useScroll` (a small hysteresis-based
+  scroll-position hook, `packages/ui/src/hooks/use-scroll.ts`) drives a `motion.nav`
+  between **named `variants`** — `enter` (mount-only: `opacity: 0, y: -20`, at the
+  `default` shape), `default`, and `scrolled` — rather than raw inline objects computed
+  per render. `initial="enter"`, `animate={scrolled ? "scrolled" : "default"}`,
+  transitioning with `springTransition` from `apps/web/lib/motion.ts`
+  (`stiffness: 200, damping: 20, mass: 0.6`, no second timing pair — see the button
+  hover-timing note above for why that matters). **Use named variants, not ad-hoc
+  merged objects, for any `motion` component with more than one animated state**: an
+  early version of this navbar built `initial`/`animate` by hand-spreading plain
+  objects per render (`{ opacity: 1, ...shapeProps }`), and because one variant defined
+  a `y` transform the other never explicitly reset, the entrance intermittently got
+  stuck mid-animation instead of settling — `variants` avoids this because every named
+  state declares its full property set. Always gate this kind of animation behind
+  `useReducedMotion()` (from `motion/react`) and fall back to `initial={false}` /
+  `{ duration: 0 }` — see the navbar for the exact pattern.
 - Still no dedicated page-transition/route system — that remains genuinely out of scope
   until a real cross-route transition is actually requested; don't add
   `AnimatePresence`-around-`{children}` speculatively.

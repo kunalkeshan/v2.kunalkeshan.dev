@@ -11,23 +11,33 @@ import { DesktopNav } from "@/components/layouts/desktop-nav"
 import { MobileNav } from "@/components/layouts/mobile-nav"
 import { springTransition } from "@/lib/motion"
 
-const ANIMATION_CONFIG = {
-  scrolled: {
-    borderRadius: "var(--radius-lg)",
-    maxWidth: "42rem",
-    top: 16,
-    width: "94%",
-    paddingInline: "1rem",
-  },
-  default: {
+const navVariants = {
+  enter: {
+    opacity: 0,
+    y: -20,
     borderRadius: "var(--radius-lg)",
     maxWidth: "48rem",
     top: 24,
     width: "96%",
     paddingInline: "1rem",
   },
-  reduced: {
-    duration: 0,
+  default: {
+    opacity: 1,
+    y: 0,
+    borderRadius: "var(--radius-lg)",
+    maxWidth: "48rem",
+    top: 24,
+    width: "96%",
+    paddingInline: "1rem",
+  },
+  scrolled: {
+    opacity: 1,
+    y: 0,
+    borderRadius: "var(--radius-lg)",
+    maxWidth: "42rem",
+    top: 16,
+    width: "94%",
+    paddingInline: "1rem",
   },
 } as const
 
@@ -35,21 +45,12 @@ const Navbar = () => {
   const scrolled = useScroll(20)
   const prefersReducedMotion = useReducedMotion()
 
-  const animationProps = prefersReducedMotion
-    ? {}
-    : scrolled
-      ? ANIMATION_CONFIG.scrolled
-      : ANIMATION_CONFIG.default
-
-  const transitionProps = prefersReducedMotion
-    ? ANIMATION_CONFIG.reduced
-    : springTransition
-
   return (
     <motion.nav
-      initial={false}
-      animate={animationProps}
-      transition={transitionProps}
+      initial={prefersReducedMotion ? false : "enter"}
+      animate={scrolled ? "scrolled" : "default"}
+      variants={navVariants}
+      transition={prefersReducedMotion ? { duration: 0 } : springTransition}
       className="fixed left-1/2 z-50 flex -translate-x-1/2 items-center justify-between border-3 border-border bg-card py-2 shadow-xl"
     >
       <Logo size="sm" priority />
@@ -57,7 +58,6 @@ const Navbar = () => {
       <DesktopNav />
 
       <div className="flex items-center gap-2">
-        <MobileNav />
         <Button
           size="icon"
           aria-label="Contact"
@@ -67,6 +67,7 @@ const Navbar = () => {
         >
           <MailIcon />
         </Button>
+        <MobileNav />
       </div>
     </motion.nav>
   )

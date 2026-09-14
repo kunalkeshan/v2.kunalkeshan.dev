@@ -27,7 +27,7 @@ export function NavDropdownItem({
       <div className="flex flex-col items-start justify-center">
         <span className="text-sm font-semibold">{label}</span>
         {description && (
-          <span className="line-clamp-1 text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             {description}
           </span>
         )}

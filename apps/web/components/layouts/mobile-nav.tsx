@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion } from "motion/react"
 import { MenuIcon, XIcon } from "lucide-react"
 
+import { Logo } from "@workspace/ui/components/logo"
 import { Button } from "@workspace/ui/components/button"
 import {
   Sheet,
@@ -40,8 +41,12 @@ export function MobileNav() {
         >
           {open ? <XIcon /> : <MenuIcon />}
         </SheetTrigger>
-        <SheetContent side="right">
-          <SheetHeader>
+        <SheetContent
+          side="right"
+          className="data-[side=right]:w-full data-[side=right]:sm:max-w-sm"
+        >
+          <SheetHeader className="flex-row items-center gap-3">
+            <Logo size="sm" />
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
           <motion.nav
