@@ -9,7 +9,7 @@ interaction, an orange primary + blue secondary, and heavy Montserrat display ty
 Values originate from a Claude Design MCP project, "Neobrutalism Design System"
 (`https://claude.ai/design/p/93bfe40b-2353-4165-8053-ea8960c5d2e6`), pulled manually into
 this repo's token files and components as a one-time reference read — not an ongoing
-sync. `/design-sync` is a separate, opposite-direction workflow (pushes local files *to*
+sync. `/design-sync` is a separate, opposite-direction workflow (pushes local files _to_
 a Claude Design project) and does not apply here; there is no automated sync step to run
 after editing tokens or components.
 
@@ -29,24 +29,24 @@ distinct hue.
 
 ## Full token table
 
-| Tailwind key | Light | Dark |
-|---|---|---|
-| `--background` | `#FAF9F6` | `#0B0B0B` |
-| `--foreground` | `#0B0B0B` | `#F1F0EE` |
-| `--card` / `--popover` | `#FFFFFF` | `#181818` |
-| `--primary` | `#FFA500` | `#FFA500` |
-| `--primary-foreground` | `#0B0B0B` | `#0B0B0B` |
-| `--secondary` | `#1C92FF` | `#1C92FF` |
-| `--secondary-foreground` | `#FFFFFF` | `#0B0B0B` |
-| `--muted` / `--accent` | `#F1F0EE` | `#242424` |
-| `--muted-foreground` | `#6B6B6B` | `#9A9A9A` |
-| `--success` | `#00E07B` | `#00E07B` |
-| `--warning` | `#FFB800` | `#FFB800` |
-| `--destructive` | `#FF4D4D` | `#FF6B6B` |
-| `--border` / `--input` | `#0B0B0B` | `#F1F0EE` |
-| `--ring` | `#1C92FF` | `#FFA500` |
-| `--overlay` | `rgba(11,11,11,.55)` | `rgba(0,0,0,.7)` |
-| `--body-foreground` | `#393939` | `#C7C7C7` |
+| Tailwind key             | Light                | Dark             |
+| ------------------------ | -------------------- | ---------------- |
+| `--background`           | `#FAF9F6`            | `#0B0B0B`        |
+| `--foreground`           | `#0B0B0B`            | `#F1F0EE`        |
+| `--card` / `--popover`   | `#FFFFFF`            | `#181818`        |
+| `--primary`              | `#FFA500`            | `#FFA500`        |
+| `--primary-foreground`   | `#0B0B0B`            | `#0B0B0B`        |
+| `--secondary`            | `#1C92FF`            | `#1C92FF`        |
+| `--secondary-foreground` | `#FFFFFF`            | `#0B0B0B`        |
+| `--muted` / `--accent`   | `#F1F0EE`            | `#242424`        |
+| `--muted-foreground`     | `#6B6B6B`            | `#9A9A9A`        |
+| `--success`              | `#00E07B`            | `#00E07B`        |
+| `--warning`              | `#FFB800`            | `#FFB800`        |
+| `--destructive`          | `#FF4D4D`            | `#FF6B6B`        |
+| `--border` / `--input`   | `#0B0B0B`            | `#F1F0EE`        |
+| `--ring`                 | `#1C92FF`            | `#FFA500`        |
+| `--overlay`              | `rgba(11,11,11,.55)` | `rgba(0,0,0,.7)` |
+| `--body-foreground`      | `#393939`            | `#C7C7C7`        |
 
 All status colors (`success`/`warning`/`destructive`) and `primary` pair with a
 near-black foreground — never light text on orange/yellow. `chart-*`/`sidebar-*` tokens
@@ -80,15 +80,15 @@ numeric scale, no custom key needed). Never use a 1px border anywhere in this la
 Solid, single-color, offset shadows only — no blur, no spread, color always equals
 `--border` (so shadows invert automatically in dark mode).
 
-| Class | Value | Usage |
-|---|---|---|
-| `shadow-sm` | `2px 2px 0 0 var(--border)` | badges, tooltips |
-| `shadow` | `4px 4px 0 0 var(--border)` | buttons/inputs at rest |
-| `shadow-lg` | `6px 6px 0 0 var(--border)` | open accordions, cards |
-| `shadow-xl` | `8px 8px 0 0 var(--border)` | sheets, dialogs, floating nav chrome |
-| `shadow-2xl` | `10px 10px 0 0 var(--border)` | the hover-grow step past `shadow-xl` — see below |
-| `shadow-[var(--shadow-reverse)]` | `-4px 4px 0 0 var(--border)` | rare, directional emphasis only |
-| `shadow-[var(--shadow-reverse-sm)]` | `-2px 2px 0 0 var(--border)` | reverse-direction hover on small circular avatars |
+| Class                               | Value                         | Usage                                             |
+| ----------------------------------- | ----------------------------- | ------------------------------------------------- |
+| `shadow-sm`                         | `2px 2px 0 0 var(--border)`   | badges, tooltips                                  |
+| `shadow`                            | `4px 4px 0 0 var(--border)`   | buttons/inputs at rest                            |
+| `shadow-lg`                         | `6px 6px 0 0 var(--border)`   | open accordions, cards                            |
+| `shadow-xl`                         | `8px 8px 0 0 var(--border)`   | sheets, dialogs, floating nav chrome              |
+| `shadow-2xl`                        | `10px 10px 0 0 var(--border)` | the hover-grow step past `shadow-xl` — see below  |
+| `shadow-[var(--shadow-reverse)]`    | `-4px 4px 0 0 var(--border)`  | rare, directional emphasis only                   |
+| `shadow-[var(--shadow-reverse-sm)]` | `-2px 2px 0 0 var(--border)`  | reverse-direction hover on small circular avatars |
 
 The raw CSS var backing `shadow` is `--shadow-base`, not a bare `--shadow` — Tailwind v4
 reserves `--shadow-*` as its own box-shadow theme namespace, so a bare `--shadow` raw var
@@ -106,14 +106,6 @@ chrome, only bordered `<Image>` wrappers; keep that boundary when porting more
 components. The `shadow-reverse-sm` variant is the same idea but for small circular
 avatar thumbnails, paired with a resting `shadow-[var(--shadow-reverse-sm)]` (not
 `shadow-sm`) and `hover:shadow-[var(--shadow-reverse)]`.
-
-**`marquee`**: an infinite horizontal-scroll keyframe (`@keyframes marquee` +
-`--animate-marquee: marquee 25s linear infinite` in `globals.css`), ported from v1's
-tech-stack/skills-logo scrolling strip. Apply `animate-marquee` (needs `whitespace-nowrap`
-on the scrolling child and `overflow-hidden` on its container) to a horizontal strip of
-repeated content — v1 used it for a rotated dark banner between page sections showing
-either tech logos or a keyword list. Not yet used by any component in this repo; add it
-when a Skills/tech-stack section is actually built rather than before.
 
 ## `pressableShadow` — the "press into shadow" interaction
 
@@ -234,7 +226,7 @@ only as a hover accent:
 Some Base UI–derived primitives in this package (ported from a reference shadcn
 registry block) render their own default chrome — background, border-radius, a subtle
 `ring-1 ring-foreground/10`, a small box-shadow — meant for consumers who use the
-primitive *without* a custom wrapper. `NavigationMenuPositioner`'s inner `Popup` element
+primitive _without_ a custom wrapper. `NavigationMenuPositioner`'s inner `Popup` element
 (`navigation-menu.tsx`) is the current example: it originally always rendered
 `rounded-lg bg-popover shadow ring-1 ring-foreground/10`, and when a consumer (like
 `desktop-nav.tsx`) also renders its own bordered `<div>` inside `NavigationMenuContent`,
@@ -246,7 +238,7 @@ current consumer supplies its own styled wrapper: strip the primitive's own
 background/border/shadow classes down to layout-only (position, size, transform,
 transition) and let the wrapping `<div>` be the sole visible surface. Only reach for a
 per-usage `className` override (e.g. `rounded-none! bg-transparent! shadow-none!`) if
-some *other* consumer still relies on the primitive's default look — in that case the
+some _other_ consumer still relies on the primitive's default look — in that case the
 override belongs on the specific usage that wants to opt out, not on the primitive.
 When something looks like a stray outline or double border and a straightforward
 `className` change doesn't remove it, use `getComputedStyle()` on the actual DOM
@@ -261,7 +253,7 @@ Button variant, and any future component that opts into the same utility). Curre
 values: `--ease-snap: cubic-bezier(0.4, 0, 0.2, 1)` (the widely-used "standard" Material
 ease — fast start, gentle settle) at `--dur-press: 180ms`. These were tuned once during
 the navbar port after the original `cubic-bezier(0.2, 0.8, 0.2, 1)` at `120ms` read as
-too abrupt/janky when a hover simultaneously changes transform, shadow, *and* color —
+too abrupt/janky when a hover simultaneously changes transform, shadow, _and_ color —
 `pressableShadow` transitions all three (`transform,box-shadow,background-color,color`)
 off this one pair of tokens, so changing either value here retunes every button's hover
 feel at once. Don't introduce a second timing pair for "just this one button" — if
@@ -285,7 +277,7 @@ module** — every section hand-rolled an identical inline snippet:
 reused verbatim (copy-pasted, not imported) across ~15+ sections/pages, with one
 staggered variant (`delay: 0.4`) used only for the navbar's own entrance. There was no
 page-transition system at all (`pages/_app.tsx` rendered `<Component {...pageProps} />`
-directly, no `AnimatePresence`, no route keying) — each page's *content* animating in on
+directly, no `AnimatePresence`, no route keying) — each page's _content_ animating in on
 mount was the only thing that ever read as a "transition." No custom easing curves or
 duration constants existed outside framer-motion's own spring defaults.
 
@@ -298,7 +290,7 @@ duration constants existed outside framer-motion's own spring defaults.
   proven baseline) but centralizes them in `apps/web/lib/motion.ts`
   (`sectionReveal` variants + `sectionRevealTransition` + `sectionRevealViewport`) —
   `initial="hidden" whileInView="visible" variants={sectionReveal}
-  transition={sectionRevealTransition} viewport={sectionRevealViewport}`. Import from
+transition={sectionRevealTransition} viewport={sectionRevealViewport}`. Import from
   there instead of inlining the object literals per component. If a second app ever
   needs the same section-reveal pattern, promote this file to
   `packages/ui/src/lib/motion.ts` (same "genuinely shared vs. app-local" test used for
