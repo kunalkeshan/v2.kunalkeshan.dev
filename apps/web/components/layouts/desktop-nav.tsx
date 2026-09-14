@@ -28,7 +28,7 @@ export function DesktopNav() {
           <NavigationMenuTrigger className="bg-transparent font-semibold hover:text-secondary">
             Work
           </NavigationMenuTrigger>
-          <NavigationMenuContent>
+          <NavigationMenuContent className="pr-1.5 pb-1.5">
             <div className="grid w-72 gap-2 rounded-(--radius-lg) border-3 border-border bg-card p-2 shadow-lg">
               {workLinks.map((item) => (
                 <NavigationMenuLink
@@ -43,7 +43,7 @@ export function DesktopNav() {
           <NavigationMenuTrigger className="bg-transparent font-semibold hover:text-secondary">
             More
           </NavigationMenuTrigger>
-          <NavigationMenuContent>
+          <NavigationMenuContent className="pr-1.5 pb-1.5">
             <div className="grid w-72 gap-2 rounded-(--radius-lg) border-3 border-border bg-card p-2 shadow-lg">
               {moreLinks.map((item) => (
                 <NavigationMenuLink
