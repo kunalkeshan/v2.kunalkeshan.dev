@@ -13,7 +13,7 @@ export interface LogoProps {
   size?: keyof typeof sizeClasses
   href?: string
   className?: string
-  priority?: boolean
+  preload?: boolean
   /** Path to the logo image, resolved from the consuming app's /public. */
   src?: string
 }
@@ -22,7 +22,7 @@ export function Logo({
   size = "md",
   href = "/",
   className,
-  priority = false,
+  preload = false,
   src = "/logo.jpg",
 }: LogoProps) {
   return (
@@ -31,7 +31,7 @@ export function Logo({
       aria-label="Home"
       className={cn(
         "block shrink-0 overflow-hidden rounded-full border-2 border-border bg-card",
-        "transition-transform duration-(--duration-press) ease-(--ease-snap) hover:scale-95",
+        "transition-transform duration-(--duration-press) ease-snap hover:scale-95",
         sizeClasses[size],
         className
       )}
@@ -41,7 +41,7 @@ export function Logo({
         alt=""
         width={112}
         height={112}
-        priority={priority}
+        preload={preload}
         className="size-full object-cover"
       />
     </Link>

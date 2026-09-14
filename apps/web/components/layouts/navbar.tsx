@@ -53,7 +53,7 @@ const Navbar = () => {
       transition={prefersReducedMotion ? { duration: 0 } : springTransition}
       className="fixed left-1/2 z-50 flex -translate-x-1/2 items-center justify-between border-3 border-border bg-card py-2 shadow-xl"
     >
-      <Logo size="sm" priority />
+      <Logo size="sm" preload />
 
       <DesktopNav />
 

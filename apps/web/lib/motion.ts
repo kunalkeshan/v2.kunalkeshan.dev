@@ -25,3 +25,15 @@ export const springTransition: Transition = {
   damping: 20,
   mass: 0.6,
 }
+
+/**
+ * Mount-entrance counterpart to sectionReveal (which is for whileInView
+ * scroll-discovered content). Hero-style above-the-fold sections are
+ * already in view at load, so they animate in on mount instead.
+ */
+export const heroReveal: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+}
+
+export const heroRevealTransition: Transition = springTransition
