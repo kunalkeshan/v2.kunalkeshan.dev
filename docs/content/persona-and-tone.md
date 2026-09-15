@@ -42,6 +42,29 @@ it**, referencing what's about to be written, rather than silently applying
 a reframe. Never assume the professional/freelancer framing on your own
 judgment alone; confirm it first.
 
+## Confirmed framing decisions (asked and answered)
+
+Recorded so the same questions don't get re-litigated on every new section.
+These were confirmed by Kunal directly; treat them as settled defaults, but
+still ask before extending them to a *new* kind of copy.
+
+- **Home page About section** (`apps/web/components/sections/about.tsx`,
+  seeded into `siteConfig`'s About group): framed as a working software
+  engineer **who also takes on freelance/consulting work** — with **no
+  employer name, no "Codelance Devs", and no job title beyond "software
+  engineer."** Public sources conflict on the current employer and LinkedIn is
+  login-walled, so naming one would mean asserting something unverified. His
+  GitHub profile README is the canonical current self-description and
+  deliberately names no employer either.
+- **Two different "since" years, never conflated**: building for the web since
+  **2021**; working professionally as an engineer since **2025**. Any
+  experience count must be derived from 2021 and worded as *building*, never
+  as years of employment. The home page keeps `BUILDING_SINCE` as a constant
+  in `apps/web/app/(static)/page.tsx` and substitutes it into the CMS string's
+  `{years}` placeholder server-side.
+- **Dropped**: v1's "Biology student turned tech freak" bullet. It may return
+  on a future detailed `/about` page, but not in home page copy.
+
 ## What is explicitly OUT of scope for this rule
 
 This doc governs factual/life-stage framing (student vs. working

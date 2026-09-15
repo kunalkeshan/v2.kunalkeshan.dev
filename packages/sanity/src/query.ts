@@ -23,6 +23,17 @@ export const SITE_CONFIG_QUERY = defineQuery(`
       asset->,
       alt
     },
+    aboutHeadingLead,
+    aboutHeadingHighlight,
+    aboutBody,
+    aboutHighlights[] {
+      title,
+      description
+    },
+    aboutImage {
+      asset->,
+      alt
+    },
     phoneNumbers[] {
       number,
       label

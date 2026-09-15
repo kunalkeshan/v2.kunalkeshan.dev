@@ -15,6 +15,10 @@ export const siteConfigType = defineType({
       title: "Hero Section",
     },
     {
+      name: "about",
+      title: "About Section",
+    },
+    {
       name: "contact",
       title: "Contact Information",
     },
@@ -132,6 +136,86 @@ export const siteConfigType = defineType({
         },
       ],
       description: "The illustration shown alongside the Hero headline.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutHeadingLead",
+      title: "About Heading (lead)",
+      type: "string",
+      group: "about",
+      description:
+        "The un-highlighted first half of the About heading, e.g. 'Wait a minute,'.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutHeadingHighlight",
+      title: "About Heading (highlighted)",
+      type: "string",
+      group: "about",
+      description:
+        "The highlighted second half of the About heading, e.g. 'who am I?'. Rendered with the animated highlighter sweep.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutBody",
+      title: "About Body",
+      type: "text",
+      group: "about",
+      rows: 4,
+      description: "The main paragraph shown in the About section.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutHighlights",
+      title: "About Highlights",
+      type: "array",
+      group: "about",
+      description:
+        "The bulleted points below the About paragraph. Swatch colors alternate automatically.",
+      of: [
+        {
+          type: "object",
+          fields: [
+            {
+              name: "title",
+              title: "Title",
+              type: "string",
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: "description",
+              title: "Description",
+              type: "text",
+              rows: 3,
+              validation: (Rule) => Rule.required(),
+            },
+          ],
+          preview: {
+            select: {
+              title: "title",
+              subtitle: "description",
+            },
+          },
+        },
+      ],
+    },
+    {
+      name: "aboutImage",
+      title: "About Image",
+      type: "image",
+      group: "about",
+      options: { hotspot: true },
+      fields: [
+        {
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description: "Short description for accessibility and SEO",
+          validation: (Rule) => Rule.required(),
+        },
+      ],
+      description:
+        "The portrait shown alongside the About copy. Rendered as a circle, so a square-ish image with the subject centered works best.",
       validation: (Rule) => Rule.required(),
     },
     {
