@@ -319,6 +319,48 @@ transition={sectionRevealTransition} viewport={sectionRevealViewport}`. Import f
   until a real cross-route transition is actually requested; don't add
   `AnimatePresence`-around-`{children}` speculatively.
 
+## Highlight text sweep (mandatory for section-heading highlights)
+
+Every section heading that highlights a phrase (an inline colored-background span
+inside an `<h1>`/`<h2>`) **must** use `apps/web/components/highlight-text.tsx`'s
+`HighlightText` component — never a bare `<span className="bg-primary px-1 ...">`.
+This was established during the Services/Skills build (the first two sections to ship
+highlighted headings) and is a going-forward requirement for any future section with a
+highlighted title, not just those two.
+
+The reasoning: a solid highlight span that just fades in with the rest of the heading
+(via `sectionReveal`'s opacity/y transition) reads as inert — it's colored text, not a
+highlight. The intended effect is a real highlighter stroke: the color sweeps in
+left-to-right across the phrase, once, the first time the heading scrolls into view.
+
+```tsx
+<h2 className="mb-6 font-heading text-2xl font-black sm:text-3xl">
+  Modern problems, require{" "}
+  <HighlightText variant="primary">modern services</HighlightText>
+</h2>
+```
+
+- `variant="primary"` (orange) or `variant="secondary"` (blue) — pick whichever one
+  the *other* nearby highlighted heading on the same page/flow isn't using. v1 alternated
+  `bg-portfolio-main`/`bg-portfolio-accent` across sections (confirmed via
+  `kunalkeshan.dev`'s `tailwind.config.js`: `main: "#ffa500"`, `accent: "#1C92FF"` —
+  the same hex pairs as this repo's `--primary`/`--secondary`) rather than making every
+  highlight the same color; keep that alternation rather than defaulting every new
+  section to `primary`.
+- **Mechanism**: an absolutely-positioned `motion.span` (the color fill) sits behind a
+  relatively-positioned text span, animating `scaleX: 0 → 1` with `style={{ originX: 0 }}`
+  so it grows from the left edge — not a `width`/`clip-path` animation, which would be
+  more expensive to composite for the same visual result. Triggered by
+  `whileInView`/`viewport={sectionRevealViewport}` (once-only, same as every other
+  scroll-reveal in this repo) and `transition={sectionRevealTransition}` — the same
+  spring feel as the heading's own `sectionReveal`, so the sweep reads as part of the
+  same reveal moment rather than a second, disconnected animation competing for
+  attention.
+- Lives in `apps/web/components/*` (not `packages/ui`) because `packages/ui` currently
+  has zero motion-package usage or dependency — see the "genuinely shared vs. app-local"
+  promotion test referenced above for `apps/web/lib/motion.ts`. Promote it the same way
+  if a second app needs the identical treatment.
+
 ## Related
 
 - [`font-stack.md`](./font-stack.md) — font loading convention and the `font-heading` →

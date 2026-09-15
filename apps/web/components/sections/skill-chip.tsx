@@ -26,13 +26,15 @@ export function SkillChip({ skill }: SkillChipProps) {
       )}
     >
       {iconUrl && (
-        <Image
-          src={iconUrl}
-          alt={skill.icon?.alt ?? ""}
-          width={20}
-          height={20}
-          className="size-5 shrink-0 object-contain"
-        />
+        <span className="flex size-5 shrink-0 items-center justify-center rounded-sm bg-white p-0.5">
+          <Image
+            src={iconUrl}
+            alt={skill.icon?.alt ?? ""}
+            width={20}
+            height={20}
+            className="size-full object-contain"
+          />
+        </span>
       )}
       {skill.name}
     </Badge>

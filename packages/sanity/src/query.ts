@@ -87,7 +87,7 @@ export const LEGAL_DOCUMENT_BY_SLUG_QUERY = defineQuery(`
 `);
 
 export const FEATURED_SKILLS_QUERY = defineQuery(`
-  *[_type == "skill" && featured == true] | order(order asc, name asc) {
+  *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {
     _id,
     name,
     icon {
@@ -99,7 +99,7 @@ export const FEATURED_SKILLS_QUERY = defineQuery(`
 `);
 
 export const SKILLS_QUERY = defineQuery(`
-  *[_type == "skill"] | order(category asc, order asc, name asc) {
+  *[_type == "skill"] | order(category asc, orderRank asc, name asc) {
     _id,
     name,
     icon {
@@ -107,5 +107,17 @@ export const SKILLS_QUERY = defineQuery(`
       alt
     },
     category
+  }
+`);
+
+export const SERVICES_QUERY = defineQuery(`
+  *[_type == "service"] | order(orderRank asc) {
+    _id,
+    name,
+    description,
+    illustration {
+      asset->,
+      alt
+    }
   }
 `);

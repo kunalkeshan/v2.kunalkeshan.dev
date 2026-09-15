@@ -41,6 +41,63 @@ Sanity's typegen (as of `sanity@6.x`) names generated result types with a `_RESU
 
 As of `@sanity/client@8.x`, the generated file's `SanityQueries` type-map registration switched from `declare module "@sanity/client"` to a `declare global` block (with a back-compat `declare module` shim for older `@sanity/client` versions). This is purely a typegen implementation detail — no `apps/web` consumer references `SanityQueries` directly — but if a future typegen run produces an unexpected diff limited to this block, it's expected and not a sign of a schema/query change.
 
+## 1a. Drag-and-drop ordering (`@sanity/orderable-document-list`)
+
+`skill` and `service` documents are ordered by dragging them in the Studio's desk
+structure, not by a manual numeric field. This is wired via
+`@sanity/orderable-document-list` (`apps/studio/package.json`):
+
+- **Schema side**: each orderable document type's schema (`skillType.ts`,
+  `serviceType.ts`) imports `orderRankField`/`orderRankOrdering` from the package,
+  adds `orderings: [orderRankOrdering]` to the `defineType(...)` call, and includes
+  `orderRankField({ type: "<the type name>" })` as one of its `fields` entries —
+  this replaces what would otherwise be a hand-rolled numeric `order` field. The
+  field itself (`orderRank`, a string) is managed entirely by the plugin; never add a
+  separate manual order field alongside it.
+- **Structure side**: `apps/studio/structure.ts` uses
+  `orderableDocumentListDeskItem({ type: "<type>", title: "<Label>", S, context })`
+  in place of a plain `S.documentTypeListItem(...)` line for that type — this is what
+  actually renders the draggable list pane. The structure resolver's signature
+  changed from `(S) => ...` to `(S, context) => ...` to supply `context` here.
+- **Query side**: sort with `order(orderRank asc)` (optionally with tiebreakers after
+  it, e.g. `order(category asc, orderRank asc, name asc)` for `SKILLS_QUERY`) — same
+  as any other GROQ sort, `orderRank`'s lexicographic string ordering just happens to
+  produce a stable drag-order.
+- **New documents created outside Studio** (e.g. via the Sanity MCP `create_documents`
+  tool, not dragged into place by a human): you must set `orderRank` explicitly on
+  creation, since nothing else assigns it. Generate valid sequential values with the
+  real `LexoRank` algorithm — see the vendored shim referenced below rather than
+  hand-typing plausible-looking strings (the format isn't a simple sortable string;
+  it's base-36 lexorank notation, e.g. `"0|100000:"`, `"0|100008:"`, ...).
+
+### The `lexorank` CJS/ESM workaround — read before touching this plugin
+
+`@sanity/orderable-document-list`'s dependency `lexorank@1.0.5` is CommonJS-only and
+unmaintained (last published 2022). Sanity Studio v6's `sanity schema extract` (and
+therefore `sanity deploy`, and this repo's own `pnpm --filter studio extract`) loads
+the whole config graph — including any plugin import in `structure.ts`/schema files —
+in a Vite worker with `ssr.noExternal: true`, which cannot bundle a CJS-only
+dependency and fails with `SchemaExtractionError: exports is not defined`. This is a
+confirmed upstream bug, not a misconfiguration in this repo:
+https://github.com/sanity-io/plugins/issues/2011.
+
+The fix lives in two places:
+
+- `apps/studio/vendor/lexorank.esm.js` — an esbuild re-bundle of the **same published
+  `lexorank@1.0.5` package** (the real algorithm, not a reimplementation) as proper
+  ESM with named exports. `apps/studio/vendor/README.md` has the exact regeneration
+  steps if `@sanity/orderable-document-list` ever bumps its `lexorank` version.
+- `apps/studio/sanity.cli.ts`'s `vite` config hook aliases the bare `lexorank` import
+  to that vendored file, so every consumer (extraction, dev, build) resolves to the
+  ESM version instead of the broken CJS original.
+
+**If a future `pnpm --filter studio extract` starts failing with the same
+`SchemaExtractionError: exports is not defined` error**, check first whether a
+`pnpm` upgrade of `@sanity/orderable-document-list` removed the CJS `lexorank`
+dependency (check `apps/studio/vendor/README.md`'s "Removing this workaround"
+section) before assuming the vendored alias broke — if the upstream issue is fixed,
+delete the vendor file, the `vite` hook, and this section.
+
 ## 2. Deploying the Studio
 
 The Studio deploys to Sanity's own hosting, independent of `apps/web`/Vercel.

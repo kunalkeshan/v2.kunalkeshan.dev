@@ -10,6 +10,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import { urlFor } from "@workspace/sanity/image"
 import type { FEATURED_SKILLS_QUERY_RESULT } from "@workspace/sanity/types"
 
+import { HighlightText } from "@/components/highlight-text"
 import {
   sectionReveal,
   sectionRevealTransition,
@@ -36,13 +37,15 @@ function SkillCell({ skill }: { skill: Skill }) {
       )}
     >
       {iconUrl && (
-        <Image
-          src={iconUrl}
-          alt={skill.icon?.alt ?? ""}
-          width={20}
-          height={20}
-          className="size-5 shrink-0 object-contain"
-        />
+        <span className="flex size-5 shrink-0 items-center justify-center rounded-sm bg-white p-0.5">
+          <Image
+            src={iconUrl}
+            alt={skill.icon?.alt ?? ""}
+            width={20}
+            height={20}
+            className="size-full object-contain"
+          />
+        </span>
       )}
       <span className="whitespace-nowrap font-heading text-xs font-bold sm:text-sm">
         {skill.name}
@@ -65,7 +68,11 @@ const Skills = ({ skills }: SkillsProps) => {
     >
       <Container>
         <h2 className="mb-6 font-heading text-2xl font-black sm:text-3xl">
-          Tools &amp; technologies I work with
+          A good workman never blames his tools
+          {"—"}
+          <HighlightText variant="secondary">
+            but a great one collects them
+          </HighlightText>
         </h2>
 
         <div className="flex flex-wrap gap-2">

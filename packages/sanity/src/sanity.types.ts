@@ -22,6 +22,41 @@ export type SanityImageAssetReference = {
   [internalGroqTypeReferenceTo]?: "sanity.imageAsset"
 }
 
+export type Service = {
+  _id: string
+  _type: "service"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name?: string
+  description?: string
+  illustration?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  orderRank?: string
+}
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop"
+  top?: number
+  bottom?: number
+  left?: number
+  right?: number
+}
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot"
+  x?: number
+  y?: number
+  height?: number
+  width?: number
+}
+
 export type Skill = {
   _id: string
   _type: "skill"
@@ -53,23 +88,7 @@ export type Skill = {
     | "collaboration"
     | "other"
   featured?: boolean
-  order?: number
-}
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop"
-  top?: number
-  bottom?: number
-  left?: number
-  right?: number
-}
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot"
-  x?: number
-  y?: number
-  height?: number
-  width?: number
+  orderRank?: string
 }
 
 export type Faqs = {
@@ -313,9 +332,10 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | SanityImageAssetReference
-  | Skill
+  | Service
   | SanityImageCrop
   | SanityImageHotspot
+  | Skill
   | Faqs
   | Legal
   | BlockContent
@@ -524,7 +544,7 @@ export type LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT = {
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: FEATURED_SKILLS_QUERY
-// Query: *[_type == "skill" && featured == true] | order(order asc, name asc) {    _id,    name,    icon {      asset->,      alt    },    category  }
+// Query: *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {    _id,    name,    icon {      asset->,      alt    },    category  }
 export type FEATURED_SKILLS_QUERY_RESULT = Array<{
   _id: string
   name: string | null
@@ -573,7 +593,7 @@ export type FEATURED_SKILLS_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: SKILLS_QUERY
-// Query: *[_type == "skill"] | order(category asc, order asc, name asc) {    _id,    name,    icon {      asset->,      alt    },    category  }
+// Query: *[_type == "skill"] | order(category asc, orderRank asc, name asc) {    _id,    name,    icon {      asset->,      alt    },    category  }
 export type SKILLS_QUERY_RESULT = Array<{
   _id: string
   name: string | null
@@ -620,6 +640,40 @@ export type SKILLS_QUERY_RESULT = Array<{
     | null
 }>
 
+// Source: ../../packages/sanity/src/query.ts
+// Variable: SERVICES_QUERY
+// Query: *[_type == "service"] | order(orderRank asc) {    _id,    name,    description,    illustration {      asset->,      alt    }  }
+export type SERVICES_QUERY_RESULT = Array<{
+  _id: string
+  name: string | null
+  description: string | null
+  illustration: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+  } | null
+}>
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
@@ -628,8 +682,9 @@ declare global {
     '\n  *[_type == "faqs"][0] {\n    ...,\n    faqItems[]{ ... }\n  }\n': FAQS_QUERY_RESULT
     '\n  *[_type == "legal"] | order(_updatedAt desc) {\n    _id,\n    title,\n    slug,\n    description,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENTS_QUERY_RESULT
     '\n  *[_type == "legal" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    description,\n    content,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT
-    '\n  *[_type == "skill" && featured == true] | order(order asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      alt\n    },\n    category\n  }\n': FEATURED_SKILLS_QUERY_RESULT
-    '\n  *[_type == "skill"] | order(category asc, order asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      alt\n    },\n    category\n  }\n': SKILLS_QUERY_RESULT
+    '\n  *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      alt\n    },\n    category\n  }\n': FEATURED_SKILLS_QUERY_RESULT
+    '\n  *[_type == "skill"] | order(category asc, orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      alt\n    },\n    category\n  }\n': SKILLS_QUERY_RESULT
+    '\n  *[_type == "service"] | order(orderRank asc) {\n    _id,\n    name,\n    description,\n    illustration {\n      asset->,\n      alt\n    }\n  }\n': SERVICES_QUERY_RESULT
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

@@ -1,4 +1,5 @@
 import { defineType } from "sanity";
+import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
 
 export const SKILL_CATEGORIES = [
   { title: "Languages", value: "languages" },
@@ -21,6 +22,7 @@ export const skillType = defineType({
   name: "skill",
   title: "Skill",
   type: "document",
+  orderings: [orderRankOrdering],
   fields: [
     {
       name: "name",
@@ -62,13 +64,7 @@ export const skillType = defineType({
         "Featured skills appear in the curated home page skills strip. Everything appears on the full /skills page regardless of this flag.",
       initialValue: false,
     },
-    {
-      name: "order",
-      title: "Order",
-      type: "number",
-      description:
-        "Lower numbers sort first, both within a category and among featured skills.",
-    },
+    orderRankField({ type: "skill" }),
   ],
   preview: {
     select: {
