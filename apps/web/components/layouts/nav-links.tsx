@@ -31,9 +31,9 @@ export const workLinks: LinkItemType[] = [
     icon: <FolderKanbanIcon />,
   },
   {
-    label: "Resume",
-    href: "/resume",
-    description: "My experience and background, in document form",
+    label: "Experience",
+    href: "/experience",
+    description: "Every role so far, and what I built in each one",
     icon: <FileTextIcon />,
   },
   {

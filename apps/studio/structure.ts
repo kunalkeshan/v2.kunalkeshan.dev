@@ -25,12 +25,37 @@ export const structure: StructureResolver = (S, context) =>
         S,
         context,
       }),
+      orderableDocumentListDeskItem({
+        type: "experience",
+        title: "Experience",
+        S,
+        context,
+      }),
+      orderableDocumentListDeskItem({
+        type: "organization",
+        title: "Organizations",
+        S,
+        context,
+      }),
+      orderableDocumentListDeskItem({
+        type: "publication",
+        title: "Publications",
+        S,
+        context,
+      }),
       S.divider(),
       ...S.documentTypeListItems().filter(
         (item) =>
           item.getId() &&
-          !["siteConfig", "legal", "faqs", "skill", "service"].includes(
-            item.getId()!
-          )
+          ![
+            "siteConfig",
+            "legal",
+            "faqs",
+            "skill",
+            "service",
+            "experience",
+            "organization",
+            "publication",
+          ].includes(item.getId()!)
       ),
     ]);

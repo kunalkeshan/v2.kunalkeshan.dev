@@ -69,6 +69,23 @@ export async function POST(req: NextRequest) {
         tags.push(createCollectionTag("service"));
         break;
 
+      case "experience":
+        // Revalidate the timeline (home page section + /experience page)
+        tags.push(createCollectionTag("experience"));
+        break;
+
+      case "organization":
+        // Organizations are only ever read through an experience reference,
+        // so a logo or name edit has to bust the experience collection too.
+        tags.push(createCollectionTag("organization"));
+        tags.push(createCollectionTag("experience"));
+        break;
+
+      case "publication":
+        // Revalidate the publication callout on /experience
+        tags.push(createCollectionTag("publication"));
+        break;
+
       default:
         // Unknown type, log it but don't fail
         console.warn(`Unknown document type: ${body._type}`);

@@ -245,6 +245,65 @@ When something looks like a stray outline or double border and a straightforward
 ancestor chain (dropdown/portal content in particular often renders outside the
 triggering element's own subtree) rather than guessing at which class is responsible.
 
+## Inverted surfaces
+
+Every shadow in this system is a solid offset in `var(--border)`, and `--border`
+is near-black in light mode. That means a section painted dark with a plain
+utility (`bg-foreground`, `bg-black`, an image overlay) silently breaks every
+control inside it: buttons keep their `shadow-[var(--shadow-base)]` but it
+renders black-on-black and disappears, taking the press-into-shadow interaction
+with it. Hairlines and focus rings fail the same way.
+
+Every shadow resolves `var(--shadow-color)`, which defaults to `--border`. That
+indirection is the whole mechanism: a surface can re-aim the cast shadow without
+touching borders, hairlines or focus rings.
+
+Use the `.on-inverted` component class instead of painting the background by
+hand. It sets `--shadow-color` to the light foreground and flips the text tokens
+(`--background`, `--foreground`, `--body-foreground`, `--muted-foreground`) for
+its subtree. It deliberately leaves `--border` alone — a button on the panel
+keeps its normal border and simply casts a light shadow, rather than turning
+into an outlined variant of itself.
+
+```tsx
+<section className="on-inverted py-14 md:py-20">
+  <Container>{/* buttons and text here get inverted tokens */}</Container>
+</section>
+```
+
+In dark mode the page ground is already near-black, so a literal black panel
+would vanish. `.on-inverted` handles this: under `.dark` the surface lifts to
+the card color (`#181818`) and reads as a raised panel, while the tokens stay
+as they already are.
+
+**Nested pale cards**: a light card sitting on an inverted panel needs the page
+text tokens back, or its copy inherits the panel's near-white foreground and
+disappears against its own pale ground. Add `.on-surface` to that card — it
+restores the text tokens *and* puts `--shadow-color` back to the dark border
+color, because a light card has to cast a dark shadow onto the panel behind it.
+Inheriting the panel's light cast would paint a white shadow against a white
+card and lose the depth entirely:
+
+```tsx
+<section className="on-inverted">
+  <article className="on-surface border-3 border-border bg-card shadow-[var(--shadow-lg)]">
+    …
+  </article>
+</section>
+```
+
+**When to use it.** `.on-inverted` is for a deliberate full-width section break
+that gives one section its own weight — the home page Experience section is the
+reference implementation, carried over from v1's black experience panel. It is
+not for individual cards, and it should stay rare: a page that flips ground
+repeatedly reads as several sites stitched together. One inverted section per
+page is the working limit.
+
+Reach for `variant="secondary"` on buttons inside an inverted panel — the blue
+holds its contrast against both the dark light-mode ground and the lifted
+dark-mode one, where the default orange `--primary` competes with the
+highlight sweep.
+
 ## Interaction timing: `--ease-snap` / `--dur-press`
 
 Both live in `packages/ui/src/styles/globals.css` (`:root`, theme-independent — not

@@ -5,17 +5,20 @@ import {
   SITE_CONFIG_QUERY,
   FEATURED_SKILLS_QUERY,
   SERVICES_QUERY,
+  FEATURED_EXPERIENCES_QUERY,
 } from "@workspace/sanity/query"
 import type {
   SITE_CONFIG_QUERY_RESULT,
   FEATURED_SKILLS_QUERY_RESULT,
   SERVICES_QUERY_RESULT,
+  FEATURED_EXPERIENCES_QUERY_RESULT,
 } from "@workspace/sanity/types"
 
 import Hero from "@/components/sections/hero"
 import Skills from "@/components/sections/skills"
 import Services from "@/components/sections/services"
 import About from "@/components/sections/about"
+import Experience from "@/components/sections/experience"
 
 /**
  * Kunal has been building for the web since 2021, and working as a software
@@ -27,7 +30,7 @@ import About from "@/components/sections/about"
 const BUILDING_SINCE = 2021
 
 export default async function Home() {
-  const [siteConfig, skills, services] = await Promise.all([
+  const [siteConfig, skills, services, experiences] = await Promise.all([
     sanityFetch<SITE_CONFIG_QUERY_RESULT>({
       query: SITE_CONFIG_QUERY,
       tags: [createCollectionTag("siteConfig")],
@@ -39,6 +42,10 @@ export default async function Home() {
     sanityFetch<SERVICES_QUERY_RESULT>({
       query: SERVICES_QUERY,
       tags: [createCollectionTag("service")],
+    }),
+    sanityFetch<FEATURED_EXPERIENCES_QUERY_RESULT>({
+      query: FEATURED_EXPERIENCES_QUERY,
+      tags: [createCollectionTag("experience")],
     }),
   ])
 
@@ -90,6 +97,7 @@ export default async function Home() {
           "Illustration of Kunal Keshan working at a desk with dual monitors"
         }
       />
+      <Experience experiences={experiences} yearsBuilding={yearsBuilding} />
     </main>
   )
 }

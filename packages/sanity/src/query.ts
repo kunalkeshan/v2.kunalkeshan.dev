@@ -53,6 +53,9 @@ export const SITE_CONFIG_QUERY = defineQuery(`
       platform,
       url,
       label
+    },
+    resumePdf {
+      asset->
     }
   }
 `);
@@ -130,5 +133,112 @@ export const SERVICES_QUERY = defineQuery(`
       asset->,
       alt
     }
+  }
+`);
+
+/**
+ * The condensed home page section: work roles only, flagged in the Studio.
+ * Deliberately projects `summary` and not `highlights` — the home section
+ * shows one line per role, and the bullets belong to the full page.
+ */
+export const FEATURED_EXPERIENCES_QUERY = defineQuery(`
+  *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {
+    _id,
+    role,
+    organization-> {
+      _id,
+      name,
+      website,
+      logo {
+        asset->,
+        alt
+      }
+    },
+    employmentType,
+    startDate,
+    endDate,
+    isCurrent,
+    summary
+  }
+`);
+
+/**
+ * The full timeline on /resume — work and community roles in Studio order.
+ * Education is excluded here and fetched separately so it renders as its own
+ * block rather than being interleaved into the work history.
+ */
+export const EXPERIENCES_QUERY = defineQuery(`
+  *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {
+    _id,
+    role,
+    kind,
+    organization-> {
+      _id,
+      name,
+      website,
+      description,
+      logo {
+        asset->,
+        alt
+      }
+    },
+    employmentType,
+    workMode,
+    location,
+    startDate,
+    endDate,
+    isCurrent,
+    summary,
+    highlights,
+    skills[]-> {
+      _id,
+      name
+    },
+    links[] {
+      label,
+      url,
+      type
+    }
+  }
+`);
+
+export const EDUCATION_QUERY = defineQuery(`
+  *[_type == "experience" && kind == "education"] | order(orderRank asc) {
+    _id,
+    role,
+    organization-> {
+      _id,
+      name,
+      website,
+      logo {
+        asset->,
+        alt
+      }
+    },
+    location,
+    startDate,
+    endDate,
+    isCurrent,
+    summary,
+    highlights,
+    credential,
+    links[] {
+      label,
+      url,
+      type
+    }
+  }
+`);
+
+export const PUBLICATIONS_QUERY = defineQuery(`
+  *[_type == "publication"] | order(orderRank asc) {
+    _id,
+    title,
+    venue,
+    publishedAt,
+    authors,
+    doi,
+    url,
+    abstract
   }
 `);

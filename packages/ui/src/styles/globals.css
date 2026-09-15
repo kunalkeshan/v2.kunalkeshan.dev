@@ -122,13 +122,13 @@
 
   /* elevation / shape — solid single-color offset shadows, no blur/spread */
   --shadow-color: var(--border);
-  --shadow-sm: 2px 2px 0 0 var(--border);
-  --shadow-base: 4px 4px 0 0 var(--border);
-  --shadow-lg: 6px 6px 0 0 var(--border);
-  --shadow-xl: 8px 8px 0 0 var(--border);
-  --shadow-2xl: 10px 10px 0 0 var(--border);
-  --shadow-reverse: -4px 4px 0 0 var(--border);
-  --shadow-reverse-sm: -2px 2px 0 0 var(--border);
+  --shadow-sm: 2px 2px 0 0 var(--shadow-color);
+  --shadow-base: 4px 4px 0 0 var(--shadow-color);
+  --shadow-lg: 6px 6px 0 0 var(--shadow-color);
+  --shadow-xl: 8px 8px 0 0 var(--shadow-color);
+  --shadow-2xl: 10px 10px 0 0 var(--shadow-color);
+  --shadow-reverse: -4px 4px 0 0 var(--shadow-color);
+  --shadow-reverse-sm: -2px 2px 0 0 var(--shadow-color);
   --radius-sm: 4px;
   --radius-base: 6px;
   --radius-lg: 10px;
@@ -187,13 +187,13 @@
   --sidebar-ring: #ff6666;
 
   --shadow-color: var(--border);
-  --shadow-sm: 2px 2px 0 0 var(--border);
-  --shadow-base: 4px 4px 0 0 var(--border);
-  --shadow-lg: 6px 6px 0 0 var(--border);
-  --shadow-xl: 8px 8px 0 0 var(--border);
-  --shadow-2xl: 10px 10px 0 0 var(--border);
-  --shadow-reverse: -4px 4px 0 0 var(--border);
-  --shadow-reverse-sm: -2px 2px 0 0 var(--border);
+  --shadow-sm: 2px 2px 0 0 var(--shadow-color);
+  --shadow-base: 4px 4px 0 0 var(--shadow-color);
+  --shadow-lg: 6px 6px 0 0 var(--shadow-color);
+  --shadow-xl: 8px 8px 0 0 var(--shadow-color);
+  --shadow-2xl: 10px 10px 0 0 var(--shadow-color);
+  --shadow-reverse: -4px 4px 0 0 var(--shadow-color);
+  --shadow-reverse-sm: -2px 2px 0 0 var(--shadow-color);
 }
 
 @layer base {
@@ -202,6 +202,112 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /*
+   * Smooth in-page scrolling, carried over from v1's globals.css. Gated on
+   * `prefers-reduced-motion` rather than v1's unconditional `!important`:
+   * animating a long jump is exactly the motion that rule exists to suppress,
+   * and anchors still land correctly without it.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+@layer components {
+  /*
+   * Inverted surface — a section deliberately painted dark on a light page.
+   *
+   * Shadows resolve `--shadow-color` (not `--border`) so this only re-aims the
+   * cast shadow: borders, hairlines and focus rings keep their own tokens. On a
+   * dark ground a black offset shadow is invisible, so the cast flips to the
+   * light foreground and the neobrutalist depth survives.
+   *
+   * Text colors flip too, but `--border` deliberately does NOT: a control on
+   * this panel keeps its normal border and simply casts a light shadow, rather
+   * than turning into an outlined variant of itself.
+   *
+   * In dark mode the page ground is already near-black, so the panel lifts to
+   * the card surface instead and every token stays as it was.
+   *
+   * See docs/ui/design-system.md "Inverted surfaces".
+   */
+  /*
+   * Note on the `--shadow-*` redeclarations below: `--shadow-base` and friends
+   * are defined once on `:root` as `Npx Npx 0 0 var(--shadow-color)`, and CSS
+   * substitutes `var()` at the point of *definition*, not at the point of use.
+   * Overriding only `--shadow-color` here would therefore leave any element
+   * that reads `--shadow-base` from an ancestor still carrying the root's dark
+   * cast. Each scope re-derives the whole scale so the override actually lands.
+   */
+  .on-inverted {
+    --background: #0b0b0b;
+    --foreground: #f1f0ee;
+    --body-foreground: #c7c7c7;
+    --muted-foreground: #9a9a9a;
+    --shadow-color: #f1f0ee;
+    --shadow-sm: 2px 2px 0 0 var(--shadow-color);
+    --shadow-base: 4px 4px 0 0 var(--shadow-color);
+    --shadow-lg: 6px 6px 0 0 var(--shadow-color);
+    --shadow-xl: 8px 8px 0 0 var(--shadow-color);
+    --shadow-2xl: 10px 10px 0 0 var(--shadow-color);
+    --shadow-reverse: -4px 4px 0 0 var(--shadow-color);
+    --shadow-reverse-sm: -2px 2px 0 0 var(--shadow-color);
+
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  .dark .on-inverted {
+    /* Already dark ground: lift to the card surface, keep the light cast. */
+    --background: #181818;
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  /*
+   * A pale card sitting on an inverted panel.
+   *
+   * Restores the page text tokens for the card's contents, and — importantly —
+   * puts `--shadow-color` back to the dark border color. The card is a light
+   * surface, so it has to cast a dark shadow onto the panel behind it; if it
+   * inherited the panel's light cast, the shadow would be white against a white
+   * card body and vanish.
+   */
+  .on-inverted .on-surface {
+    --foreground: #0b0b0b;
+    --body-foreground: #393939;
+    --muted-foreground: #6b6b6b;
+    --shadow-color: #0b0b0b;
+    --shadow-sm: 2px 2px 0 0 var(--shadow-color);
+    --shadow-base: 4px 4px 0 0 var(--shadow-color);
+    --shadow-lg: 6px 6px 0 0 var(--shadow-color);
+    --shadow-xl: 8px 8px 0 0 var(--shadow-color);
+    --shadow-2xl: 10px 10px 0 0 var(--shadow-color);
+    --shadow-reverse: -4px 4px 0 0 var(--shadow-color);
+    --shadow-reverse-sm: -2px 2px 0 0 var(--shadow-color);
+
+    color: var(--foreground);
+  }
+
+  .dark .on-inverted .on-surface {
+    /* Dark card on a lifted dark panel: the light cast is the readable one. */
+    --foreground: #f1f0ee;
+    --body-foreground: #c7c7c7;
+    --muted-foreground: #9a9a9a;
+    --shadow-color: #f1f0ee;
+    --shadow-sm: 2px 2px 0 0 var(--shadow-color);
+    --shadow-base: 4px 4px 0 0 var(--shadow-color);
+    --shadow-lg: 6px 6px 0 0 var(--shadow-color);
+    --shadow-xl: 8px 8px 0 0 var(--shadow-color);
+    --shadow-2xl: 10px 10px 0 0 var(--shadow-color);
+    --shadow-reverse: -4px 4px 0 0 var(--shadow-color);
+    --shadow-reverse-sm: -2px 2px 0 0 var(--shadow-color);
+
+    color: var(--foreground);
   }
 }
 

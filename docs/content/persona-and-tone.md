@@ -64,6 +64,27 @@ still ask before extending them to a *new* kind of copy.
   `{years}` placeholder server-side.
 - **Dropped**: v1's "Biology student turned tech freak" bullet. It may return
   on a future detailed `/about` page, but not in home page copy.
+- **The resume/experience surface is exempt from the no-employer rule.** The
+  "no employer name, no job title beyond 'software engineer'" decision above is
+  scoped to the **About blurb**, where naming an employer would have meant
+  asserting something unverified. A resume section's entire purpose is naming
+  where the work happened, so `experience` documents and the `/resume` page
+  carry real employer names, real titles, dates, and locations. Sourced from
+  Kunal's own master CV (`~/Desktop/kunalkeshan/resume/master-resume.md`) and
+  his LinkedIn, so nothing here is inferred. This does **not** loosen the About
+  section, which keeps its existing framing.
+- **Club and community roles are written in a working-professional voice.**
+  The underlying LinkedIn/CV bullets for the student-era club roles (IEEE
+  SRMIST, Think-Digital, SRMpedia, CodeChef) were written at the time and read
+  as student copy. They are reframed to describe the work and its outcomes
+  (mentoring, leading a domain, shipping an internal platform) rather than the
+  learning-in-progress framing. The roles themselves stay on the page as past
+  history; they are ordered below the professional roles.
+- **Education is never a dated row in the work timeline.** It lives in its own
+  block on `/resume`, via the `experience` schema's `kind` field. v1 listed the
+  B.Tech as an experience entry ending "(Tentative)" — the anti-pattern this
+  doc opens with. The correct end date is **May 2025** (CGPA 8.65), not v1's
+  "July 2024 (Tentative)".
 
 ## What is explicitly OUT of scope for this rule
 

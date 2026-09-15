@@ -6,6 +6,9 @@ import { legalType } from "./legalType";
 import { faqsType } from "./faqsType";
 import { skillType } from "./skillType";
 import { serviceType } from "./serviceType";
+import { organizationType } from "./organizationType";
+import { experienceType } from "./experienceType";
+import { publicationType } from "./publicationType";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -15,5 +18,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     faqsType,
     skillType,
     serviceType,
+    organizationType,
+    experienceType,
+    publicationType,
   ],
 };

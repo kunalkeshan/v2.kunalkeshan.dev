@@ -362,6 +362,15 @@ export const siteConfigType = defineType({
         "Add your social media profiles. Only platforms with URLs will be displayed.",
     },
     {
+      name: "resumePdf",
+      title: "Resume PDF",
+      type: "file",
+      group: "content",
+      options: { accept: "application/pdf" },
+      description:
+        "The downloadable resume offered on the /resume page. The download banner is hidden entirely while this is empty, so the page never ships a dead link.",
+    },
+    {
       name: "footerLegalLinks",
       title: "Footer Legal Links",
       type: "array",

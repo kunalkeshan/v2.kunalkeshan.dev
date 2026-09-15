@@ -15,11 +15,117 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: schema.json
+export type Publication = {
+  _id: string
+  _type: "publication"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  venue?: string
+  publishedAt?: string
+  authors?: Array<string>
+  doi?: string
+  url?: string
+  abstract?: string
+  orderRank?: string
+}
+
+export type OrganizationReference = {
+  _ref: string
+  _type: "reference"
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: "organization"
+}
+
+export type SkillReference = {
+  _ref: string
+  _type: "reference"
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: "skill"
+}
+
+export type Experience = {
+  _id: string
+  _type: "experience"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  role?: string
+  organization?: OrganizationReference
+  kind?: "work" | "community" | "education"
+  employmentType?:
+    | "full-time"
+    | "part-time"
+    | "internship"
+    | "contract"
+    | "freelance"
+    | "volunteer"
+  workMode?: "on-site" | "remote" | "hybrid"
+  location?: string
+  startDate?: string
+  endDate?: string
+  isCurrent?: boolean
+  summary?: string
+  highlights?: Array<string>
+  skills?: Array<
+    {
+      _key: string
+    } & SkillReference
+  >
+  credential?: string
+  links?: Array<{
+    label?: string
+    url?: string
+    type?:
+      "live-site" | "repo" | "certificate" | "letter" | "patent" | "publication"
+    _key: string
+  }>
+  featured?: boolean
+  orderRank?: string
+}
+
 export type SanityImageAssetReference = {
   _ref: string
   _type: "reference"
   _weak?: boolean
   [internalGroqTypeReferenceTo]?: "sanity.imageAsset"
+}
+
+export type Organization = {
+  _id: string
+  _type: "organization"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name?: string
+  logo?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  website?: string
+  description?: string
+  orderRank?: string
+}
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop"
+  top?: number
+  bottom?: number
+  left?: number
+  right?: number
+}
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot"
+  x?: number
+  y?: number
+  height?: number
+  width?: number
 }
 
 export type Service = {
@@ -39,22 +145,6 @@ export type Service = {
     _type: "image"
   }
   orderRank?: string
-}
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop"
-  top?: number
-  bottom?: number
-  left?: number
-  right?: number
-}
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot"
-  x?: number
-  y?: number
-  height?: number
-  width?: number
 }
 
 export type Skill = {
@@ -153,6 +243,13 @@ export type Slug = {
   source?: string
 }
 
+export type SanityFileAssetReference = {
+  _ref: string
+  _type: "reference"
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset"
+}
+
 export type LegalReference = {
   _ref: string
   _type: "reference"
@@ -242,6 +339,11 @@ export type SiteConfig = {
     label?: string
     _key: string
   }>
+  resumePdf?: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: "file"
+  }
   footerLegalLinks?: Array<
     {
       _key: string
@@ -347,15 +449,21 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
+  | Publication
+  | OrganizationReference
+  | SkillReference
+  | Experience
   | SanityImageAssetReference
-  | Service
+  | Organization
   | SanityImageCrop
   | SanityImageHotspot
+  | Service
   | Skill
   | Faqs
   | Legal
   | BlockContent
   | Slug
+  | SanityFileAssetReference
   | LegalReference
   | SiteConfig
   | SanityImagePaletteSwatch
@@ -369,7 +477,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: SITE_CONFIG_QUERY
-// Query: *[_type == "siteConfig"][0] {    _id,    title,    description,    ogImage {      asset->,      alt    },    twitterImage {      asset->,      alt    },    logo {      asset->,      alt    },    heroName,    heroRoles,    heroImage {      asset->,      alt    },    aboutHeadingLead,    aboutHeadingHighlight,    aboutBody,    aboutHighlights[] {      title,      description    },    aboutImage {      asset->,      alt    },    phoneNumbers[] {      number,      label    },    emails[] {      email,      label    },    address {      street,      city,      state,      postalCode,      country    },    socialMedia[] {      platform,      url,      label    }  }
+// Query: *[_type == "siteConfig"][0] {    _id,    title,    description,    ogImage {      asset->,      alt    },    twitterImage {      asset->,      alt    },    logo {      asset->,      alt    },    heroName,    heroRoles,    heroImage {      asset->,      alt    },    aboutHeadingLead,    aboutHeadingHighlight,    aboutBody,    aboutHighlights[] {      title,      description    },    aboutImage {      asset->,      alt    },    phoneNumbers[] {      number,      label    },    emails[] {      email,      label    },    address {      street,      city,      state,      postalCode,      country    },    socialMedia[] {      platform,      url,      label    },    resumePdf {      asset->    }  }
 export type SITE_CONFIG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -535,6 +643,29 @@ export type SITE_CONFIG_QUERY_RESULT = {
     url: string | null
     label: string | null
   }> | null
+  resumePdf: {
+    asset: {
+      _id: string
+      _type: "sanity.fileAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      source?: SanityAssetSourceData
+    } | null
+  } | null
 } | null
 
 // Source: ../../packages/sanity/src/query.ts
@@ -722,10 +853,202 @@ export type SERVICES_QUERY_RESULT = Array<{
   } | null
 }>
 
+// Source: ../../packages/sanity/src/query.ts
+// Variable: FEATURED_EXPERIENCES_QUERY
+// Query: *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {    _id,    role,    organization-> {      _id,      name,      website,      logo {        asset->,        alt      }    },    employmentType,    startDate,    endDate,    isCurrent,    summary  }
+export type FEATURED_EXPERIENCES_QUERY_RESULT = Array<{
+  _id: string
+  role: string | null
+  organization: {
+    _id: string
+    name: string | null
+    website: string | null
+    logo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      alt: string | null
+    } | null
+  } | null
+  employmentType:
+    | "contract"
+    | "freelance"
+    | "full-time"
+    | "internship"
+    | "part-time"
+    | "volunteer"
+    | null
+  startDate: string | null
+  endDate: string | null
+  isCurrent: boolean | null
+  summary: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: EXPERIENCES_QUERY
+// Query: *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {    _id,    role,    kind,    organization-> {      _id,      name,      website,      description,      logo {        asset->,        alt      }    },    employmentType,    workMode,    location,    startDate,    endDate,    isCurrent,    summary,    highlights,    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    }  }
+export type EXPERIENCES_QUERY_RESULT = Array<{
+  _id: string
+  role: string | null
+  kind: "community" | "education" | "work" | null
+  organization: {
+    _id: string
+    name: string | null
+    website: string | null
+    description: string | null
+    logo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      alt: string | null
+    } | null
+  } | null
+  employmentType:
+    | "contract"
+    | "freelance"
+    | "full-time"
+    | "internship"
+    | "part-time"
+    | "volunteer"
+    | null
+  workMode: "hybrid" | "on-site" | "remote" | null
+  location: string | null
+  startDate: string | null
+  endDate: string | null
+  isCurrent: boolean | null
+  summary: string | null
+  highlights: Array<string> | null
+  skills: Array<{
+    _id: string
+    name: string | null
+  }> | null
+  links: Array<{
+    label: string | null
+    url: string | null
+    type:
+      | "certificate"
+      | "letter"
+      | "live-site"
+      | "patent"
+      | "publication"
+      | "repo"
+      | null
+  }> | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: EDUCATION_QUERY
+// Query: *[_type == "experience" && kind == "education"] | order(orderRank asc) {    _id,    role,    organization-> {      _id,      name,      website,      logo {        asset->,        alt      }    },    location,    startDate,    endDate,    isCurrent,    summary,    highlights,    credential,    links[] {      label,      url,      type    }  }
+export type EDUCATION_QUERY_RESULT = Array<{
+  _id: string
+  role: string | null
+  organization: {
+    _id: string
+    name: string | null
+    website: string | null
+    logo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      alt: string | null
+    } | null
+  } | null
+  location: string | null
+  startDate: string | null
+  endDate: string | null
+  isCurrent: boolean | null
+  summary: string | null
+  highlights: Array<string> | null
+  credential: string | null
+  links: Array<{
+    label: string | null
+    url: string | null
+    type:
+      | "certificate"
+      | "letter"
+      | "live-site"
+      | "patent"
+      | "publication"
+      | "repo"
+      | null
+  }> | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: PUBLICATIONS_QUERY
+// Query: *[_type == "publication"] | order(orderRank asc) {    _id,    title,    venue,    publishedAt,    authors,    doi,    url,    abstract  }
+export type PUBLICATIONS_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  venue: string | null
+  publishedAt: string | null
+  authors: Array<string> | null
+  doi: string | null
+  url: string | null
+  abstract: string | null
+}>
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      alt\n    },\n    twitterImage {\n      asset->,\n      alt\n    },\n    logo {\n      asset->,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      alt\n    },\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
+    '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      alt\n    },\n    twitterImage {\n      asset->,\n      alt\n    },\n    logo {\n      asset->,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      alt\n    },\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    },\n    resumePdf {\n      asset->\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0].footerLegalLinks[]-> {\n    _id,\n    title,\n    slug,\n    description,\n    _updatedAt\n  }\n': FOOTER_LEGAL_LINKS_QUERY_RESULT
     '\n  *[_type == "faqs"][0] {\n    ...,\n    faqItems[]{ ... }\n  }\n': FAQS_QUERY_RESULT
     '\n  *[_type == "legal"] | order(_updatedAt desc) {\n    _id,\n    title,\n    slug,\n    description,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENTS_QUERY_RESULT
@@ -733,6 +1056,10 @@ declare global {
     '\n  *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      alt\n    },\n    category\n  }\n': FEATURED_SKILLS_QUERY_RESULT
     '\n  *[_type == "skill"] | order(category asc, orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      alt\n    },\n    category\n  }\n': SKILLS_QUERY_RESULT
     '\n  *[_type == "service"] | order(orderRank asc) {\n    _id,\n    name,\n    description,\n    illustration {\n      asset->,\n      alt\n    }\n  }\n': SERVICES_QUERY_RESULT
+    '\n  *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    employmentType,\n    startDate,\n    endDate,\n    isCurrent,\n    summary\n  }\n': FEATURED_EXPERIENCES_QUERY_RESULT
+    '\n  *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {\n    _id,\n    role,\n    kind,\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    employmentType,\n    workMode,\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EXPERIENCES_QUERY_RESULT
+    '\n  *[_type == "experience" && kind == "education"] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    credential,\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EDUCATION_QUERY_RESULT
+    '\n  *[_type == "publication"] | order(orderRank asc) {\n    _id,\n    title,\n    venue,\n    publishedAt,\n    authors,\n    doi,\n    url,\n    abstract\n  }\n': PUBLICATIONS_QUERY_RESULT
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too
