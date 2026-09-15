@@ -4,7 +4,8 @@ import { blockContentType } from "./blockContentType";
 import { siteConfigType } from "./siteConfigType";
 import { legalType } from "./legalType";
 import { faqsType } from "./faqsType";
+import { skillType } from "./skillType";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [blockContentType, siteConfigType, legalType, faqsType],
+  types: [blockContentType, siteConfigType, legalType, faqsType, skillType],
 };

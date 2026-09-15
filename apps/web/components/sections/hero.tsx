@@ -10,28 +10,28 @@ import { Container } from "@workspace/ui/components/container"
 
 import { heroReveal, heroRevealTransition } from "@/lib/motion"
 
-const roles = [
-  "Building, steadily",
-  "Clean design, practical decisions",
-  "Curious, always learning",
-  "Maintainable systems",
-]
-
 const ROLE_INTERVAL_MS = 2600
 
-const Hero = () => {
+interface HeroProps {
+  name: string
+  roles: string[]
+  imageUrl: string
+  imageAlt: string
+}
+
+const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
   const prefersReducedMotion = useReducedMotion()
   const [roleIndex, setRoleIndex] = useState(0)
 
   useEffect(() => {
-    if (prefersReducedMotion) return
+    if (prefersReducedMotion || roles.length <= 1) return
 
     const id = setInterval(() => {
       setRoleIndex((current) => (current + 1) % roles.length)
     }, ROLE_INTERVAL_MS)
 
     return () => clearInterval(id)
-  }, [prefersReducedMotion])
+  }, [prefersReducedMotion, roles.length])
 
   const activeRole = prefersReducedMotion ? roles[0] : roles[roleIndex]
 
@@ -51,7 +51,7 @@ const Hero = () => {
             <div>
               <h1 className="font-heading text-5xl leading-tight font-black sm:text-6xl md:text-7xl">
                 <span className="bg-primary px-1 text-primary-foreground">
-                  Kunal Keshan
+                  {name}
                 </span>
               </h1>
 
@@ -105,8 +105,8 @@ const Hero = () => {
 
           <div className="flex h-fit max-h-[520px] w-full max-w-lg items-center justify-center overflow-hidden rounded-(--radius-lg) border-3 border-border shadow-xl transition-shadow duration-(--duration-press) ease-(--ease-snap) hover:shadow-[var(--shadow-2xl)] md:mx-auto">
             <Image
-              src="/logo.jpg"
-              alt="Illustration of Kunal Keshan working at a desk with dual monitors"
+              src={imageUrl}
+              alt={imageAlt}
               width={1433}
               height={1956}
               loading="eager"

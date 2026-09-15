@@ -40,6 +40,20 @@ packages/sanity/src/query.ts ──sanity typegen generate───────�
 
 See [`docs/runbooks/sanity-workflow.md`](./runbooks/sanity-workflow.md) for the exact commands and the propagation rule.
 
+## Server/Client Component boundary
+
+`apps/web/app/**/page.tsx` and `layout.tsx` files are always Server Components —
+never add `"use client"` to a page or layout. Pages fetch Sanity data server-side
+(`sanityFetch`) and pass it as props into whichever leaf components actually need
+client-side behavior (state, effects, `motion.*` scroll/hover animation, event
+handlers). Only those leaf components carry `"use client"`, scoped as narrowly as
+possible — e.g. `components/sections/hero.tsx` (rotating role text needs
+`useState`/`useEffect`), `components/layouts/footer.tsx` and
+`components/sections/skills.tsx` (scroll-triggered `motion` reveal), not their
+parent page. This keeps data fetching server-side (no client-side waterfall, no
+Sanity token exposure to the browser) while still allowing interactive pieces
+where they're genuinely needed.
+
 ## Package boundaries
 
 - **`packages/ui`** — anything visual and reusable: shadcn primitives (`src/components`), the font definitions (`src/lib/fonts.ts`), global Tailwind theme (`src/styles/globals.css`). No data-fetching, no app-specific logic.

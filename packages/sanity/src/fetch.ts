@@ -30,7 +30,7 @@ export async function sanityFetch<QueryResponse>({
   options?: NextFetchOptions;
 }): Promise<QueryResponse> {
   return client
-    .withConfig({ useCdn: true })
+    .withConfig({ useCdn: false })
     .fetch<QueryResponse>(query, params, {
       ...(options.cache && {
         cache: options.cache,

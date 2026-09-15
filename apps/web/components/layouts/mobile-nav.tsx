@@ -28,7 +28,11 @@ const itemVariants = {
   closed: { opacity: 0, y: -8 },
 }
 
-export function MobileNav() {
+interface Props {
+  logoSrc?: string
+}
+
+export function MobileNav({ logoSrc }: Props) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -46,7 +50,7 @@ export function MobileNav() {
           className="data-[side=right]:w-full data-[side=right]:sm:max-w-sm"
         >
           <SheetHeader className="flex-row items-center gap-3">
-            <Logo size="sm" />
+            <Logo size="sm" src={logoSrc} />
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
           <motion.nav

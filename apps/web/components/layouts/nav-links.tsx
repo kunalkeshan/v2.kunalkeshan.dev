@@ -7,6 +7,7 @@ import {
   HelpCircleIcon,
   RssIcon,
   LinkIcon,
+  SparklesIcon,
 } from "lucide-react"
 
 export type LinkItemType = {
@@ -40,6 +41,12 @@ export const workLinks: LinkItemType[] = [
     href: "/certifications",
     description: "Courses and credentials I've picked up",
     icon: <BadgeCheckIcon />,
+  },
+  {
+    label: "Skills",
+    href: "/skills",
+    description: "The full stack of tools and technologies I work with",
+    icon: <SparklesIcon />,
   },
 ]
 

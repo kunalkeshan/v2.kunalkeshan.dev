@@ -13,6 +13,16 @@ export const SITE_CONFIG_QUERY = defineQuery(`
       asset->,
       alt
     },
+    logo {
+      asset->,
+      alt
+    },
+    heroName,
+    heroRoles,
+    heroImage {
+      asset->,
+      alt
+    },
     phoneNumbers[] {
       number,
       label
@@ -73,5 +83,29 @@ export const LEGAL_DOCUMENT_BY_SLUG_QUERY = defineQuery(`
     content,
     _createdAt,
     _updatedAt
+  }
+`);
+
+export const FEATURED_SKILLS_QUERY = defineQuery(`
+  *[_type == "skill" && featured == true] | order(order asc, name asc) {
+    _id,
+    name,
+    icon {
+      asset->,
+      alt
+    },
+    category
+  }
+`);
+
+export const SKILLS_QUERY = defineQuery(`
+  *[_type == "skill"] | order(category asc, order asc, name asc) {
+    _id,
+    name,
+    icon {
+      asset->,
+      alt
+    },
+    category
   }
 `);

@@ -11,6 +11,10 @@ export const siteConfigType = defineType({
       default: true,
     },
     {
+      name: "hero",
+      title: "Hero Section",
+    },
+    {
       name: "contact",
       title: "Contact Information",
     },
@@ -29,6 +33,8 @@ export const siteConfigType = defineType({
       title: "Site Title",
       type: "string",
       group: "basic",
+      description:
+        "Used for SEO/meta <title> and social previews. Can differ from the Hero Name shown on the page (e.g. include a tagline).",
       validation: (Rule) => Rule.required(),
     },
     {
@@ -72,6 +78,60 @@ export const siteConfigType = defineType({
       ],
       description:
         "Recommended minimum: 1200 x 600px (1.91:1). Use JPG/PNG under 5MB. Keep key content centered with ~60px padding to avoid cropping in Twitter previews.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "logo",
+      title: "Logo",
+      type: "image",
+      group: "basic",
+      options: { hotspot: true },
+      fields: [
+        {
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description: "Short description for accessibility and SEO",
+        },
+      ],
+      description:
+        "Shown in the navbar, mobile menu, and footer. Square image recommended.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "heroName",
+      title: "Hero Name",
+      type: "string",
+      group: "hero",
+      description: "The large name shown in the Hero section headline.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "heroRoles",
+      title: "Hero Rotating Roles",
+      type: "array",
+      group: "hero",
+      of: [{ type: "string" }],
+      description:
+        "Short taglines that rotate below the Hero name (e.g. 'Building, steadily').",
+      validation: (Rule) => Rule.required().min(1),
+    },
+    {
+      name: "heroImage",
+      title: "Hero Image",
+      type: "image",
+      group: "hero",
+      options: { hotspot: true },
+      fields: [
+        {
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description: "Short description for accessibility and SEO",
+          validation: (Rule) => Rule.required(),
+        },
+      ],
+      description: "The illustration shown alongside the Hero headline.",
       validation: (Rule) => Rule.required(),
     },
     {

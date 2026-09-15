@@ -24,10 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
     tags: [createCollectionTag("siteConfig")],
   });
 
-  const title = siteConfig?.title || "Hzel Brown";
+  const title = siteConfig?.title || "Kunal Keshan — Software Engineer";
   const description =
     siteConfig?.description ||
-    "Artisan dessert shop curating handcrafted brownies, brookies, cupcakes and cookies, freshly baked with love. Order now, delivery across Tamil Nadu.";
+    "Portfolio of Kunal Keshan, a software engineer who builds products with clean design and systems that hold up over time.";
 
   const ogImageUrl = siteConfig?.ogImage?.asset
     ? urlFor(siteConfig.ogImage)
@@ -50,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: {
-      template: `%s | ${siteConfig?.title}`,
+      template: `%s | ${title}`,
       default: title,
     },
     description,
@@ -96,7 +96,7 @@ export default async function RootLayout({
     <>
       <Providers>
         <ViewTransitionWrapper>
-          <Navbar />
+          <Navbar siteConfig={siteConfig} />
           {children}
           <Footer siteConfig={siteConfig} legalLinks={legalLinks} />
           <Toaster richColors />

@@ -35,7 +35,7 @@ export type CacheTag = CollectionTag | DocumentTag;
 /**
  * Create a collection-level cache tag
  * @param type - The Sanity document type
- * @returns A collection tag (e.g., "collection:menuItem")
+ * @returns A collection tag (e.g., "collection:skill")
  */
 export function createCollectionTag(type: SanityDocumentType): CollectionTag {
   return `collection:${type}`;
@@ -45,7 +45,7 @@ export function createCollectionTag(type: SanityDocumentType): CollectionTag {
  * Create a document-level cache tag
  * @param type - The Sanity document type
  * @param slug - The document slug
- * @returns A document tag (e.g., "menuItem:chocolate-brownie")
+ * @returns A document tag (e.g., "legal:privacy-policy")
  */
 export function createDocumentTag(
   type: SanityDocumentType,

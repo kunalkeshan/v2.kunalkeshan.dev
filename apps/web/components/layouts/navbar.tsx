@@ -6,6 +6,8 @@ import { MailIcon } from "lucide-react"
 import { Logo } from "@workspace/ui/components/logo"
 import { Button } from "@workspace/ui/components/button"
 import { useScroll } from "@workspace/ui/hooks/use-scroll"
+import { urlFor } from "@workspace/sanity/image"
+import type { SITE_CONFIG_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { DesktopNav } from "@/components/layouts/desktop-nav"
 import { MobileNav } from "@/components/layouts/mobile-nav"
@@ -41,9 +43,16 @@ const navVariants = {
   },
 } as const
 
-const Navbar = () => {
+interface Props {
+  siteConfig: SITE_CONFIG_QUERY_RESULT
+}
+
+const Navbar = ({ siteConfig }: Props) => {
   const scrolled = useScroll(20)
   const prefersReducedMotion = useReducedMotion()
+  const logoSrc = siteConfig?.logo?.asset
+    ? urlFor(siteConfig.logo).width(112).height(112).url()
+    : undefined
 
   return (
     <motion.nav
@@ -53,7 +62,7 @@ const Navbar = () => {
       transition={prefersReducedMotion ? { duration: 0 } : springTransition}
       className="fixed left-1/2 z-50 flex -translate-x-1/2 items-center justify-between border-3 border-border bg-card py-2 shadow-xl"
     >
-      <Logo size="sm" preload />
+      <Logo size="sm" preload src={logoSrc} />
 
       <DesktopNav />
 
@@ -67,7 +76,7 @@ const Navbar = () => {
         >
           <MailIcon />
         </Button>
-        <MobileNav />
+        <MobileNav logoSrc={logoSrc} />
       </div>
     </motion.nav>
   )

@@ -59,6 +59,11 @@ export async function POST(req: NextRequest) {
         tags.push(createCollectionTag("faqs"));
         break;
 
+      case "skill":
+        // Revalidate skills list (home page featured strip + /skills page)
+        tags.push(createCollectionTag("skill"));
+        break;
+
       default:
         // Unknown type, log it but don't fail
         console.warn(`Unknown document type: ${body._type}`);
