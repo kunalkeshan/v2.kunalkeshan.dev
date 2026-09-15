@@ -31,6 +31,7 @@ Deployment, hosting, and operational topology.
 
 Operational how-tos for recurring or step-by-step tasks.
 
+- [`linting.md`](./runbooks/linting.md) — ESLint flat-config layout, and what a new workspace package must ship to keep `pnpm lint` passing
 - [`sanity-workflow.md`](./runbooks/sanity-workflow.md) — schema → typegen → types → consumer propagation, and Studio deploy steps
 - [`vercel-deployment.md`](./runbooks/vercel-deployment.md) — linking and deploying `apps/web` to Vercel (manual, on-demand only — not part of every change's Definition of Done)
 

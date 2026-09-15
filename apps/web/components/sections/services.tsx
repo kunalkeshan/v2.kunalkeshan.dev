@@ -29,9 +29,16 @@ const cardShell = cn(
 )
 
 function ServiceCard({ service }: { service: Service }) {
+  // No `.height()`: Sanity ignores w/h/rect for SVGs and serves the original
+  // file, so requesting a square crop produced a URL whose delivered image was
+  // never square — which is what Next's aspect-ratio warning was reporting.
   const illustrationUrl = service.illustration?.asset
-    ? urlFor(service.illustration).width(280).height(280).url()
+    ? urlFor(service.illustration).width(280).url()
     : undefined
+
+  // Declare the asset's real ratio rather than assuming 1:1. Already in the
+  // query payload via `asset->`, so this needs no GROQ/typegen change.
+  const dimensions = service.illustration?.asset?.metadata?.dimensions
 
   return (
     <div className={cardShell}>
@@ -40,8 +47,9 @@ function ServiceCard({ service }: { service: Service }) {
           <Image
             src={illustrationUrl}
             alt={service.illustration?.alt ?? ""}
-            width={140}
-            height={140}
+            width={dimensions?.width ?? 140}
+            height={dimensions?.height ?? 140}
+            sizes="140px"
             className="h-auto w-full max-w-[140px] object-contain"
           />
         )}
@@ -60,11 +68,14 @@ function ContactCard() {
   return (
     <div className={cn(cardShell, "bg-secondary")}>
       <div className="flex min-h-[180px] items-center justify-center bg-secondary p-8">
+        {/* Intrinsic size of public/mailbox.svg (576.5 x 493.5), not the
+            rendered size — `max-w-[140px]` still caps how large it paints. */}
         <Image
           src="/mailbox.svg"
           alt="Illustration of an open mailbox with letters"
-          width={140}
-          height={140}
+          width={577}
+          height={494}
+          sizes="140px"
           className="h-auto w-full max-w-[140px] object-contain"
         />
       </div>

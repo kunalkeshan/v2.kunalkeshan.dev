@@ -23,6 +23,17 @@ This repo may grow beyond `apps/web` (other portfolio sub-projects, experiments,
 
 See `docs/architecture.md` for the fuller walkthrough of this layout and the package-boundary rules (what belongs in `packages/ui` vs `packages/sanity` vs `packages/env`).
 
+### New package checklist
+
+Every new workspace under `apps/` or `packages/` must ship, or `pnpm lint` breaks
+workspace-wide (`turbo lint` aborts on the first failing task):
+
+1. `"@workspace/eslint-config": "workspace:*"` in `devDependencies` — a config file alone does not resolve.
+2. A `"lint": "eslint"` script.
+3. An `eslint.config.js` re-exporting the right shared config (`base` for non-React TS, `react-internal` for React, `next-js` for a Next app) — **`eslint.config.mjs` if the package has no `"type": "module"`**, otherwise the `import` is parsed as CommonJS and throws.
+
+Full details, including what to ignore and why lint is currently non-blocking: `docs/runbooks/linting.md`.
+
 ## Sanity: schema, types, and the propagation rule
 
 **Ownership split:**
@@ -88,6 +99,7 @@ Before considering any change complete:
 
 - [ ] `pnpm typecheck` passes for every affected package/app
 - [ ] `pnpm build` succeeds for every affected app
+- [ ] `pnpm lint` passes — and if a new workspace package was added, it ships the three items in the New package checklist above (`docs/runbooks/linting.md`)
 - [ ] **If a Sanity schema field or GROQ query changed** (`apps/studio/schemaTypes/**`, `apps/studio/structure.ts`, or `packages/sanity/src/query.ts`): typegen was regenerated (`pnpm --filter studio extract && pnpm --filter studio type`) and every consumer of the changed type/query in `apps/web` was updated to match. This is a **strict, blocking rule** — never mark a task done with stale generated types. See `docs/runbooks/sanity-workflow.md`.
 - [ ] **If new or edited page/section copy was written** (hero/intro, bio, meta descriptions, experience/resume entries, project write-ups, values or services copy): checked against `docs/content/persona-and-tone.md` and any student-era framing reframed only after asking the user — never applied silently. This is a **strict, blocking rule**, same severity as the Sanity typegen rule above.
 - [ ] UI components reuse `@workspace/ui` primitives rather than redefining them locally
