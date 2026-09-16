@@ -5,7 +5,7 @@ import { motion } from "motion/react"
 import { ArrowRightIcon, MailIcon } from "lucide-react"
 
 import { Container } from "@workspace/ui/components/container"
-import { cn } from "@workspace/ui/lib/utils"
+import { cardLift, cn } from "@workspace/ui/lib/utils"
 import { urlFor } from "@workspace/sanity/image"
 import type { SERVICES_QUERY_RESULT } from "@workspace/sanity/types"
 
@@ -23,31 +23,13 @@ interface ServicesGridProps {
 }
 
 /**
- * The content-card hover, ported from v1's project/service cards: the card
- * **rests flat** and the hard shadow *appears* on hover alongside a lift, with
- * the illustration scaling inside it.
- *
- * This is deliberately not the resting-`shadow-xl` -> `hover:shadow-2xl` pair,
- * which docs/ui/design-system.md reserves for bordered *image wrappers* (hero
- * art, avatars). An earlier version of this file used that pairing and it read
- * as inert — the shadow was already there, so hover barely registered.
- *
- * `group` is what lets the illustration respond; see `group-hover:scale-110`
- * on the `<Image>` below. Never combine this with `pressableShadow`, which owns
- * its own `hover:translate-*` on the same axis and would fight the lift.
+ * `group` is what lets the illustration respond to the card's hover; see
+ * `group-hover:scale-110` on the `<Image>` below. The lift itself lives in
+ * `cardLift` (@workspace/ui/lib/utils).
  */
 const cardShell = cn(
   "group flex min-h-105 flex-col overflow-hidden rounded-lg border-3 border-border bg-card",
-  // An explicit resting `translate-y-0` matters: without a declared start value
-  // the transform is absent at rest, and the browser has nothing to interpolate
-  // *from* on hover / *back to* on unhover. That asymmetry is what read as jank
-  // on the way out. `transform-gpu` promotes the card to its own layer so the
-  // lift composites instead of repainting the bordered box every frame.
-  "translate-y-0 transform-gpu will-change-transform",
-  "transition-[transform,box-shadow] duration-press ease-snap",
-  "hover:-translate-y-2 hover:shadow-xl",
-  // Reduced motion: keep the shadow cue, drop the travel.
-  "motion-reduce:transition-[box-shadow] motion-reduce:hover:translate-y-0"
+  cardLift
 )
 
 function ServiceCard({ service }: { service: Service }) {
@@ -124,7 +106,7 @@ function ContactCard() {
           className={cn(
             "mt-auto flex items-center justify-center gap-2 rounded-lg border-2 border-border bg-primary px-4 py-3",
             "font-heading text-sm font-bold text-primary-foreground",
-            "shadow-sm transition-[transform,box-shadow] duration-press ease-snap",
+            "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
             "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none"
           )}
         >

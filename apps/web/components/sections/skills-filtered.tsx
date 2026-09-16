@@ -84,7 +84,7 @@ export function SkillsFiltered({ skills }: SkillsFilteredProps) {
               aria-pressed={isActive}
               className={cn(
                 "h-auto cursor-pointer rounded-lg border-2 border-border px-3 py-1.5 text-xs normal-case",
-                "shadow-sm transition-[transform,box-shadow,background-color,color] duration-press ease-snap",
+                "shadow-sm transition-[translate,transform,box-shadow,background-color,color] duration-press ease-snap",
                 "hover:translate-x-px hover:translate-y-px hover:shadow-none",
                 isActive
                   ? "bg-primary text-primary-foreground"

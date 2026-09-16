@@ -21,7 +21,7 @@ export function SkillChip({ skill }: SkillChipProps) {
       variant="outline"
       className={cn(
         "h-auto gap-2 rounded-lg border-2 border-border bg-card px-3 py-1.5 text-xs normal-case",
-        "shadow-sm transition-[transform,box-shadow] duration-press ease-snap",
+        "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
         "hover:translate-x-px hover:translate-y-px hover:shadow-none"
       )}
     >

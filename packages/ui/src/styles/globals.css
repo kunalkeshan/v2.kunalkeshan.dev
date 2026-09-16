@@ -69,20 +69,28 @@
   /* bare `border` utility = 2px (controls tier); containers use border-3 */
   --default-border-width: 2px;
 
-  /* motion — registered so `ease-snap`, `duration-press` etc. resolve as real
-   * utilities; never write the arbitrary bracket form.
+  /* motion — registered so `ease-snap` resolves as a real utility; never write
+   * the arbitrary bracket form.
    *
-   * Every key here must dereference to a LITERAL in `:root`, never to another
-   * `var()`. `@theme inline` substitutes at definition time, so a chain of
-   * indirection resolves to an unresolvable value and the property is silently
-   * dropped — for a timing function that means no easing at all, and the
-   * transition snaps. The `--ease-out-*` curves are deliberately NOT registered
-   * here: they are the palette `:root` picks from, not utilities components
-   * reach for directly. Use `ease-snap`. */
-  --ease-snap: var(--ease-snap);
-  --ease-spring: var(--ease-spring);
-  --duration-press: var(--dur-press);
-  --duration-reveal: var(--dur-reveal);
+   * These MUST be written as literal `cubic-bezier(...)` values, not as
+   * `var(--ease-snap)` pointing at `:root`. `@theme inline` substitutes a
+   * token's value where it is *defined*, so a key that names the same custom
+   * property it wants to read resolves to itself — `--ease-snap:var(--ease-snap)`
+   * — which is unresolvable. The declaration is then dropped silently (no error,
+   * no warning) and the browser falls back to `ease`, so every transition in the
+   * app loses its curve while keeping a duration. This shipped once already; see
+   * the Trap callout in docs/ui/design-system.md.
+   *
+   * The `--ease-out-*` curves are deliberately NOT registered here: they are the
+   * palette `:root` picks from, not utilities components reach for directly.
+   * Use `ease-snap`.
+   *
+   * Durations are NOT here: Tailwind v4 has no `--duration-*` theme namespace,
+   * so a key of that name emits no class at all. `duration-press` /
+   * `duration-reveal` are defined as real `@utility` rules at the end of this
+   * file instead. */
+  --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
@@ -176,12 +184,20 @@
   --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* An out-expo curve spends most of its duration nearly settled, so it needs
-   * a longer clock than a linear-ish one to read as deliberate rather than
-   * instant. 180ms on this curve looked like a jump cut; 260ms still read as
-   * fast. 400ms lets the shadow visibly grow in and back out again while
-   * staying responsive enough to sweep across a grid of cards. */
-  --dur-press: 400ms;
+  /* An out-expo curve spends most of its duration nearly settled, so it needs a
+   * longer clock than a linear-ish one to read as deliberate rather than
+   * instant.
+   *
+   * 300ms is the value both references land on: Paperfolio's card
+   * (`transition: box-shadow .3s, transform .3s, color .3s`) and v1's
+   * `duration-300`. It is long enough for the shadow to visibly grow in and
+   * back out, and short enough to sweep a grid of cards without feeling laggy.
+   *
+   * Note the earlier 400ms here was never actually observed: `duration-press`
+   * emitted no class at the time, so every hover was really running at
+   * Tailwind's 150ms default. Re-tune by eye against the rendered page, not
+   * against this comment. */
+  --dur-press: 300ms;
   --dur-reveal: 600ms;
 
   --font-sans: Nunito Sans, ui-sans-serif, sans-serif, system-ui;
@@ -352,5 +368,26 @@
 
     color: var(--foreground);
   }
+}
+
+/* Named duration utilities.
+ *
+ * These exist as `@utility` rules rather than `@theme inline` keys because
+ * Tailwind v4 has NO `--duration-*` theme namespace — only `--ease-*`, `--color-*`,
+ * `--shadow-*` and friends. A `--duration-press` theme key therefore compiles to
+ * nothing at all: no class, no error. Every `duration-press` in the codebase then
+ * silently fell back to Tailwind's 150ms default.
+ *
+ * Reading `:root` at use time (rather than inlining the value) keeps `--dur-press`
+ * the single source of truth, so retuning it still reaches every call site at once.
+ *
+ * To confirm these are live, grep the compiled CSS for `.duration-press{` — if it
+ * is missing, the utility does not exist no matter how correct the source looks. */
+@utility duration-press {
+  transition-duration: var(--dur-press);
+}
+
+@utility duration-reveal {
+  transition-duration: var(--dur-reveal);
 }
 

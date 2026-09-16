@@ -117,19 +117,35 @@ from the image-wrapper one above, and the two are easy to confuse. A content car
 (service card, project card — a bordered panel holding text) **rests with no
 shadow at all** and gains both the lift and the shadow on hover:
 
+The recipe lives in **`cardLift`** (`packages/ui/src/lib/utils.ts`), beside
+`pressableShadow`. Import it rather than re-spelling the classes — it owns motion only,
+so layout, colour and border classes stay at the call site:
+
 ```tsx
+import { cardLift, cn } from "@workspace/ui/lib/utils"
+
 const cardShell = cn(
   "group … rounded-lg border-3 border-border bg-card",
-  "transition-[transform,box-shadow] duration-press ease-snap",
-  "hover:-translate-y-2 hover:shadow-xl",
-  "motion-reduce:hover:translate-y-0"
+  cardLift
 )
 ```
 
-with the card's image scaling in sympathy via `group-hover:scale-110`
-(`motion-reduce:group-hover:scale-100`). This is the literal v1 behaviour —
-`hover:-translate-y-2 hover:shadow-3d` on the card, `group-hover:scale-110` on
-the cover art, where `shadow-3d` is `8px 8px` = this repo's `shadow-xl`.
+`cardLift` carries `translate-y-0 transform-gpu will-change-transform` alongside the
+hover classes. The explicit resting `translate-y-0` is load-bearing: without a declared
+start value the transform is absent at rest and the browser has nothing to interpolate
+*back to* on unhover, which reads as jank on the way out. `transform-gpu` promotes the
+card to its own layer so the lift composites instead of repainting the bordered box
+every frame.
+
+Pair with `group` on the same element so the card's image scales in sympathy via
+`group-hover:scale-110` (`motion-reduce:group-hover:scale-100`). This is the literal v1
+behaviour — `hover:-translate-y-2 hover:shadow-3d` on the card, `group-hover:scale-110`
+on the cover art, where `shadow-3d` is `8px 8px` = this repo's `shadow-xl` — and it
+matches the Paperfolio reference card, which rests flat and applies both the shadow and
+a -10px translate only on `:hover`.
+
+Never combine `cardLift` with `pressableShadow`: both own `hover:translate-*` on the
+same axis and would fight each other.
 
 Why it matters: an earlier version of `services.tsx` used the image-wrapper
 pairing (resting `shadow-xl` → `hover:shadow-2xl`) on its content cards. The
@@ -397,14 +413,23 @@ genuinely needs a different feel.
 
 ### Durations
 
-`--dur-press: 260ms` and `--dur-reveal: 420ms` (Tailwind: `duration-press`,
+`--dur-press: 300ms` and `--dur-reveal: 600ms` (Tailwind: `duration-press`,
 `duration-reveal`).
 
-These went up alongside the curve change, and the two are coupled: an out-expo curve
-spends most of its duration already nearly settled, so it needs a longer clock than a
-linear-ish curve to read as deliberate. At the old 180ms this curve looked like a jump
-cut. If you shorten the duration, you must soften the curve to match (expo → quart →
-quad), and vice versa.
+Duration and curve are coupled: an out-expo curve spends most of its duration already
+nearly settled, so it needs a longer clock than a linear-ish curve to read as
+deliberate. At 180ms this curve looked like a jump cut. If you shorten the duration,
+you must soften the curve to match (expo → quart → quad), and vice versa.
+
+300ms is what both references land on — Paperfolio's card rule is
+`transition: box-shadow .3s, transform .3s, color .3s`, and v1's cards used
+`duration-300`. It is long enough for the hard shadow to visibly grow in and back out,
+short enough to sweep a grid of cards without feeling laggy.
+
+> Values written here before the token bug below was fixed (`260ms`/`420ms`, later
+> `400ms`) were never actually observed in a browser: `duration-press` emitted no class
+> at all, so every hover really ran at Tailwind's 150ms default. Re-tune against the
+> rendered page, never against a remembered number.
 
 ### Writing it
 
@@ -412,22 +437,72 @@ Write the named utilities — `ease-snap`, `duration-press` — never the arbitr
 form (`ease-[cubic-bezier(...)]`), which bypasses the token and triggers a
 `suggestCanonicalClasses` editor warning.
 
-Only `--ease-snap`, `--ease-spring`, `--duration-press` and `--duration-reveal` are
-registered in `@theme inline`. The `--ease-out-*` curves are the palette that `:root`
-picks from, not utilities to reach for directly.
+Only `--ease-snap` and `--ease-spring` are registered in `@theme inline`, as literal
+`cubic-bezier(...)` values. The `--ease-out-*` curves are the palette that `:root` picks
+from, not utilities to reach for directly. The durations are **not** theme keys — they
+are `@utility` rules at the end of `globals.css` (see the second trap below).
 
-> **Trap — a `@theme inline` key must dereference to a literal.**
-> `@theme inline` substitutes a token's value *where it is defined*. If a theme key
-> points at a `:root` var that itself holds another `var()`, the chain resolves to an
-> unresolvable value and the property is silently dropped — no error, no warning. For a
-> timing function that means **no easing at all**, so every transition snaps instantly.
-> This actually shipped: `--ease-snap: var(--ease-out-expo)` in `:root` produced a
-> circular `--ease-snap:var(--ease-snap)` → `var(--ease-out-expo)` → `var(--ease-out-expo)`
-> chain in the compiled CSS, and every hover in the app lost its easing while keeping its
-> duration. The fix is to write the literal `cubic-bezier(...)` in `:root`.
-> If motion ever starts feeling "sudden but not instant", check the **compiled** CSS in
-> `.next/static/chunks/*.css` for `--ease-snap:` before touching component classes —
-> the source will look perfectly correct.
+> **Trap 1 — a `@theme inline` key must be a literal, in `@theme` itself.**
+> `@theme inline` substitutes a token's value *where it is defined*. A key that names
+> the same custom property it wants to read (`--ease-snap: var(--ease-snap)`) resolves
+> to itself; so does one pointing at a `:root` var that holds another `var()`. Either
+> way the value is unresolvable and the declaration is dropped silently — no error, no
+> warning. For a timing function that means **no easing at all**: the browser falls back
+> to `ease` and motion reads as "sudden, not gradual".
+>
+> This shipped twice. The first fix corrected only `:root` and left
+> `--ease-snap: var(--ease-snap)` in the `@theme inline` block, where it shadowed the
+> now-correct `:root` literal — so the bug survived its own fix. **Writing the literal
+> in `:root` is not sufficient; the `@theme inline` key must be a literal too.**
+
+> **Trap 2 — there is no `--duration-*` theme namespace in Tailwind v4.**
+> `--ease-*`, `--color-*`, `--shadow-*` and friends exist; `--duration-*` does not. A
+> `--duration-press` key in `@theme inline` therefore compiles to **nothing at all** —
+> not a wrong value, no class whatsoever — and every `duration-press` in the codebase
+> silently falls back to Tailwind's 150ms default. Named durations must be declared as
+> real utilities instead:
+>
+> ```css
+> @utility duration-press {
+>   transition-duration: var(--dur-press);
+> }
+> ```
+>
+> Reading `:root` at use time keeps `--dur-press` the single source of truth, so
+> retuning it still reaches every call site at once.
+
+> **Trap 3 — `-translate-y-*` animates the `translate` property, not `transform`.**
+> Tailwind v4 composes translate/rotate/scale as *separate* CSS properties so utilities
+> don't clobber one another. `hover:-translate-y-2` therefore changes **`translate`**,
+> and a `transition-[transform,box-shadow]` list does not cover it. The result is a card
+> whose shadow eases over 300ms while the 8px lift **jumps instantly** — the classic
+> "sudden, not gradual" hover, with the transition looking entirely correct in the
+> source.
+>
+> Always name `translate` in the property list (keep `transform` too, for
+> `transform-gpu`'s `translateZ(0)` and any composed transform):
+>
+> ```
+> transition-[translate,transform,box-shadow]
+> ```
+
+**Verifying all three:** every one of these is invisible in the source, which looks
+perfectly correct. Check the **compiled** CSS and the live computed style:
+
+```bash
+grep -o "\.duration-press{[^}]*}" apps/web/.next/static/chunks/*.css   # missing ⇒ Trap 2
+grep -c -- "--ease-snap:var(--ease-snap)" apps/web/.next/static/chunks/*.css  # >0 ⇒ Trap 1
+```
+
+```js
+// In DevTools, on a card element — Trap 3:
+getComputedStyle($0).transitionProperty  // must include "translate"
+getComputedStyle($0).transitionDuration  // "0.3s", not "0.15s"
+```
+
+A missing class means the utility never existed, no matter how right the source reads.
+A `transitionDuration` of `0.15s` or an `ease-in-out` timing function means you are
+looking at Tailwind's fallback, i.e. the token silently failed.
 
 `pressableShadow` transitions `transform`, `box-shadow`, `background-color` and `color`
 off this one pair, so changing either value retunes every button at once. Don't

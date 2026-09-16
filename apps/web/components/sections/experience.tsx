@@ -163,7 +163,7 @@ function RoleLinks({ links }: { links: Role["links"] }) {
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-sm border-2 border-border bg-muted px-2.5 py-1",
                 "text-xs font-bold",
-                "shadow-sm transition-[transform,box-shadow] duration-press ease-snap",
+                "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
                 "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
                 "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
               )}

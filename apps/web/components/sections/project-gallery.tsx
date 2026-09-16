@@ -10,7 +10,7 @@ import "yet-another-react-lightbox/styles.css"
 import "yet-another-react-lightbox/plugins/captions.css"
 import "yet-another-react-lightbox/plugins/thumbnails.css"
 
-import { cn } from "@workspace/ui/lib/utils"
+import { cardLift, cn } from "@workspace/ui/lib/utils"
 import { urlFor } from "@workspace/sanity/image"
 import type { PROJECT_BY_SLUG_QUERY_RESULT } from "@workspace/sanity/types"
 
@@ -70,10 +70,7 @@ export function ProjectGallery({ gallery, title }: ProjectGalleryProps) {
               }
               className={cn(
                 "group block w-full overflow-hidden rounded-lg border-3 border-border bg-muted",
-                "translate-y-0 transform-gpu will-change-transform",
-                "transition-[transform,box-shadow] duration-press ease-snap",
-                "hover:-translate-y-2 hover:shadow-xl",
-                "motion-reduce:transition-[box-shadow] motion-reduce:hover:translate-y-0",
+                cardLift,
                 "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
               )}
             >

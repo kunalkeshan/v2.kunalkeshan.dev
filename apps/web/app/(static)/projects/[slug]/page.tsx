@@ -17,7 +17,7 @@ import {
 import { SiAppstore, SiGoogleplay } from "react-icons/si"
 
 import { Container } from "@workspace/ui/components/container"
-import { cn } from "@workspace/ui/lib/utils"
+import { cardLift, cn } from "@workspace/ui/lib/utils"
 import { sanityFetch } from "@workspace/sanity/fetch"
 import {
   createCollectionTag,
@@ -388,7 +388,7 @@ export default async function ProjectPage({
                       className={cn(
                         "mt-3 flex items-center justify-center gap-2 rounded-lg border-2 border-border bg-primary px-4 py-2.5",
                         "font-heading text-sm font-bold text-primary-foreground",
-                        "shadow-sm transition-[transform,box-shadow] duration-press ease-snap",
+                        "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
                         "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
                         "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                       )}
@@ -420,7 +420,7 @@ export default async function ProjectPage({
                               className={cn(
                                 "inline-flex items-center gap-1.5 rounded-sm border-2 border-border bg-background px-2.5 py-1",
                                 "text-xs font-bold",
-                                "shadow-sm transition-[transform,box-shadow] duration-press ease-snap",
+                                "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
                                 "hover:translate-x-0.5 hover:translate-y-0.5 hover:bg-muted hover:shadow-none",
                                 "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                               )}
@@ -450,10 +450,7 @@ export default async function ProjectPage({
                   href={`/projects/${previous.slug.current}`}
                   className={cn(
                     "group flex items-center gap-3 rounded-lg border-3 border-border bg-card p-4",
-                    "translate-y-0 transform-gpu will-change-transform",
-                    "transition-[transform,box-shadow] duration-press ease-snap",
-                    "hover:-translate-y-2 hover:shadow-xl",
-                    "motion-reduce:transition-[box-shadow] motion-reduce:hover:translate-y-0",
+                    cardLift,
                     "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                   )}
                 >
@@ -481,10 +478,7 @@ export default async function ProjectPage({
                     // Next on the right and Previous on the left always, so the
                     // tile's position always means the same thing.
                     "md:col-start-2",
-                    "translate-y-0 transform-gpu will-change-transform",
-                    "transition-[transform,box-shadow] duration-press ease-snap",
-                    "hover:-translate-y-2 hover:shadow-xl",
-                    "motion-reduce:transition-[box-shadow] motion-reduce:hover:translate-y-0",
+                    cardLift,
                     "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                   )}
                 >

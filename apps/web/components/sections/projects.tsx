@@ -7,7 +7,7 @@ import { ArrowRightIcon, FolderKanbanIcon, StarIcon } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
 import { Container } from "@workspace/ui/components/container"
-import { cn } from "@workspace/ui/lib/utils"
+import { cardLift, cn } from "@workspace/ui/lib/utils"
 import { urlFor } from "@workspace/sanity/image"
 import type {
   FEATURED_PROJECTS_QUERY_RESULT,
@@ -36,19 +36,13 @@ type ProjectCardData = Project | FeaturedProject
 
 /**
  * Content-card hover: rests flat, lifts and gains the hard shadow on hover,
- * with the cover art scaling inside it. See docs/ui/design-system.md
- * "Content-card hover" — deliberately NOT the resting-`shadow-xl` pairing,
- * which is scoped to bordered image wrappers.
+ * with the cover art scaling inside it (`group` + `group-hover:scale-*` below).
+ * The lift lives in `cardLift`; see docs/ui/design-system.md "Content-card
+ * hover".
  */
 const cardShell = cn(
   "group flex h-full flex-col overflow-hidden rounded-lg border-3 border-border bg-card",
-  // Explicit resting transform + GPU promotion — see the note in services.tsx:
-  // without a declared start value the unhover transition has nothing to
-  // interpolate back to, which reads as jank on the way out.
-  "translate-y-0 transform-gpu will-change-transform",
-  "transition-[transform,box-shadow] duration-press ease-snap",
-  "hover:-translate-y-2 hover:shadow-xl",
-  "motion-reduce:transition-[box-shadow] motion-reduce:hover:translate-y-0"
+  cardLift
 )
 
 function MetaBadge({
