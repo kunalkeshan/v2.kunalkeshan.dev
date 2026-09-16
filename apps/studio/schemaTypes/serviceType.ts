@@ -1,42 +1,60 @@
-import { defineType } from "sanity";
-import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
+import { defineField, defineType } from "sanity";
+import { WrenchIcon } from "@sanity/icons/Wrench";
+import {
+  orderRankField,
+  orderRankOrdering,
+} from "@sanity/orderable-document-list";
 
+/**
+ * One offering in the Services grid, shown both on the home page strip and on
+ * the standalone /services page.
+ *
+ * Deliberately flat — three fields don't justify field groups; the Studio form
+ * reads better as a single short column.
+ */
 export const serviceType = defineType({
   name: "service",
   title: "Service",
   type: "document",
+  icon: WrenchIcon,
   orderings: [orderRankOrdering],
   fields: [
-    {
+    defineField({
       name: "name",
       title: "Name",
       type: "string",
+      description:
+        "The service as a customer would name it. Example: 'Software Development', 'CMS & Content Platforms'.",
       validation: (Rule) => Rule.required(),
-    },
-    {
+    }),
+    defineField({
       name: "description",
       title: "Description",
       type: "text",
       rows: 3,
-      description: "Short 1-2 sentence summary shown on the service card.",
+      description:
+        "One or two sentences on what this actually covers and who it's for. Shown as the body of the service card — aim for a similar length across all services so the cards line up.",
       validation: (Rule) => Rule.required(),
-    },
-    {
+    }),
+    defineField({
       name: "illustration",
       title: "Illustration",
       type: "image",
       options: { hotspot: true },
+      description:
+        "The artwork at the top of the card, sitting on a muted panel and zooming slightly on hover. SVGs work best. Keep the visual style consistent across every service.",
       fields: [
-        {
+        defineField({
           name: "alt",
           title: "Alt text",
           type: "string",
-          description: "Short description for accessibility and SEO",
+          description:
+            "Describe the illustration for screen readers and SEO. Example: 'Developer working at a desk with dual monitors'.",
           validation: (Rule) => Rule.required(),
-        },
+        }),
       ],
       validation: (Rule) => Rule.required(),
-    },
+    }),
     orderRankField({ type: "service" }),
   ],
   preview: {

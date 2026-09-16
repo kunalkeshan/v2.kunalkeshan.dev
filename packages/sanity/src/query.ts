@@ -247,12 +247,18 @@ export const PUBLICATIONS_QUERY = defineQuery(`
  * The condensed home page section: featured projects only, and never the
  * archived/earlier-work ones — those exist for the full page's lower section.
  *
+ * Capped at six. The grid runs three per row, so six fills exactly two rows —
+ * eight left a ragged 3/3/2. The slice is a hard ceiling rather than the only
+ * control: `featured` is still curated in the Studio, and this just guarantees
+ * the section can't overflow if more get flagged later. Studio drag order
+ * decides which six survive the cut.
+ *
  * `hasBody` rather than `body`: the card only needs to know whether to offer a
  * "Read case study" CTA, and projecting every case study's portable-text array
  * into the listing payload would bloat it for no rendering benefit.
  */
 export const FEATURED_PROJECTS_QUERY = defineQuery(`
-  *[_type == "project" && featured == true && archived != true] | order(orderRank asc) {
+  *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {
     _id,
     title,
     slug,

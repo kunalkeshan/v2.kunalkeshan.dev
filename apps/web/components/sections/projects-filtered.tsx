@@ -200,7 +200,10 @@ export function ProjectsFiltered({ projects, stars }: ProjectsFilteredProps) {
 
       <div className="mt-8">
         {current.length > 0 && (
-          <ProjectsGrid projects={current} stars={stars} />
+          // `split` only here: /projects runs two per row, wide enough for the
+          // text-left/image-right layout. The home strip is 3-up and stays
+          // stacked.
+          <ProjectsGrid projects={current} stars={stars} split />
         )}
 
         {earlier.length > 0 && (

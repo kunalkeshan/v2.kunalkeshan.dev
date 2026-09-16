@@ -225,9 +225,12 @@ bars) — not just the current navbar.
   (`packages/ui/src/components/navigation-menu.tsx`) defaults to `gap-0` — that default
   is correct for menus that rely on internal item padding, but it reads as cramped for a
   v1-style flat link row. When building a nav bar from this primitive, override the gap
-  on your own `NavigationMenuList` usage (`className="gap-6"` is what the current navbar
-  uses, matching v1's `gap-6` exactly) rather than changing the shared primitive's
-  default — other menu styles may legitimately want `gap-0`.
+  on your own `NavigationMenuList` usage rather than changing the shared primitive's
+  default — other menu styles may legitimately want `gap-0`. The current navbar uses
+  `className="gap-3"`: v1 used `gap-6`, but v1's links were lighter-weight, and once the
+  links went `font-bold` (see Hover-color rules below) the heavier type filled more of
+  the row and `gap-6` read as too airy. Treat gap as paired with type weight, not as a
+  fixed number to copy from v1.
 - **Pill container width vs. content:** a floating pill that's wider than its content
   needs reads as loose/uncertain; v1's navbar pill is `max-w-3xl` (48rem) for 5 flat
   links + one dropdown. Size a new floating nav's `max-w` to roughly that ratio for a
@@ -241,12 +244,26 @@ v1's navbar used exactly two non-neutral hover colors, confirmed via computed st
 the live site — neither color is used as a resting-state fill anywhere in the navbar,
 only as a hover accent:
 
-- **Nav links / dropdown triggers** (flat text links, "Work"/"More" triggers): add
-  `hover:text-secondary` (and `focus:text-secondary` on plain links) alongside whatever
-  neutral `hover:bg-muted` the component already has — v1 used `hover:text-portfolio-accent`
-  (blue) with no background change; this repo keeps the neutral background hover from the
-  shared primitives too rather than replacing it, so hover gets both a bg and text-color
-  change.
+- **Top-level nav links / dropdown triggers** (flat text links, "Work"/"More" triggers):
+  **flat text-only — `hover:text-secondary` with no background change at all**, matching v1's
+  `hover:text-portfolio-accent` (blue). An **open** dropdown trigger reads the same way
+  (`data-open:text-secondary`), blue text rather than a grey chip — the open panel below it
+  is already the "this menu is open" signal. These links also render `font-bold`.
+
+  The shared `navigation-menu.tsx` primitives bake a neutral `bg-muted` chip into
+  `hover:`/`focus:`/`data-open:`/`data-active:` states. **Cancelling it requires naming each
+  variant** (`hover:bg-transparent focus:bg-transparent data-open:bg-transparent`, …) — a
+  bare `bg-transparent` only overrides the *rest* state and leaves every other one painting
+  grey. Do this **on the nav's own usage** (`apps/web/components/layouts/desktop-nav.tsx`
+  defines `navLinkClassName`/`navTriggerClassName` for exactly this), not by editing the
+  shared primitive's defaults — same reasoning as the `gap-0` override note above.
+
+  Pair the hover with `focus-visible:text-secondary`, **not** bare `focus:` — with no chip,
+  bare `focus:` leaves a link stranded blue after a mouse click.
+
+- **Dropdown panel rows** (the icon+label+description items *inside* a Work/More panel): these
+  **keep** `hover:bg-muted` (`nav-dropdown-item.tsx`). The flat/no-chip rule above is for the
+  top-level nav row only — inside a panel, the chip is the row's hit-target affordance.
 - **Solid icon/CTA buttons in chrome** (e.g. the navbar's contact button): add
   `hover:bg-primary hover:text-primary-foreground` — v1 used `hover:bg-portfolio-main`
   (orange) with a **white** icon, but this repo's Color-never-alone/contrast rule (see

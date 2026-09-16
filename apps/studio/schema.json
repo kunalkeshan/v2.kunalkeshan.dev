@@ -1,6 +1,36 @@
 [
   {
     "type": "type",
+    "name": "sanity.imageAsset.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "sanity.imageAsset"
+    }
+  },
+  {
+    "type": "type",
     "name": "organization.reference",
     "value": {
       "type": "object",
@@ -87,36 +117,6 @@
         }
       },
       "dereferencesTo": "skill"
-    }
-  },
-  {
-    "type": "type",
-    "name": "sanity.imageAsset.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "sanity.imageAsset"
     }
   },
   {
@@ -242,44 +242,6 @@
         "value": {
           "type": "inline",
           "name": "blockContent"
-        },
-        "optional": true
-      },
-      "organization": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "organization.reference"
-        },
-        "optional": true
-      },
-      "relatedExperience": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "experience.reference"
-        },
-        "optional": true
-      },
-      "skills": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "array",
-          "of": {
-            "type": "object",
-            "attributes": {
-              "_key": {
-                "type": "objectAttribute",
-                "value": {
-                  "type": "string"
-                }
-              }
-            },
-            "rest": {
-              "type": "inline",
-              "name": "skill.reference"
-            }
-          }
         },
         "optional": true
       },
@@ -466,6 +428,44 @@
         },
         "optional": true
       },
+      "organization": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "organization.reference"
+        },
+        "optional": true
+      },
+      "relatedExperience": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "experience.reference"
+        },
+        "optional": true
+      },
+      "skills": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "array",
+          "of": {
+            "type": "object",
+            "attributes": {
+              "_key": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                }
+              }
+            },
+            "rest": {
+              "type": "inline",
+              "name": "skill.reference"
+            }
+          }
+        },
+        "optional": true
+      },
       "links": {
         "type": "objectAttribute",
         "value": {
@@ -499,6 +499,14 @@
                     {
                       "type": "string",
                       "value": "repo"
+                    },
+                    {
+                      "type": "string",
+                      "value": "play-store"
+                    },
+                    {
+                      "type": "string",
+                      "value": "app-store"
                     },
                     {
                       "type": "string",
@@ -983,6 +991,13 @@
         },
         "optional": true
       },
+      "abstract": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "authors": {
         "type": "objectAttribute",
         "value": {
@@ -1001,13 +1016,6 @@
         "optional": true
       },
       "url": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "abstract": {
         "type": "objectAttribute",
         "value": {
           "type": "string"

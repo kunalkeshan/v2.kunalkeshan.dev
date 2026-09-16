@@ -14,6 +14,7 @@ import {
   ScrollTextIcon,
   StarIcon,
 } from "lucide-react"
+import { SiAppstore, SiGoogleplay } from "react-icons/si"
 
 import { Container } from "@workspace/ui/components/container"
 import { cn } from "@workspace/ui/lib/utils"
@@ -42,9 +43,16 @@ import {
   attributionLine,
 } from "@/lib/projects"
 
+/**
+ * `react-icons/si` for the two app stores: lucide deliberately ships no brand
+ * marks, and a generic phone glyph doesn't read as "Google Play" the way the
+ * real logo does. Everything else stays on lucide.
+ */
 const LINK_ICONS = {
   "live-site": ExternalLinkIcon,
   repo: GitBranchIcon,
+  "play-store": SiGoogleplay,
+  "app-store": SiAppstore,
   "case-study": FileTextIcon,
   video: PlayIcon,
   paper: ScrollTextIcon,
@@ -147,9 +155,22 @@ export default async function ProjectPage({
     ? stars.get(project.githubRepo)
     : undefined
 
+  // Width-only, no server-side crop: the panel below is a fixed 21:9 box that
+  // caps the height (uncapped, a tall illustration filled the whole viewport
+  // before any content was reachable), but the image is contained inside it
+  // rather than cropped to fill, so nothing is ever cut off.
   const coverUrl = project.coverImage?.asset
-    ? urlFor(project.coverImage).width(1600).url()
+    ? urlFor(project.coverImage).width(1680).url()
     : undefined
+
+  const iconUrl = project.icon?.asset
+    ? urlFor(project.icon).width(240).url()
+    : undefined
+
+  // The first usable link leads as the primary action; everything after it
+  // renders as a compact chip, so the panel scales to any number of links.
+  const links = (project.links ?? []).filter((link) => link.url)
+  const [primaryLink, ...secondaryLinks] = links
 
   const kindLabel = project.kind ? PROJECT_KIND_LABELS[project.kind] : null
   const statusLabel = project.status
@@ -195,7 +216,19 @@ export default async function ProjectPage({
           All projects
         </Link>
 
-        <div className="mt-6 flex flex-wrap items-center gap-2">
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          {iconUrl && (
+            // Free-floating, matching the card treatment: height locked, width
+            // free, so wordmarks and square app icons both sit correctly.
+            <Image
+              src={iconUrl}
+              alt={project.icon?.alt ?? ""}
+              width={240}
+              height={64}
+              sizes="140px"
+              className="h-8 w-auto max-w-35 shrink-0 object-contain object-left"
+            />
+          )}
           {kindLabel && (
             <span className="rounded-sm border-2 border-border bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">
               {kindLabel}
@@ -230,18 +263,21 @@ export default async function ProjectPage({
           // -> `hover:shadow-2xl` pairing belongs. See docs/ui/design-system.md.
           <div
             className={cn(
-              "mt-8 overflow-hidden rounded-lg border-3 border-border bg-muted",
+              "mt-8 aspect-[21/9] overflow-hidden rounded-lg border-3 border-border bg-muted",
               "shadow-xl transition-shadow duration-press ease-snap hover:shadow-2xl"
             )}
           >
             <Image
               src={coverUrl}
               alt={project.coverImage?.alt ?? ""}
-              width={1600}
-              height={900}
+              width={1680}
+              height={720}
               priority
               sizes="(min-width: 1280px) 1200px, 100vw"
-              className="h-auto w-full object-cover"
+              // `contain`, matching the split cards on /projects: the 21:9 box
+              // caps how tall the hero can get, and the image sits fully inside
+              // it on the muted ground rather than being cropped to fill.
+              className="h-full w-full object-contain p-4"
             />
           </div>
         )}
@@ -283,13 +319,14 @@ export default async function ProjectPage({
             `flex-col-reverse`) sits above the prose.
           */}
           <aside className="lg:h-fit lg:w-80 lg:shrink-0">
-            <div
-              className={cn(
-                "rounded-lg border-3 border-border bg-card p-5 shadow-lg",
-                "lg:sticky lg:top-32"
-              )}
-            >
-              <h2 className="font-heading text-lg font-black">Information</h2>
+            {/*
+              One sticky column holding two separate cards: the sticky lives on
+              this wrapper rather than on each card, so Information and Links
+              travel and settle together with the gap between them intact.
+            */}
+            <div className="flex flex-col gap-5 lg:sticky lg:top-32">
+              <div className="rounded-lg border-3 border-border bg-card p-5 shadow-lg">
+                <h2 className="font-heading text-lg font-black">Information</h2>
 
               <dl className="mt-3">
                 {dateRange && <InfoRow label="Timeline">{dateRange}</InfoRow>}
@@ -329,33 +366,74 @@ export default async function ProjectPage({
                 )}
               </dl>
 
-              {project.links && project.links.length > 0 && (
-                <ul className="mt-5 flex flex-col gap-2">
-                  {project.links.map((link) => {
-                    if (!link.url) return null
-                    const Icon = link.type ? LINK_ICONS[link.type] : LinkIcon
+              </div>
 
-                    return (
-                      <li key={`${link.url}-${link.label}`}>
-                        <a
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={cn(
-                            "flex items-center justify-center gap-2 rounded-lg border-2 border-border bg-primary px-4 py-2.5",
-                            "font-heading text-sm font-bold text-primary-foreground",
-                            "shadow-sm transition-[transform,box-shadow] duration-press ease-snap",
-                            "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
-                            "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
-                          )}
-                        >
-                          <Icon className="size-4" aria-hidden="true" />
-                          {link.label ?? "Visit"}
-                        </a>
-                      </li>
-                    )
-                  })}
-                </ul>
+              {/*
+                Links get their own card, and only the first one is a full-width
+                primary button — the rest are compact chips on a wrapping row,
+                matching the "Built with" chips above. Three stacked orange
+                buttons already crowded the panel; six or eight would have been
+                a wall of colour with no hierarchy, and nothing reading as the
+                primary action.
+              */}
+              {links.length > 0 && (
+                <div className="rounded-lg border-3 border-border bg-card p-5 shadow-lg">
+                  <h2 className="font-heading text-lg font-black">Links</h2>
+
+                  {primaryLink?.url && (
+                    <a
+                      href={primaryLink.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        "mt-3 flex items-center justify-center gap-2 rounded-lg border-2 border-border bg-primary px-4 py-2.5",
+                        "font-heading text-sm font-bold text-primary-foreground",
+                        "shadow-sm transition-[transform,box-shadow] duration-press ease-snap",
+                        "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
+                        "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+                      )}
+                    >
+                      {(() => {
+                        const Icon = primaryLink.type
+                          ? LINK_ICONS[primaryLink.type]
+                          : LinkIcon
+                        return <Icon className="size-4" aria-hidden="true" />
+                      })()}
+                      {primaryLink.label ?? "Visit"}
+                    </a>
+                  )}
+
+                  {secondaryLinks.length > 0 && (
+                    <ul className="mt-3 flex flex-wrap gap-2">
+                      {secondaryLinks.map((link) => {
+                        if (!link.url) return null
+                        const Icon = link.type
+                          ? LINK_ICONS[link.type]
+                          : LinkIcon
+
+                        return (
+                          <li key={`${link.url}-${link.label}`}>
+                            <a
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={cn(
+                                "inline-flex items-center gap-1.5 rounded-sm border-2 border-border bg-background px-2.5 py-1",
+                                "text-xs font-bold",
+                                "shadow-sm transition-[transform,box-shadow] duration-press ease-snap",
+                                "hover:translate-x-0.5 hover:translate-y-0.5 hover:bg-muted hover:shadow-none",
+                                "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+                              )}
+                            >
+                              <Icon className="size-3.5" aria-hidden="true" />
+                              {link.label ?? "Link"}
+                            </a>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+                </div>
               )}
             </div>
           </aside>
@@ -395,7 +473,14 @@ export default async function ProjectPage({
                 <Link
                   href={`/projects/${next.slug.current}`}
                   className={cn(
-                    "group flex items-center gap-3 rounded-lg border-3 border-border bg-card p-4 md:ml-auto md:flex-row-reverse md:text-right",
+                    "group flex items-center gap-3 rounded-lg border-3 border-border bg-card p-4 md:flex-row-reverse md:text-right",
+                    // Pinned to the second column rather than pushed right with
+                    // `ml-auto`. On the first project there is no Previous tile,
+                    // and `ml-auto` left this one floating mid-row inside
+                    // column 1 — belonging to neither edge. `col-start-2` keeps
+                    // Next on the right and Previous on the left always, so the
+                    // tile's position always means the same thing.
+                    "md:col-start-2",
                     "translate-y-0 transform-gpu will-change-transform",
                     "transition-[transform,box-shadow] duration-press ease-snap",
                     "hover:-translate-y-2 hover:shadow-xl",
