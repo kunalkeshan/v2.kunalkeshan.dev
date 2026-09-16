@@ -1,9 +1,8 @@
 import {
   FolderKanbanIcon,
-  FileTextIcon,
+  HandshakeIcon,
   BadgeCheckIcon,
   NewspaperIcon,
-  HeartHandshakeIcon,
   HelpCircleIcon,
   RssIcon,
   LinkIcon,
@@ -20,7 +19,7 @@ export type LinkItemType = {
 export const primaryLinks: LinkItemType[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Services", href: "/#services" },
+  { label: "Experience", href: "/experience" },
 ]
 
 export const workLinks: LinkItemType[] = [
@@ -31,10 +30,10 @@ export const workLinks: LinkItemType[] = [
     icon: <FolderKanbanIcon />,
   },
   {
-    label: "Experience",
-    href: "/experience",
-    description: "Every role so far, and what I built in each one",
-    icon: <FileTextIcon />,
+    label: "Services",
+    href: "/services",
+    description: "What I can help you build, from software to deployment.",
+    icon: <HandshakeIcon />,
   },
   {
     label: "Certifications",
@@ -56,12 +55,6 @@ export const moreLinks: LinkItemType[] = [
     href: "https://blog.kunalkeshan.dev",
     description: "Notes and writing on things I'm learning",
     icon: <NewspaperIcon />,
-  },
-  {
-    label: "Tributes",
-    href: "/tributes",
-    description: "People and things that shaped how I think",
-    icon: <HeartHandshakeIcon />,
   },
   {
     label: "FAQs",

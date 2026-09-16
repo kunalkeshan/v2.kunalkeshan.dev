@@ -110,7 +110,7 @@ const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
               alt={imageAlt}
               width={1433}
               height={1956}
-              loading="eager"
+              priority
               className="h-auto w-full object-cover"
             />
           </div>
