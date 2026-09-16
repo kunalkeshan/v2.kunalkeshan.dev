@@ -60,6 +60,33 @@ export const SITE_CONFIG_QUERY = defineQuery(`
   }
 `);
 
+/**
+ * The /about page's copy, kept out of SITE_CONFIG_QUERY on purpose.
+ *
+ * SITE_CONFIG_QUERY is fetched by the shared (static) layout, so it runs on
+ * every route. Folding ten about-only fields (one of them dereferencing a full
+ * image asset) into it would put that payload on pages that never render it.
+ * /about fetches this alongside the others in one Promise.all, so the extra
+ * round trip costs essentially nothing.
+ */
+export const ABOUT_PAGE_QUERY = defineQuery(`
+  *[_type == "siteConfig"][0] {
+    aboutPageHeadingLead,
+    aboutPageHeadingHighlight,
+    aboutPageIntro,
+    aboutPageStoryHeadingLead,
+    aboutPageStoryHeadingHighlight,
+    aboutPageStoryHeadingTrail,
+    aboutPageStory,
+    aboutPageValuesHeading,
+    aboutPageValuesIntro,
+    aboutPagePortrait {
+      asset->,
+      alt
+    }
+  }
+`);
+
 export const FOOTER_LEGAL_LINKS_QUERY = defineQuery(`
   *[_type == "siteConfig"][0].footerLegalLinks[]-> {
     _id,
@@ -128,6 +155,27 @@ export const SERVICES_QUERY = defineQuery(`
   *[_type == "service"] | order(orderRank asc) {
     _id,
     name,
+    description,
+    illustration {
+      asset->,
+      alt
+    }
+  }
+`);
+
+/**
+ * The six core values on /about.
+ *
+ * `asset->` is dereferenced in full, not just for the URL: every illustration is
+ * an SVG, and ValueCard reads `metadata.dimensions` off the asset to declare the
+ * real aspect ratio. Sanity ignores w/h/rect for SVGs and serves the original
+ * file, so assuming a square here produces a Next.js aspect-ratio warning —
+ * the same trap already documented in ServiceCard.
+ */
+export const VALUES_QUERY = defineQuery(`
+  *[_type == "value"] | order(orderRank asc) {
+    _id,
+    title,
     description,
     illustration {
       asset->,

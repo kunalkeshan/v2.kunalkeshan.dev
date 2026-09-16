@@ -425,7 +425,7 @@ const Projects = ({ projects, stars }: ProjectsProps) => {
       variants={sectionReveal}
       transition={sectionRevealTransition}
       viewport={sectionRevealViewport}
-      className="scroll-mt-28 py-10 md:py-16"
+      className="py-10 md:py-16"
     >
       <Container>
         {/*

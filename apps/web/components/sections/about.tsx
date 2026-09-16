@@ -54,7 +54,7 @@ const About = ({
       variants={sectionReveal}
       transition={sectionRevealTransition}
       viewport={sectionRevealViewport}
-      className="scroll-mt-28 py-10 md:py-16"
+      className="py-10 md:py-16"
     >
       <Container>
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">

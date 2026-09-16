@@ -238,6 +238,25 @@ export type Organization = {
   orderRank?: string
 }
 
+export type Value = {
+  _id: string
+  _type: "value"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  description?: string
+  illustration?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  orderRank?: string
+}
+
 export type Service = {
   _id: string
   _type: "service"
@@ -382,6 +401,23 @@ export type SiteConfig = {
     _key: string
   }>
   aboutImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  aboutPageHeadingLead?: string
+  aboutPageHeadingHighlight?: string
+  aboutPageIntro?: string
+  aboutPageStoryHeadingLead?: string
+  aboutPageStoryHeadingHighlight?: string
+  aboutPageStoryHeadingTrail?: string
+  aboutPageStory?: Array<string>
+  aboutPageValuesHeading?: string
+  aboutPageValuesIntro?: string
+  aboutPagePortrait?: {
     asset?: SanityImageAssetReference
     media?: unknown
     hotspot?: SanityImageHotspot
@@ -535,6 +571,7 @@ export type AllSanitySchemaTypes =
   | Publication
   | Experience
   | Organization
+  | Value
   | Service
   | Skill
   | Faqs
@@ -745,6 +782,46 @@ export type SITE_CONFIG_QUERY_RESULT = {
 } | null
 
 // Source: ../../packages/sanity/src/query.ts
+// Variable: ABOUT_PAGE_QUERY
+// Query: *[_type == "siteConfig"][0] {    aboutPageHeadingLead,    aboutPageHeadingHighlight,    aboutPageIntro,    aboutPageStoryHeadingLead,    aboutPageStoryHeadingHighlight,    aboutPageStoryHeadingTrail,    aboutPageStory,    aboutPageValuesHeading,    aboutPageValuesIntro,    aboutPagePortrait {      asset->,      alt    }  }
+export type ABOUT_PAGE_QUERY_RESULT = {
+  aboutPageHeadingLead: string | null
+  aboutPageHeadingHighlight: string | null
+  aboutPageIntro: string | null
+  aboutPageStoryHeadingLead: string | null
+  aboutPageStoryHeadingHighlight: string | null
+  aboutPageStoryHeadingTrail: string | null
+  aboutPageStory: Array<string> | null
+  aboutPageValuesHeading: string | null
+  aboutPageValuesIntro: string | null
+  aboutPagePortrait: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+  } | null
+} | null
+
+// Source: ../../packages/sanity/src/query.ts
 // Variable: FOOTER_LEGAL_LINKS_QUERY
 // Query: *[_type == "siteConfig"][0].footerLegalLinks[]-> {    _id,    title,    slug,    description,    _updatedAt  }
 export type FOOTER_LEGAL_LINKS_QUERY_RESULT = Array<{
@@ -901,6 +978,40 @@ export type SKILLS_QUERY_RESULT = Array<{
 export type SERVICES_QUERY_RESULT = Array<{
   _id: string
   name: string | null
+  description: string | null
+  illustration: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+  } | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: VALUES_QUERY
+// Query: *[_type == "value"] | order(orderRank asc) {    _id,    title,    description,    illustration {      asset->,      alt    }  }
+export type VALUES_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
   description: string | null
   illustration: {
     asset: {
@@ -1547,6 +1658,7 @@ export type PROJECT_SLUGS_QUERY_RESULT = Array<{
 declare global {
   interface SanityQueries {
     '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      alt\n    },\n    twitterImage {\n      asset->,\n      alt\n    },\n    logo {\n      asset->,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      alt\n    },\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    },\n    resumePdf {\n      asset->\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
+    '\n  *[_type == "siteConfig"][0] {\n    aboutPageHeadingLead,\n    aboutPageHeadingHighlight,\n    aboutPageIntro,\n    aboutPageStoryHeadingLead,\n    aboutPageStoryHeadingHighlight,\n    aboutPageStoryHeadingTrail,\n    aboutPageStory,\n    aboutPageValuesHeading,\n    aboutPageValuesIntro,\n    aboutPagePortrait {\n      asset->,\n      alt\n    }\n  }\n': ABOUT_PAGE_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0].footerLegalLinks[]-> {\n    _id,\n    title,\n    slug,\n    description,\n    _updatedAt\n  }\n': FOOTER_LEGAL_LINKS_QUERY_RESULT
     '\n  *[_type == "faqs"][0] {\n    ...,\n    faqItems[]{ ... }\n  }\n': FAQS_QUERY_RESULT
     '\n  *[_type == "legal"] | order(_updatedAt desc) {\n    _id,\n    title,\n    slug,\n    description,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENTS_QUERY_RESULT
@@ -1554,6 +1666,7 @@ declare global {
     '\n  *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      alt\n    },\n    category\n  }\n': FEATURED_SKILLS_QUERY_RESULT
     '\n  *[_type == "skill"] | order(category asc, orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      alt\n    },\n    category\n  }\n': SKILLS_QUERY_RESULT
     '\n  *[_type == "service"] | order(orderRank asc) {\n    _id,\n    name,\n    description,\n    illustration {\n      asset->,\n      alt\n    }\n  }\n': SERVICES_QUERY_RESULT
+    '\n  *[_type == "value"] | order(orderRank asc) {\n    _id,\n    title,\n    description,\n    illustration {\n      asset->,\n      alt\n    }\n  }\n': VALUES_QUERY_RESULT
     '\n  *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    employmentType,\n    startDate,\n    endDate,\n    isCurrent,\n    summary\n  }\n': FEATURED_EXPERIENCES_QUERY_RESULT
     '\n  *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {\n    _id,\n    role,\n    kind,\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    employmentType,\n    workMode,\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EXPERIENCES_QUERY_RESULT
     '\n  *[_type == "experience" && kind == "education"] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    credential,\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EDUCATION_QUERY_RESULT

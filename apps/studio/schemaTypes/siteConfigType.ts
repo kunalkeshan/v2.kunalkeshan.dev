@@ -18,7 +18,11 @@ export const siteConfigType = defineType({
     },
     {
       name: "about",
-      title: "About Section",
+      title: "About Section (Home)",
+    },
+    {
+      name: "aboutPage",
+      title: "About Page",
     },
     {
       name: "contact",
@@ -218,6 +222,114 @@ export const siteConfigType = defineType({
       ],
       description:
         "The portrait shown alongside the About copy. Rendered as a circle, so a square-ish image with the subject centered works best.",
+      validation: (Rule) => Rule.required(),
+    },
+    /*
+     * The `aboutPage` group below feeds the standalone /about page, and is
+     * deliberately separate from the `about` group above, which feeds the short
+     * two-column strip on the home page. They are different lengths for
+     * different surfaces — `aboutBody` is one paragraph, `aboutPageStory` is
+     * several — and merging them into one group made it impossible to tell in
+     * the Studio which field lands where.
+     */
+    {
+      name: "aboutPageHeadingLead",
+      title: "About Page — Heading Lead",
+      type: "string",
+      group: "aboutPage",
+      description:
+        "The un-highlighted first half of the /about <h1>. Example: 'Hello there! I'm'.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutPageHeadingHighlight",
+      title: "About Page — Heading Highlight",
+      type: "string",
+      group: "aboutPage",
+      description:
+        "The highlighted second half of the <h1>, drawn with the highlighter sweep. Example: 'Kunal Keshan'.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutPageIntro",
+      title: "About Page — Intro",
+      type: "text",
+      group: "aboutPage",
+      rows: 3,
+      description:
+        "The paragraph directly under the <h1>. One or two sentences framing what the page covers.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutPageStoryHeadingLead",
+      title: "About Page — Story Heading Lead",
+      type: "string",
+      group: "aboutPage",
+      description:
+        "Un-highlighted text before the highlight in the story <h2>. Example: 'What keeps me'.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutPageStoryHeadingHighlight",
+      title: "About Page — Story Heading Highlight",
+      type: "string",
+      group: "aboutPage",
+      description: "The highlighted phrase in the story <h2>.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutPageStoryHeadingTrail",
+      title: "About Page — Story Heading Trail",
+      type: "string",
+      group: "aboutPage",
+      description:
+        "Optional un-highlighted text AFTER the highlight, so headings like 'My story as a developer' (highlight in the middle) are expressible. Leave empty when the highlight ends the heading.",
+    },
+    {
+      name: "aboutPageStory",
+      title: "About Page — Story",
+      type: "array",
+      group: "aboutPage",
+      of: [{ type: "text", rows: 5 }],
+      description:
+        "The bio, one array entry per paragraph. Present-tense work comes first, past-tense backstory after — see docs/content/persona-and-tone.md, which requires asking before any student-era reframing. Supports a {years} placeholder, substituted server-side from BUILDING_SINCE (2021) and worded as years *building*, never years employed.",
+      validation: (Rule) => Rule.required().min(1),
+    },
+    {
+      name: "aboutPageValuesHeading",
+      title: "About Page — Values Heading",
+      type: "string",
+      group: "aboutPage",
+      description:
+        "The <h2> above the values grid. Plain text with no highlight — it follows the inverted marquee band, where a third highlighter sweep reads as decoration.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutPageValuesIntro",
+      title: "About Page — Values Intro",
+      type: "text",
+      group: "aboutPage",
+      rows: 3,
+      description: "The paragraph under the values heading.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "aboutPagePortrait",
+      title: "About Page — Portrait",
+      type: "image",
+      group: "aboutPage",
+      options: { hotspot: true },
+      fields: [
+        {
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description: "Short description for accessibility and SEO",
+          validation: (Rule) => Rule.required(),
+        },
+      ],
+      description:
+        "The portrait on /about, rendered as a circle. Kept separate from the home About Image so the two surfaces can use different photos.",
       validation: (Rule) => Rule.required(),
     },
     {

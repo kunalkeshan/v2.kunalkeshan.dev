@@ -19,11 +19,7 @@ export function Publications({ publications }: PublicationsProps) {
   if (!publications || publications.length === 0) return null
 
   return (
-    <section
-      id="publications"
-      aria-labelledby="publications-heading"
-      className="scroll-mt-32"
-    >
+    <section id="publications" aria-labelledby="publications-heading">
       <h2
         id="publications-heading"
         className="mb-6 flex items-center gap-2.5 font-heading text-2xl font-black sm:text-3xl"

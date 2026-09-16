@@ -274,6 +274,36 @@
       scroll-behavior: smooth;
     }
   }
+
+  /*
+   * Anchor clearance for the fixed navbar.
+   *
+   * The navbar is `position: fixed` and floats 16px below the top of the
+   * viewport, so it is outside normal flow and an `#id` jump would otherwise
+   * land the target underneath it. `scroll-padding-top` on the scroll container
+   * offsets every anchor landing at once — including `scroll-into-view` calls
+   * and keyboard sequential focus navigation, which a per-section utility class
+   * does not reach.
+   *
+   * This exists because the alternative was `scroll-mt-*` repeated on each
+   * section, which had drifted to three different values across eight sections
+   * and was simply missing on others (`/#services` landed under the navbar).
+   * Sections may still override locally where a heading needs extra breathing
+   * room; this is the floor, not a ceiling.
+   *
+   * Values: the navbar measures 62px tall plus its 16px top offset (78px), so
+   * these carry roughly 18-34px of visual breathing room above the target.
+   * Keep them in sync with the navbar's height if its padding changes.
+   */
+  html {
+    scroll-padding-top: 6rem; /* 96px — mobile */
+  }
+
+  @media (min-width: 768px) {
+    html {
+      scroll-padding-top: 7rem; /* 112px — desktop */
+    }
+  }
 }
 
 @layer components {
@@ -389,5 +419,64 @@
 
 @utility duration-reveal {
   transition-duration: var(--dur-reveal);
+}
+
+/* Marquee — the rotated skill band on /about.
+ *
+ * `<Marquee>` renders its children TWICE, side by side in a flex row, and the
+ * track translates by -50% of its own width. That lands copy 2 exactly where
+ * copy 1 started, so the loop restart is pixel-identical and invisible.
+ *
+ * This is why the keyframe is -50% and not -100%. v1 rendered the content once
+ * and ran 0% -> -100%, which scrolled the band to empty before snapping back —
+ * a visible jump every cycle. The -50% here and the two copies in
+ * packages/ui/src/components/marquee.tsx are one mechanism: changing either
+ * alone brings the snap back.
+ *
+ * Duration is read from --marquee-duration, which the component sets inline, so
+ * a call site retunes speed without needing a new utility class.
+ *
+ * `linear` is deliberate, and is the one place in this system that does NOT use
+ * ease-snap. The easing tokens are for user-initiated motion that decelerates
+ * into place; this is continuous ambient motion, and any easing curve would
+ * make the band visibly surge and slow once per cycle. */
+@keyframes marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@utility animate-marquee-left {
+  animation: marquee-left var(--marquee-duration, 30s) linear infinite;
+}
+
+@utility animate-marquee-right {
+  animation: marquee-right var(--marquee-duration, 30s) linear infinite;
+}
+
+/* Reduced motion: stop the band rather than hide it — the skill names stay
+ * readable and the layout is unchanged, only the travel is removed.
+ *
+ * Handled here rather than with a `useReducedMotion()` guard so that every
+ * consumer of <Marquee /> inherits it and no call site can forget. packages/ui
+ * also carries no motion-package dependency (see docs/ui/design-system.md), so
+ * a JS guard was never an option in this package anyway. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-left,
+  .animate-marquee-right {
+    animation: none;
+  }
 }
 

@@ -81,6 +81,11 @@ export async function POST(req: NextRequest) {
         tags.push(createCollectionTag("service"));
         break;
 
+      case "value":
+        // Revalidate the core values grid on /about
+        tags.push(createCollectionTag("value"));
+        break;
+
       case "experience":
         // Revalidate the timeline (home page section + /experience page).
         // Projects cross-reference the role they were built in, so an edited

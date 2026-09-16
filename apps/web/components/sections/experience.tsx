@@ -414,9 +414,9 @@ export function ExperienceTimeline({
   return (
     <div className="flex flex-col gap-12">
       {groups.length > 0 && (
-        // `scroll-mt` clears the floating navbar so an anchor jump doesn't
-        // park the heading underneath it.
-        <div id="work" className="flex scroll-mt-32 flex-col gap-6">
+        // Navbar clearance for this anchor comes from `scroll-padding-top` on
+        // `html` (packages/ui/src/styles/globals.css), not a local scroll margin.
+        <div id="work" className="flex flex-col gap-6">
           {groups.map((group) => (
             <OrganizationBlock key={group.key} group={group} />
           ))}
@@ -424,11 +424,7 @@ export function ExperienceTimeline({
       )}
 
       {educationGroups.length > 0 && (
-        <section
-          id="education"
-          aria-labelledby="education-heading"
-          className="scroll-mt-32"
-        >
+        <section id="education" aria-labelledby="education-heading">
           <h2
             id="education-heading"
             className="mb-6 flex items-center gap-2.5 font-heading text-2xl font-black sm:text-3xl"
@@ -550,7 +546,7 @@ const Experience = ({ experiences, yearsBuilding }: ExperienceProps) => {
       transition={sectionRevealTransition}
       viewport={sectionRevealViewport}
       className={cn(
-        "scroll-mt-28 py-14 md:py-20",
+        "py-14 md:py-20",
         // v1 ran this section on a hard black panel. `.on-inverted` reproduces
         // it by flipping the design tokens for this subtree, so descendant
         // shadows and focus rings re-derive against the dark ground instead of

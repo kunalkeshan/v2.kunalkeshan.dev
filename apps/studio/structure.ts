@@ -8,6 +8,7 @@ import { HelpCircleIcon } from "@sanity/icons/HelpCircle";
 import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import { SparklesIcon } from "@sanity/icons/Sparkles";
 import { WrenchIcon } from "@sanity/icons/Wrench";
+import { HeartIcon } from "@sanity/icons/Heart";
 import { ProjectsIcon } from "@sanity/icons/Projects";
 import { CaseIcon } from "@sanity/icons/Case";
 import { UsersIcon } from "@sanity/icons/Users";
@@ -38,6 +39,13 @@ export const structure: StructureResolver = (S, context) =>
         type: "service",
         title: "Services",
         icon: WrenchIcon,
+        S,
+        context,
+      }),
+      orderableDocumentListDeskItem({
+        type: "value",
+        title: "Values",
+        icon: HeartIcon,
         S,
         context,
       }),
@@ -79,6 +87,7 @@ export const structure: StructureResolver = (S, context) =>
             "faqs",
             "skill",
             "service",
+            "value",
             "project",
             "experience",
             "organization",

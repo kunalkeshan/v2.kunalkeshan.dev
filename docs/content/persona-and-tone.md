@@ -80,6 +80,22 @@ still ask before extending them to a *new* kind of copy.
   (mentoring, leading a domain, shipping an internal platform) rather than the
   learning-in-progress framing. The roles themselves stay on the page as past
   history; they are ordered below the professional roles.
+- **The `/about` page origin arc (asked and answered).** The detailed `/about` page
+  is where the "Dropped" bullet above was cashed in: it tells the
+  biology-expectation → ECE → web-development arc, but **present-tense work comes
+  first and the backstory follows**, so the page opens on who Kunal is now rather
+  than on where he studied. Every backstory sentence is past tense ("I chose",
+  "I wrote", "I spent"). The family-of-doctors and biology details were explicitly
+  approved. A third paragraph closes the arc forward — the PYNQ Z-series interface
+  work and the resulting IEEE RAEEUCCI 2025 paper — framed as *still shapes what I
+  find interesting, just isn't what I do every day*, so the electronics background
+  reads as a live thread rather than nostalgia. Both facts were confirmed by Kunal
+  directly, not inferred. The opening paragraph is near-verbatim from his GitHub
+  profile README, and still names **no employer and no title beyond "software
+  engineer"** — the About-blurb rule above holds on this page too.
+- **The six values are ported verbatim from v1** (`data/values.ts`) into the `value`
+  document type. They are covered by the "personal values language" exemption below —
+  no rewording was applied, including to the noticeably longer Discipline entry.
 - **Education is never a dated row in the work timeline.** It lives in its own
   block on `/resume`, via the `experience` schema's `kind` field. v1 listed the
   B.Tech as an experience entry ending "(Tentative)" — the anti-pattern this

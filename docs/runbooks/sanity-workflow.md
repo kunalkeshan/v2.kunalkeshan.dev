@@ -22,6 +22,11 @@ pnpm --filter studio extract   # apps/studio/schema.json
 pnpm --filter studio type      # writes packages/sanity/src/sanity.types.ts
 ```
 
+The `extract` script passes `--force`. Current Sanity CLI versions refuse to overwrite an
+existing `schema.json` without it, and since `schema.json` is committed, every run after
+the first is an overwrite — without the flag the documented command fails with
+"Schema file already exists".
+
 `sanity.cli.ts`'s `typegen` config points `generates` at `../../packages/sanity/src/sanity.types.ts` — across the workspace boundary, from `apps/studio` into `packages/sanity`. This is intentional: `apps/web` imports generated types as `@workspace/sanity/types`, and `apps/studio` never needs to consume its own generated types.
 
 **Never hand-edit `packages/sanity/src/sanity.types.ts`.** It is regenerated wholesale on every `type` run; manual edits are silently discarded.

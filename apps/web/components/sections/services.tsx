@@ -98,8 +98,8 @@ function ContactCard() {
           Get in touch
         </h3>
         <p className="text-sm leading-relaxed text-secondary-foreground/90">
-          Looking for something not listed here? Reach out — there&apos;s a
-          good chance I can help.
+          Looking for something not listed here? Reach out — there&apos;s a good
+          chance I can help.
         </p>
         <a
           href="/contact"
@@ -153,6 +153,7 @@ const Services = ({ services }: ServicesProps) => {
       transition={sectionRevealTransition}
       viewport={sectionRevealViewport}
       className="py-10 md:py-16"
+      id="services"
     >
       <Container>
         <h2 className="mb-6 font-heading text-2xl font-black sm:text-3xl">

@@ -8,7 +8,7 @@
     "start": "sanity start",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "extract": "sanity schema extract",
+    "extract": "sanity schema extract --force",
     "type": "sanity typegen generate",
     "lint": "eslint",
     "typecheck": "tsc --noEmit"

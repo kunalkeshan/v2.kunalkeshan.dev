@@ -611,6 +611,95 @@ left-to-right across the phrase, once, the first time the heading scrolls into v
   promotion test referenced above for `apps/web/lib/motion.ts`. Promote it the same way
   if a second app needs the identical treatment.
 
+## Anchor clearance under the fixed navbar
+
+The navbar is `position: fixed`, so it sits outside normal flow and an `#id` jump would
+land the target underneath it.
+
+**This is handled once, globally**, by `scroll-padding-top` on `html` in
+`packages/ui/src/styles/globals.css` — `6rem` on mobile, `7rem` from `md` up, against a
+navbar that measures 62px tall plus a 16px top offset.
+
+**Do not add `scroll-mt-*` to new sections.** That was the previous approach and it had
+drifted to three different values across eight sections while being missing entirely from
+others, so `/#services` landed under the navbar while `#about` sat 222px below it. A
+single scroll-padding rule also covers what a scroll-margin utility cannot: programmatic
+`scrollIntoView()` calls and keyboard sequential-focus navigation.
+
+Keep the two values in sync with the navbar if its height or offset changes. A section
+may still set a local `scroll-mt-*` when a particular heading needs extra breathing room —
+the global rule is the floor, not a ceiling.
+
+## Illustrated card layout (values grid reference)
+
+The `/about` values grid is the reference for cards that pair a stock illustration with
+copy. It was first built with v1's side-panel layout and then rebuilt — the reasoning is
+worth keeping, because the same trap applies to any future illustrated card.
+
+- **Don't put a variable-aspect illustration in a fixed panel.** The original layout gave
+  each card a 180×316 tinted side panel. The source SVGs range from 0.86:1 to 1.44:1, so
+  they rendered 84–135px tall inside it, leaving **181–232px of empty tint per card** —
+  and the panel took width the copy needed. Placing the art inline above the copy at a
+  **fixed height with `w-auto`** normalizes wildly different source ratios into one
+  consistent visual weight without any cropping, and hands the full card width back to
+  the text.
+- **Left-align the art with the text column** (`items-start` on the card body), not
+  centered. A centered illustration above left-aligned copy reads as two unrelated
+  elements.
+- **Use a column flow, not a grid, when the copy lengths are uneven and fixed.** The
+  values copy ranges from ~190 to ~385 characters, and it is not editable (v1 values are
+  protected by `docs/content/persona-and-tone.md`). CSS grid offers only two bad answers
+  to that: stretching to a shared row height pads every short card in the row with
+  trailing dead space, and `items-start` leaves ragged holes *between* rows, which reads
+  as broken rather than as rhythm in a 3-up layout. `columns` removes the dilemma — with
+  no rows to align, each card ends at its own copy and the next packs directly beneath
+  it, so the variance becomes vertical flow. Pair with `break-inside-avoid` on the items.
+  This also shortened the section by ~200px.
+  **Only reach for this when the copy genuinely can't be evened out** — for content you
+  control, matching the copy lengths is the better fix and a plain grid is simpler.
+- **Keep a real step between section and card headings.** The cards originally used
+  `text-2xl` (24px) under a `text-3xl` (30px) section heading — too close, so the grid
+  read flat and was hard to scan. Card headings sit at `text-lg`/`md:text-xl`.
+- Cards use `cardLift` (rest flat, lift on hover) with `group` driving
+  `group-hover:scale-110` on the art, plus a `motion-reduce:` reset. `origin-left` on the
+  image keeps that zoom anchored to the text column.
+
+## Marquee (`@workspace/ui/components/marquee`)
+
+The continuously scrolling band, used on `/about` for the featured-skills ticker.
+Ported from `kunalkeshan.dev` v1's `SkillsInText`.
+
+- **Pure CSS, and deliberately so.** No `"use client"`, no hooks, no event handlers —
+  which keeps it a Server Component that adds nothing to the client bundle. This is
+  also a hard constraint rather than a preference: `packages/ui` has zero
+  motion-package dependency (see the note under "Highlight text sweep"), so a
+  `motion/react` implementation could not live in this package at all. `pauseOnHover`
+  is a CSS `:hover` rule for the same reason.
+- **Why the keyframe is `-50%`, not `-100%`.** The component renders its children
+  **twice**, side by side, and translates the track by half its own width. That lands
+  copy 2 exactly where copy 1 began, so the loop restart is pixel-identical and
+  invisible. v1 rendered the content once and ran `0% → -100%`, which scrolled the band
+  to empty before snapping back — a visible jump every cycle. **The `-50%` in
+  `globals.css` and the two copies in `marquee.tsx` are one mechanism; changing either
+  alone reintroduces the gap.**
+- **`linear` is correct here, and is the one place in this system that does not use
+  `ease-snap`.** The easing tokens are for user-initiated motion that decelerates into
+  place. This is continuous ambient motion, and any easing curve would make the band
+  visibly surge and slow once per cycle.
+- **Reduced motion is handled in CSS**, not per-call-site, so every consumer inherits it
+  and no call site can forget. The band stops rather than hiding — the text stays
+  readable and the layout is unchanged.
+- **Accessibility**: the duplicate copy is `aria-hidden`, so the content is announced
+  once. Give the wrapping landmark an `aria-label` at the call site.
+- **Rotating the band**: put the rotation on a wrapper, never on the animated track —
+  Tailwind v4 emits `rotate` separately from `transform`, and the keyframe owns
+  `transform`. Pair a rotated band with an overshoot (`w-[120%]` + a centered negative
+  translate) so the tilt doesn't expose triangular gaps at the corners, and clip it with
+  **`overflow-x-clip`, not `overflow-hidden`** — the latter creates a scroll container
+  and will silently break any `position: sticky` ancestor elsewhere on the page.
+- Speed is set per call site via `durationSeconds`, which the component writes to
+  `--marquee-duration`.
+
 ## Related
 
 - [`font-stack.md`](./font-stack.md) — font loading convention and the `font-heading` →
