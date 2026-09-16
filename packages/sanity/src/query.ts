@@ -7,20 +7,28 @@ export const SITE_CONFIG_QUERY = defineQuery(`
     description,
     ogImage {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     twitterImage {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     logo {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     heroName,
     heroRoles,
     heroImage {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     aboutHeadingLead,
@@ -32,6 +40,8 @@ export const SITE_CONFIG_QUERY = defineQuery(`
     },
     aboutImage {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     phoneNumbers[] {
@@ -82,6 +92,8 @@ export const ABOUT_PAGE_QUERY = defineQuery(`
     aboutPageValuesIntro,
     aboutPagePortrait {
       asset->,
+      hotspot,
+      crop,
       alt
     }
   }
@@ -133,6 +145,8 @@ export const FEATURED_SKILLS_QUERY = defineQuery(`
     name,
     icon {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     category
@@ -145,6 +159,8 @@ export const SKILLS_QUERY = defineQuery(`
     name,
     icon {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     category
@@ -158,6 +174,8 @@ export const SERVICES_QUERY = defineQuery(`
     description,
     illustration {
       asset->,
+      hotspot,
+      crop,
       alt
     }
   }
@@ -179,6 +197,8 @@ export const VALUES_QUERY = defineQuery(`
     description,
     illustration {
       asset->,
+      hotspot,
+      crop,
       alt
     }
   }
@@ -199,6 +219,8 @@ export const FEATURED_EXPERIENCES_QUERY = defineQuery(`
       website,
       logo {
         asset->,
+        hotspot,
+        crop,
         alt
       }
     },
@@ -227,6 +249,8 @@ export const EXPERIENCES_QUERY = defineQuery(`
       description,
       logo {
         asset->,
+        hotspot,
+        crop,
         alt
       }
     },
@@ -260,6 +284,8 @@ export const EDUCATION_QUERY = defineQuery(`
       website,
       logo {
         asset->,
+        hotspot,
+        crop,
         alt
       }
     },
@@ -317,10 +343,14 @@ export const FEATURED_PROJECTS_QUERY = defineQuery(`
     "hasBody": defined(body),
     icon {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     coverImage {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     organization-> {
@@ -362,10 +392,14 @@ export const PROJECTS_QUERY = defineQuery(`
     featured,
     icon {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     coverImage {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     organization-> {
@@ -411,14 +445,20 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(`
     archived,
     icon {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     coverImage {
       asset->,
+      hotspot,
+      crop,
       alt
     },
     gallery[] {
       asset->,
+      hotspot,
+      crop,
       alt,
       caption
     },
@@ -429,6 +469,8 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(`
       description,
       logo {
         asset->,
+        hotspot,
+        crop,
         alt
       }
     },
@@ -472,6 +514,8 @@ export const PROJECT_SLUGS_QUERY = defineQuery(`
     slug,
     coverImage {
       asset->,
+      hotspot,
+      crop,
       alt
     }
   }

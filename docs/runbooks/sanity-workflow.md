@@ -15,6 +15,23 @@ Covers two things: (1) changing schema/queries and propagating types, (2) deploy
 
 1. Edit/add the query in `packages/sanity/src/query.ts`, using `defineQuery` from `next-sanity` (required for typegen to pick it up).
 
+### Image field projections must include `hotspot`/`crop`
+
+Every image field in this repo is rendered through `urlFor()` (`@workspace/sanity/image`, a thin `@sanity/image-url` wrapper) and, at most call sites, a fixed aspect ratio via `.width().height().fit("crop")`. `@sanity/image-url` automatically honors an editor's Studio-set focal point (hotspot) and manual crop rectangle when cropping to a fixed aspect ratio — but only if the object passed into `urlFor()` actually carries `hotspot`/`crop`.
+
+The standard fragment for any image field is therefore:
+
+```groq
+fieldName {
+  asset->,
+  hotspot,
+  crop,
+  alt
+}
+```
+
+Projecting only `{ asset->, alt }` compiles fine and still returns a working image, but silently degrades every `.fit("crop")` render to a blind center-crop — any hotspot an editor sets in Studio is discarded before it reaches the URL builder. When adding a new image field to a schema and query, copy the four-field fragment above (adding any other sibling fields, like `gallery[]`'s `caption`, as needed) rather than the shorter two-field one.
+
 ### Then, always — regenerate types
 
 ```bash

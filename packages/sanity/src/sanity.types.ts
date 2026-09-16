@@ -590,7 +590,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: SITE_CONFIG_QUERY
-// Query: *[_type == "siteConfig"][0] {    _id,    title,    description,    ogImage {      asset->,      alt    },    twitterImage {      asset->,      alt    },    logo {      asset->,      alt    },    heroName,    heroRoles,    heroImage {      asset->,      alt    },    aboutHeadingLead,    aboutHeadingHighlight,    aboutBody,    aboutHighlights[] {      title,      description    },    aboutImage {      asset->,      alt    },    phoneNumbers[] {      number,      label    },    emails[] {      email,      label    },    address {      street,      city,      state,      postalCode,      country    },    socialMedia[] {      platform,      url,      label    },    resumePdf {      asset->    }  }
+// Query: *[_type == "siteConfig"][0] {    _id,    title,    description,    ogImage {      asset->,      hotspot,      crop,      alt    },    twitterImage {      asset->,      hotspot,      crop,      alt    },    logo {      asset->,      hotspot,      crop,      alt    },    heroName,    heroRoles,    heroImage {      asset->,      hotspot,      crop,      alt    },    aboutHeadingLead,    aboutHeadingHighlight,    aboutBody,    aboutHighlights[] {      title,      description    },    aboutImage {      asset->,      hotspot,      crop,      alt    },    phoneNumbers[] {      number,      label    },    emails[] {      email,      label    },    address {      street,      city,      state,      postalCode,      country    },    socialMedia[] {      platform,      url,      label    },    resumePdf {      asset->    }  }
 export type SITE_CONFIG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -618,6 +618,8 @@ export type SITE_CONFIG_QUERY_RESULT = {
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   twitterImage: {
@@ -643,6 +645,8 @@ export type SITE_CONFIG_QUERY_RESULT = {
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   logo: {
@@ -668,6 +672,8 @@ export type SITE_CONFIG_QUERY_RESULT = {
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   heroName: string | null
@@ -695,6 +701,8 @@ export type SITE_CONFIG_QUERY_RESULT = {
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   aboutHeadingLead: string | null
@@ -727,6 +735,8 @@ export type SITE_CONFIG_QUERY_RESULT = {
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   phoneNumbers: Array<{
@@ -783,7 +793,7 @@ export type SITE_CONFIG_QUERY_RESULT = {
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: ABOUT_PAGE_QUERY
-// Query: *[_type == "siteConfig"][0] {    aboutPageHeadingLead,    aboutPageHeadingHighlight,    aboutPageIntro,    aboutPageStoryHeadingLead,    aboutPageStoryHeadingHighlight,    aboutPageStoryHeadingTrail,    aboutPageStory,    aboutPageValuesHeading,    aboutPageValuesIntro,    aboutPagePortrait {      asset->,      alt    }  }
+// Query: *[_type == "siteConfig"][0] {    aboutPageHeadingLead,    aboutPageHeadingHighlight,    aboutPageIntro,    aboutPageStoryHeadingLead,    aboutPageStoryHeadingHighlight,    aboutPageStoryHeadingTrail,    aboutPageStory,    aboutPageValuesHeading,    aboutPageValuesIntro,    aboutPagePortrait {      asset->,      hotspot,      crop,      alt    }  }
 export type ABOUT_PAGE_QUERY_RESULT = {
   aboutPageHeadingLead: string | null
   aboutPageHeadingHighlight: string | null
@@ -817,6 +827,8 @@ export type ABOUT_PAGE_QUERY_RESULT = {
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
 } | null
@@ -876,7 +888,7 @@ export type LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT = {
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: FEATURED_SKILLS_QUERY
-// Query: *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {    _id,    name,    icon {      asset->,      alt    },    category  }
+// Query: *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {    _id,    name,    icon {      asset->,      hotspot,      crop,      alt    },    category  }
 export type FEATURED_SKILLS_QUERY_RESULT = Array<{
   _id: string
   name: string | null
@@ -903,6 +915,8 @@ export type FEATURED_SKILLS_QUERY_RESULT = Array<{
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   category:
@@ -925,7 +939,7 @@ export type FEATURED_SKILLS_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: SKILLS_QUERY
-// Query: *[_type == "skill"] | order(category asc, orderRank asc, name asc) {    _id,    name,    icon {      asset->,      alt    },    category  }
+// Query: *[_type == "skill"] | order(category asc, orderRank asc, name asc) {    _id,    name,    icon {      asset->,      hotspot,      crop,      alt    },    category  }
 export type SKILLS_QUERY_RESULT = Array<{
   _id: string
   name: string | null
@@ -952,6 +966,8 @@ export type SKILLS_QUERY_RESULT = Array<{
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   category:
@@ -974,7 +990,7 @@ export type SKILLS_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: SERVICES_QUERY
-// Query: *[_type == "service"] | order(orderRank asc) {    _id,    name,    description,    illustration {      asset->,      alt    }  }
+// Query: *[_type == "service"] | order(orderRank asc) {    _id,    name,    description,    illustration {      asset->,      hotspot,      crop,      alt    }  }
 export type SERVICES_QUERY_RESULT = Array<{
   _id: string
   name: string | null
@@ -1002,13 +1018,15 @@ export type SERVICES_QUERY_RESULT = Array<{
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
 }>
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: VALUES_QUERY
-// Query: *[_type == "value"] | order(orderRank asc) {    _id,    title,    description,    illustration {      asset->,      alt    }  }
+// Query: *[_type == "value"] | order(orderRank asc) {    _id,    title,    description,    illustration {      asset->,      hotspot,      crop,      alt    }  }
 export type VALUES_QUERY_RESULT = Array<{
   _id: string
   title: string | null
@@ -1036,13 +1054,15 @@ export type VALUES_QUERY_RESULT = Array<{
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
 }>
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: FEATURED_EXPERIENCES_QUERY
-// Query: *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {    _id,    role,    organization-> {      _id,      name,      website,      logo {        asset->,        alt      }    },    employmentType,    startDate,    endDate,    isCurrent,    summary  }
+// Query: *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {    _id,    role,    organization-> {      _id,      name,      website,      logo {        asset->,        hotspot,        crop,        alt      }    },    employmentType,    startDate,    endDate,    isCurrent,    summary  }
 export type FEATURED_EXPERIENCES_QUERY_RESULT = Array<{
   _id: string
   role: string | null
@@ -1073,6 +1093,8 @@ export type FEATURED_EXPERIENCES_QUERY_RESULT = Array<{
         metadata?: SanityImageMetadata
         source?: SanityAssetSourceData
       } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
       alt: string | null
     } | null
   } | null
@@ -1092,7 +1114,7 @@ export type FEATURED_EXPERIENCES_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: EXPERIENCES_QUERY
-// Query: *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {    _id,    role,    kind,    organization-> {      _id,      name,      website,      description,      logo {        asset->,        alt      }    },    employmentType,    workMode,    location,    startDate,    endDate,    isCurrent,    summary,    highlights,    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    }  }
+// Query: *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {    _id,    role,    kind,    organization-> {      _id,      name,      website,      description,      logo {        asset->,        hotspot,        crop,        alt      }    },    employmentType,    workMode,    location,    startDate,    endDate,    isCurrent,    summary,    highlights,    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    }  }
 export type EXPERIENCES_QUERY_RESULT = Array<{
   _id: string
   role: string | null
@@ -1125,6 +1147,8 @@ export type EXPERIENCES_QUERY_RESULT = Array<{
         metadata?: SanityImageMetadata
         source?: SanityAssetSourceData
       } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
       alt: string | null
     } | null
   } | null
@@ -1163,7 +1187,7 @@ export type EXPERIENCES_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: EDUCATION_QUERY
-// Query: *[_type == "experience" && kind == "education"] | order(orderRank asc) {    _id,    role,    organization-> {      _id,      name,      website,      logo {        asset->,        alt      }    },    location,    startDate,    endDate,    isCurrent,    summary,    highlights,    credential,    links[] {      label,      url,      type    }  }
+// Query: *[_type == "experience" && kind == "education"] | order(orderRank asc) {    _id,    role,    organization-> {      _id,      name,      website,      logo {        asset->,        hotspot,        crop,        alt      }    },    location,    startDate,    endDate,    isCurrent,    summary,    highlights,    credential,    links[] {      label,      url,      type    }  }
 export type EDUCATION_QUERY_RESULT = Array<{
   _id: string
   role: string | null
@@ -1194,6 +1218,8 @@ export type EDUCATION_QUERY_RESULT = Array<{
         metadata?: SanityImageMetadata
         source?: SanityAssetSourceData
       } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
       alt: string | null
     } | null
   } | null
@@ -1234,7 +1260,7 @@ export type PUBLICATIONS_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: FEATURED_PROJECTS_QUERY
-// Query: *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    "hasBody": defined(body),    icon {      asset->,      alt    },    coverImage {      asset->,      alt    },    organization-> {      _id,      name,      website    },    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt  }
+// Query: *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    "hasBody": defined(body),    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    organization-> {      _id,      name,      website    },    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt  }
 export type FEATURED_PROJECTS_QUERY_RESULT = Array<{
   _id: string
   title: string | null
@@ -1273,6 +1299,8 @@ export type FEATURED_PROJECTS_QUERY_RESULT = Array<{
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   coverImage: {
@@ -1298,6 +1326,8 @@ export type FEATURED_PROJECTS_QUERY_RESULT = Array<{
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   organization: {
@@ -1329,7 +1359,7 @@ export type FEATURED_PROJECTS_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: PROJECTS_QUERY
-// Query: *[_type == "project"] | order(orderRank asc) {    _id,    title,    slug,    kind,    status,    tagline,    summary,    "hasBody": defined(body),    archived,    featured,    icon {      asset->,      alt    },    coverImage {      asset->,      alt    },    organization-> {      _id,      name,      website    },    relatedExperience-> {      _id,      role,      employmentType    },    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt  }
+// Query: *[_type == "project"] | order(orderRank asc) {    _id,    title,    slug,    kind,    status,    tagline,    summary,    "hasBody": defined(body),    archived,    featured,    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    organization-> {      _id,      name,      website    },    relatedExperience-> {      _id,      role,      employmentType    },    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt  }
 export type PROJECTS_QUERY_RESULT = Array<{
   _id: string
   title: string | null
@@ -1370,6 +1400,8 @@ export type PROJECTS_QUERY_RESULT = Array<{
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   coverImage: {
@@ -1395,6 +1427,8 @@ export type PROJECTS_QUERY_RESULT = Array<{
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   organization: {
@@ -1438,7 +1472,7 @@ export type PROJECTS_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: PROJECT_BY_SLUG_QUERY
-// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    body,    archived,    icon {      asset->,      alt    },    coverImage {      asset->,      alt    },    gallery[] {      asset->,      alt,      caption    },    organization-> {      _id,      name,      website,      description,      logo {        asset->,        alt      }    },    relatedExperience-> {      _id,      role,      employmentType,      startDate,      endDate,      isCurrent,      organization-> {        _id,        name      }    },    skills[]-> {      _id,      name,      category    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt,    _updatedAt  }
+// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    body,    archived,    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    gallery[] {      asset->,      hotspot,      crop,      alt,      caption    },    organization-> {      _id,      name,      website,      description,      logo {        asset->,        hotspot,        crop,        alt      }    },    relatedExperience-> {      _id,      role,      employmentType,      startDate,      endDate,      isCurrent,      organization-> {        _id,        name      }    },    skills[]-> {      _id,      name,      category    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt,    _updatedAt  }
 export type PROJECT_BY_SLUG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -1478,6 +1512,8 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   coverImage: {
@@ -1503,6 +1539,8 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
   gallery: Array<{
@@ -1528,6 +1566,8 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
     caption: string | null
   }> | null
@@ -1559,6 +1599,8 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
         metadata?: SanityImageMetadata
         source?: SanityAssetSourceData
       } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
       alt: string | null
     } | null
   } | null
@@ -1622,7 +1664,7 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: PROJECT_SLUGS_QUERY
-// Query: *[_type == "project" && defined(slug.current)] | order(orderRank asc) {    _id,    title,    slug,    coverImage {      asset->,      alt    }  }
+// Query: *[_type == "project" && defined(slug.current)] | order(orderRank asc) {    _id,    title,    slug,    coverImage {      asset->,      hotspot,      crop,      alt    }  }
 export type PROJECT_SLUGS_QUERY_RESULT = Array<{
   _id: string
   title: string | null
@@ -1650,6 +1692,8 @@ export type PROJECT_SLUGS_QUERY_RESULT = Array<{
       metadata?: SanityImageMetadata
       source?: SanityAssetSourceData
     } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
     alt: string | null
   } | null
 }>
@@ -1657,24 +1701,24 @@ export type PROJECT_SLUGS_QUERY_RESULT = Array<{
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      alt\n    },\n    twitterImage {\n      asset->,\n      alt\n    },\n    logo {\n      asset->,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      alt\n    },\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    },\n    resumePdf {\n      asset->\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
-    '\n  *[_type == "siteConfig"][0] {\n    aboutPageHeadingLead,\n    aboutPageHeadingHighlight,\n    aboutPageIntro,\n    aboutPageStoryHeadingLead,\n    aboutPageStoryHeadingHighlight,\n    aboutPageStoryHeadingTrail,\n    aboutPageStory,\n    aboutPageValuesHeading,\n    aboutPageValuesIntro,\n    aboutPagePortrait {\n      asset->,\n      alt\n    }\n  }\n': ABOUT_PAGE_QUERY_RESULT
+    '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    twitterImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    logo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    },\n    resumePdf {\n      asset->\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
+    '\n  *[_type == "siteConfig"][0] {\n    aboutPageHeadingLead,\n    aboutPageHeadingHighlight,\n    aboutPageIntro,\n    aboutPageStoryHeadingLead,\n    aboutPageStoryHeadingHighlight,\n    aboutPageStoryHeadingTrail,\n    aboutPageStory,\n    aboutPageValuesHeading,\n    aboutPageValuesIntro,\n    aboutPagePortrait {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': ABOUT_PAGE_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0].footerLegalLinks[]-> {\n    _id,\n    title,\n    slug,\n    description,\n    _updatedAt\n  }\n': FOOTER_LEGAL_LINKS_QUERY_RESULT
     '\n  *[_type == "faqs"][0] {\n    ...,\n    faqItems[]{ ... }\n  }\n': FAQS_QUERY_RESULT
     '\n  *[_type == "legal"] | order(_updatedAt desc) {\n    _id,\n    title,\n    slug,\n    description,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENTS_QUERY_RESULT
     '\n  *[_type == "legal" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    description,\n    content,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT
-    '\n  *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      alt\n    },\n    category\n  }\n': FEATURED_SKILLS_QUERY_RESULT
-    '\n  *[_type == "skill"] | order(category asc, orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      alt\n    },\n    category\n  }\n': SKILLS_QUERY_RESULT
-    '\n  *[_type == "service"] | order(orderRank asc) {\n    _id,\n    name,\n    description,\n    illustration {\n      asset->,\n      alt\n    }\n  }\n': SERVICES_QUERY_RESULT
-    '\n  *[_type == "value"] | order(orderRank asc) {\n    _id,\n    title,\n    description,\n    illustration {\n      asset->,\n      alt\n    }\n  }\n': VALUES_QUERY_RESULT
-    '\n  *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    employmentType,\n    startDate,\n    endDate,\n    isCurrent,\n    summary\n  }\n': FEATURED_EXPERIENCES_QUERY_RESULT
-    '\n  *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {\n    _id,\n    role,\n    kind,\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    employmentType,\n    workMode,\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EXPERIENCES_QUERY_RESULT
-    '\n  *[_type == "experience" && kind == "education"] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    credential,\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EDUCATION_QUERY_RESULT
+    '\n  *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    category\n  }\n': FEATURED_SKILLS_QUERY_RESULT
+    '\n  *[_type == "skill"] | order(category asc, orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    category\n  }\n': SKILLS_QUERY_RESULT
+    '\n  *[_type == "service"] | order(orderRank asc) {\n    _id,\n    name,\n    description,\n    illustration {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': SERVICES_QUERY_RESULT
+    '\n  *[_type == "value"] | order(orderRank asc) {\n    _id,\n    title,\n    description,\n    illustration {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': VALUES_QUERY_RESULT
+    '\n  *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    employmentType,\n    startDate,\n    endDate,\n    isCurrent,\n    summary\n  }\n': FEATURED_EXPERIENCES_QUERY_RESULT
+    '\n  *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {\n    _id,\n    role,\n    kind,\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    employmentType,\n    workMode,\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EXPERIENCES_QUERY_RESULT
+    '\n  *[_type == "experience" && kind == "education"] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    credential,\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EDUCATION_QUERY_RESULT
     '\n  *[_type == "publication"] | order(orderRank asc) {\n    _id,\n    title,\n    venue,\n    publishedAt,\n    authors,\n    doi,\n    url,\n    abstract\n  }\n': PUBLICATIONS_QUERY_RESULT
-    '\n  *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    icon {\n      asset->,\n      alt\n    },\n    coverImage {\n      asset->,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': FEATURED_PROJECTS_QUERY_RESULT
-    '\n  *[_type == "project"] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    archived,\n    featured,\n    icon {\n      asset->,\n      alt\n    },\n    coverImage {\n      asset->,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': PROJECTS_QUERY_RESULT
-    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    body,\n    archived,\n    icon {\n      asset->,\n      alt\n    },\n    coverImage {\n      asset->,\n      alt\n    },\n    gallery[] {\n      asset->,\n      alt,\n      caption\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType,\n      startDate,\n      endDate,\n      isCurrent,\n      organization-> {\n        _id,\n        name\n      }\n    },\n    skills[]-> {\n      _id,\n      name,\n      category\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt,\n    _updatedAt\n  }\n': PROJECT_BY_SLUG_QUERY_RESULT
-    '\n  *[_type == "project" && defined(slug.current)] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    coverImage {\n      asset->,\n      alt\n    }\n  }\n': PROJECT_SLUGS_QUERY_RESULT
+    '\n  *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': FEATURED_PROJECTS_QUERY_RESULT
+    '\n  *[_type == "project"] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    archived,\n    featured,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': PROJECTS_QUERY_RESULT
+    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    body,\n    archived,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    gallery[] {\n      asset->,\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType,\n      startDate,\n      endDate,\n      isCurrent,\n      organization-> {\n        _id,\n        name\n      }\n    },\n    skills[]-> {\n      _id,\n      name,\n      category\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt,\n    _updatedAt\n  }\n': PROJECT_BY_SLUG_QUERY_RESULT
+    '\n  *[_type == "project" && defined(slug.current)] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': PROJECT_SLUGS_QUERY_RESULT
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too
