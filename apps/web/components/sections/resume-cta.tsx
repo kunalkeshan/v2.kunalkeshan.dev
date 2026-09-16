@@ -42,8 +42,8 @@ export function ResumeCta({ fileUrl, fileName }: ResumeCtaProps) {
       aria-labelledby="resume-download-heading"
       className={cn(
         "relative isolate overflow-hidden",
-        "rounded-(--radius-lg) border-3 border-border bg-card",
-        "shadow-[var(--shadow-lg)]",
+        "rounded-lg border-3 border-border bg-card",
+        "shadow-lg",
         "px-6 py-12 md:px-10 md:py-16"
       )}
     >

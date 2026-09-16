@@ -72,7 +72,7 @@ const Navbar = ({ siteConfig }: Props) => {
           aria-label="Contact"
           nativeButton={false}
           render={<a href="/contact" />}
-          className="rounded-(--radius-lg) border-border bg-foreground text-background hover:bg-primary hover:text-primary-foreground"
+          className="rounded-lg border-border bg-foreground text-background hover:bg-primary hover:text-primary-foreground"
         >
           <MailIcon />
         </Button>

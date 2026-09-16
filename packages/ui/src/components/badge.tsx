@@ -10,15 +10,15 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-2 border-border bg-primary text-primary-foreground shadow-[var(--shadow-sm)] [a]:hover:bg-primary/80",
+          "border-2 border-border bg-primary text-primary-foreground shadow-sm [a]:hover:bg-primary/80",
         secondary:
-          "border-2 border-border bg-secondary text-secondary-foreground shadow-[var(--shadow-sm)] [a]:hover:bg-secondary/80",
+          "border-2 border-border bg-secondary text-secondary-foreground shadow-sm [a]:hover:bg-secondary/80",
         success:
-          "border-2 border-border bg-success text-success-foreground shadow-[var(--shadow-sm)] [a]:hover:bg-success/80",
+          "border-2 border-border bg-success text-success-foreground shadow-sm [a]:hover:bg-success/80",
         warning:
-          "border-2 border-border bg-warning text-warning-foreground shadow-[var(--shadow-sm)] [a]:hover:bg-warning/80",
+          "border-2 border-border bg-warning text-warning-foreground shadow-sm [a]:hover:bg-warning/80",
         destructive:
-          "border-2 border-border bg-destructive text-destructive-foreground shadow-[var(--shadow-sm)] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/80",
+          "border-2 border-border bg-destructive text-destructive-foreground shadow-sm focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/80",
         outline:
           "border-2 border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
         ghost:

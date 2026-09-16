@@ -43,8 +43,8 @@ export function Publications({ publications }: PublicationsProps) {
             <li
               key={publication._id}
               className={cn(
-                "rounded-(--radius-lg) border-3 border-border bg-card p-5 md:p-7",
-                "shadow-[var(--shadow-lg)]"
+                "rounded-lg border-3 border-border bg-card p-5 md:p-7",
+                "shadow-lg"
               )}
             >
               <h3 className="font-heading text-lg font-black text-balance sm:text-xl">

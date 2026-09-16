@@ -31,7 +31,7 @@ export function Logo({
       aria-label="Home"
       className={cn(
         "block shrink-0 overflow-hidden rounded-full border-2 border-border bg-card",
-        "transition-transform duration-(--duration-press) ease-snap hover:scale-95",
+        "transition-transform duration-press ease-snap hover:scale-95",
         sizeClasses[size],
         className
       )}

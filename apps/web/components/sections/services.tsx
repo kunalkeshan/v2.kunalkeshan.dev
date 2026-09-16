@@ -23,9 +23,9 @@ interface ServicesGridProps {
 }
 
 const cardShell = cn(
-  "flex min-h-[420px] flex-col overflow-hidden rounded-(--radius-lg) border-3 border-border bg-card",
-  "shadow-[var(--shadow-xl)] transition-shadow duration-(--duration-press) ease-(--ease-snap)",
-  "hover:shadow-[var(--shadow-2xl)]"
+  "flex min-h-105 flex-col overflow-hidden rounded-lg border-3 border-border bg-card",
+  "shadow-xl transition-shadow duration-press ease-snap",
+  "hover:shadow-2xl"
 )
 
 function ServiceCard({ service }: { service: Service }) {
@@ -42,7 +42,7 @@ function ServiceCard({ service }: { service: Service }) {
 
   return (
     <div className={cardShell}>
-      <div className="flex min-h-[180px] items-center justify-center bg-muted p-8">
+      <div className="flex min-h-45 items-center justify-center bg-muted p-8">
         {illustrationUrl && (
           <Image
             src={illustrationUrl}
@@ -50,7 +50,7 @@ function ServiceCard({ service }: { service: Service }) {
             width={dimensions?.width ?? 140}
             height={dimensions?.height ?? 140}
             sizes="140px"
-            className="h-auto w-full max-w-[140px] object-contain"
+            className="h-auto w-full max-w-35 object-contain"
           />
         )}
       </div>
@@ -67,16 +67,16 @@ function ServiceCard({ service }: { service: Service }) {
 function ContactCard() {
   return (
     <div className={cn(cardShell, "bg-secondary")}>
-      <div className="flex min-h-[180px] items-center justify-center bg-secondary p-8">
+      <div className="flex min-h-45 items-center justify-center bg-secondary p-8">
         {/* Intrinsic size of public/mailbox.svg (576.5 x 493.5), not the
-            rendered size — `max-w-[140px]` still caps how large it paints. */}
+            rendered size — `max-w-35` still caps how large it paints. */}
         <Image
           src="/mailbox.svg"
           alt="Illustration of an open mailbox with letters"
           width={577}
           height={494}
           sizes="140px"
-          className="h-auto w-full max-w-[140px] object-contain"
+          className="h-auto w-full max-w-35 object-contain"
         />
       </div>
       <div className="flex flex-1 flex-col gap-3 p-6">
@@ -90,9 +90,9 @@ function ContactCard() {
         <a
           href="/contact"
           className={cn(
-            "mt-auto flex items-center justify-center gap-2 rounded-(--radius-lg) border-2 border-border bg-primary px-4 py-3",
+            "mt-auto flex items-center justify-center gap-2 rounded-lg border-2 border-border bg-primary px-4 py-3",
             "font-heading text-sm font-bold text-primary-foreground",
-            "shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-(--duration-press) ease-(--ease-snap)",
+            "shadow-sm transition-[transform,box-shadow] duration-press ease-snap",
             "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none"
           )}
         >

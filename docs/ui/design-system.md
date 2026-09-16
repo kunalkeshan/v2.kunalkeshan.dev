@@ -87,25 +87,30 @@ Solid, single-color, offset shadows only — no blur, no spread, color always eq
 | `shadow-lg`                         | `6px 6px 0 0 var(--border)`   | open accordions, cards                            |
 | `shadow-xl`                         | `8px 8px 0 0 var(--border)`   | sheets, dialogs, floating nav chrome              |
 | `shadow-2xl`                        | `10px 10px 0 0 var(--border)` | the hover-grow step past `shadow-xl` — see below  |
-| `shadow-[var(--shadow-reverse)]`    | `-4px 4px 0 0 var(--border)`  | rare, directional emphasis only                   |
-| `shadow-[var(--shadow-reverse-sm)]` | `-2px 2px 0 0 var(--border)`  | reverse-direction hover on small circular avatars |
+| `shadow-reverse`                    | `-4px 4px 0 0 var(--border)`  | rare, directional emphasis only                   |
+| `shadow-reverse-sm`                 | `-2px 2px 0 0 var(--border)`  | reverse-direction hover on small circular avatars |
 
 The raw CSS var backing `shadow` is `--shadow-base`, not a bare `--shadow` — Tailwind v4
 reserves `--shadow-*` as its own box-shadow theme namespace, so a bare `--shadow` raw var
-would collide. `@theme inline` maps `--shadow: var(--shadow-base)` to bridge it. Same
-reasoning applies to `shadow-2xl`/`shadow-reverse-sm` — reference them as
-`shadow-[var(--shadow-2xl)]` / `shadow-[var(--shadow-reverse-sm)]` in Tailwind classes
-rather than expecting a bare utility name, consistent with `shadow-reverse`.
+would collide. `@theme inline` maps `--shadow: var(--shadow-base)` to bridge it.
+
+**Write every one of these as the bare utility** (`shadow-sm`, `shadow`, `shadow-lg`,
+`shadow-xl`, `shadow-2xl`, `shadow-reverse`, `shadow-reverse-sm`) — each is a registered
+`@theme inline` key, so the named utility resolves and is what Tailwind's IDE plugin
+expects. The namespace-collision note above is only about how the **raw var** is spelled
+in `:root`; it does not mean these need an arbitrary `shadow-[var(...)]` form. Writing
+the bracket form instead produces a `suggestCanonicalClasses` warning in the editor.
+Note the `--shadow-base` raw var maps to the bare `shadow` utility, not `shadow-base` —
+there is no `shadow-base` class.
 
 **`shadow-xl` → `shadow-2xl` hover-grow pattern** (ported from v1's
 `shadow-3d hover:shadow-3d-hover`): pair a resting `shadow-xl` with
-`hover:shadow-[var(--shadow-2xl)]` plus `transition-shadow duration-(--duration-press)
-ease-(--ease-snap)` on **image containers** — hero art, profile/avatar photos, a
-highlighted "currently active" card. In v1 this was never applied to buttons or nav
-chrome, only bordered `<Image>` wrappers; keep that boundary when porting more
-components. The `shadow-reverse-sm` variant is the same idea but for small circular
-avatar thumbnails, paired with a resting `shadow-[var(--shadow-reverse-sm)]` (not
-`shadow-sm`) and `hover:shadow-[var(--shadow-reverse)]`.
+`hover:shadow-2xl` plus `transition-shadow duration-press ease-snap` on **image
+containers** — hero art, profile/avatar photos, a highlighted "currently active" card.
+In v1 this was never applied to buttons or nav chrome, only bordered `<Image>` wrappers;
+keep that boundary when porting more components. The `shadow-reverse-sm` variant is the
+same idea but for small circular avatar thumbnails, paired with a resting
+`shadow-reverse-sm` (not `shadow-sm`) and `hover:shadow-reverse`.
 
 ## `pressableShadow` — the "press into shadow" interaction
 
@@ -174,7 +179,7 @@ bars) — not just the current navbar.
   v1's navbar shadow (`8px 8px 0 0 rgb(11,11,11)`) is what `shadow-xl` already encodes
   in this repo's tokens.
 - **Dropdown panels** (e.g. a nav item's expandable menu): reuse the same
-  `border-3 border-border bg-card` + `rounded-(--radius-lg)` treatment as any other
+  `border-3 border-border bg-card` + `rounded-lg` treatment as any other
   card-tier surface, plus `shadow-lg`. Note this repo's navbar dropdowns intentionally
   render richer than v1's — v1's own "More" dropdown was a bare `border-2` panel with
   **no icons, no per-item descriptions, and no shadow at all** (plain two-column text
@@ -250,7 +255,7 @@ triggering element's own subtree) rather than guessing at which class is respons
 Every shadow in this system is a solid offset in `var(--border)`, and `--border`
 is near-black in light mode. That means a section painted dark with a plain
 utility (`bg-foreground`, `bg-black`, an image overlay) silently breaks every
-control inside it: buttons keep their `shadow-[var(--shadow-base)]` but it
+control inside it: buttons keep their `shadow` but it
 renders black-on-black and disappears, taking the press-into-shadow interaction
 with it. Hairlines and focus rings fail the same way.
 
@@ -286,7 +291,7 @@ card and lose the depth entirely:
 
 ```tsx
 <section className="on-inverted">
-  <article className="on-surface border-3 border-border bg-card shadow-[var(--shadow-lg)]">
+  <article className="on-surface border-3 border-border bg-card shadow-lg">
     …
   </article>
 </section>

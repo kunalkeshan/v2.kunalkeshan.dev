@@ -103,7 +103,7 @@ const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
             </div>
           </div>
 
-          <div className="flex h-fit max-h-[520px] w-full max-w-lg items-center justify-center overflow-hidden rounded-(--radius-lg) border-3 border-border shadow-xl transition-shadow duration-(--duration-press) ease-(--ease-snap) hover:shadow-[var(--shadow-2xl)] md:mx-auto">
+          <div className="flex h-fit max-h-130 w-full max-w-lg items-center justify-center overflow-hidden rounded-lg border-3 border-border shadow-xl transition-shadow duration-press ease-snap hover:shadow-2xl md:mx-auto">
             <Image
               src={imageUrl}
               alt={imageAlt}

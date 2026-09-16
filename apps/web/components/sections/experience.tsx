@@ -92,9 +92,9 @@ function OrganizationLogoMark({
     <span
       className={cn(
         "flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-card",
-        "border-2 border-border shadow-[var(--shadow-sm)]",
+        "border-2 border-border shadow-sm",
         website &&
-          "transition-shadow duration-(--duration-press) ease-(--ease-snap) hover:shadow-[var(--shadow-base)]"
+          "transition-shadow duration-press ease-snap hover:shadow"
       )}
       style={{ width: size, height: size }}
     >
@@ -161,9 +161,9 @@ function RoleLinks({ links }: { links: Role["links"] }) {
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-(--radius-sm) border-2 border-border bg-muted px-2.5 py-1",
+                "inline-flex items-center gap-1.5 rounded-sm border-2 border-border bg-muted px-2.5 py-1",
                 "text-xs font-bold",
-                "shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-(--duration-press) ease-(--ease-snap)",
+                "shadow-sm transition-[transform,box-shadow] duration-press ease-snap",
                 "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
                 "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
               )}
@@ -186,7 +186,7 @@ function SkillTags({ skills }: { skills: Role["skills"] }) {
       {skills.map((skill) => (
         <li
           key={skill._id}
-          className="rounded-(--radius-sm) border-2 border-border bg-background px-2 py-0.5 text-xs font-semibold"
+          className="rounded-sm border-2 border-border bg-background px-2 py-0.5 text-xs font-semibold"
         >
           {skill.name}
         </li>
@@ -326,8 +326,8 @@ function OrganizationBlock({ group }: { group: OrganizationGroup }) {
   return (
     <article
       className={cn(
-        "rounded-(--radius-lg) border-3 border-border bg-card",
-        "shadow-[var(--shadow-lg)]",
+        "rounded-lg border-3 border-border bg-card",
+        "shadow-lg",
         "p-5 md:p-7"
       )}
     >
@@ -465,12 +465,12 @@ function FeaturedCard({ role }: { role: FeaturedRole }) {
   return (
     <article
       className={cn(
-        "overflow-hidden rounded-(--radius-lg) border-3 border-border bg-card",
+        "overflow-hidden rounded-lg border-3 border-border bg-card",
         // Pale card on the inverted panel: `.on-surface` restores the normal
         // tokens inside it, so its text, hairlines and shadow read against the
         // card's own ground rather than inheriting the inverted ones.
         "on-surface",
-        "shadow-[var(--shadow-lg)]"
+        "shadow-lg"
       )}
     >
       <div className="flex items-center justify-between gap-4 px-5 py-4">

@@ -15,12 +15,12 @@ export function NavDropdownItem({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-3 rounded-(--radius-base) p-2 transition-colors hover:bg-muted",
+        "flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-muted",
         className
       )}
     >
       {icon && (
-        <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-(--radius-sm) border-2 border-border bg-background [&_svg]:size-4">
+        <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-sm border-2 border-border bg-background [&_svg]:size-4">
           {icon}
         </div>
       )}

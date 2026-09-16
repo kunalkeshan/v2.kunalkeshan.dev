@@ -58,12 +58,12 @@ const About = ({
     >
       <Container>
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="order-last flex w-full items-center justify-center lg:order-none">
+          <div className="order-last flex w-full items-center justify-center lg:order-0">
             <div
               className={cn(
                 "aspect-square w-full max-w-md overflow-hidden rounded-full",
                 "border-3 border-border shadow-xl",
-                "transition-shadow duration-(--duration-press) ease-(--ease-snap)",
+                "transition-shadow duration-press ease-snap",
                 "hover:shadow-2xl"
               )}
             >

@@ -64,7 +64,7 @@ export function MobileNav({ logoSrc }: Props) {
                 <Link
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-(--radius-base) p-2 text-sm font-semibold hover:bg-muted"
+                  className="block rounded-md p-2 text-sm font-semibold hover:bg-muted"
                 >
                   {item.label}
                 </Link>

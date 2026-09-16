@@ -77,14 +77,14 @@ export function SectionNav({ items }: SectionNavProps) {
                 href={`#${item.id}`}
                 aria-current={isActive ? "true" : undefined}
                 className={cn(
-                  "inline-flex items-center rounded-(--radius-pill) border-2 border-border px-4 py-1.5",
+                  "inline-flex items-center rounded-4xl border-2 border-border px-4 py-1.5",
                   "font-heading text-sm font-bold whitespace-nowrap",
-                  "transition-[transform,box-shadow,background-color,color] duration-(--duration-press) ease-(--ease-snap)",
+                  "transition-[transform,box-shadow,background-color,color] duration-press ease-snap",
                   "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
                   "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
                   isActive
                     ? "bg-primary text-primary-foreground shadow-none"
-                    : "bg-card text-card-foreground shadow-[var(--shadow-sm)]"
+                    : "bg-card text-card-foreground shadow-sm"
                 )}
               >
                 {item.label}

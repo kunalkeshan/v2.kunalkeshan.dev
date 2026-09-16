@@ -29,7 +29,7 @@ export function DesktopNav() {
             Work
           </NavigationMenuTrigger>
           <NavigationMenuContent className="pr-1.5 pb-1.5">
-            <div className="grid w-72 gap-2 rounded-(--radius-lg) border-3 border-border bg-card p-2 shadow-lg">
+            <div className="grid w-72 gap-2 rounded-lg border-3 border-border bg-card p-2 shadow-lg">
               {workLinks.map((item) => (
                 <NavigationMenuLink
                   key={item.href}
@@ -44,7 +44,7 @@ export function DesktopNav() {
             More
           </NavigationMenuTrigger>
           <NavigationMenuContent className="pr-1.5 pb-1.5">
-            <div className="grid w-72 gap-2 rounded-(--radius-lg) border-3 border-border bg-card p-2 shadow-lg">
+            <div className="grid w-72 gap-2 rounded-lg border-3 border-border bg-card p-2 shadow-lg">
               {moreLinks.map((item) => (
                 <NavigationMenuLink
                   key={item.href}
