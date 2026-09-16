@@ -22,10 +22,32 @@ interface ServicesGridProps {
   services: SERVICES_QUERY_RESULT
 }
 
+/**
+ * The content-card hover, ported from v1's project/service cards: the card
+ * **rests flat** and the hard shadow *appears* on hover alongside a lift, with
+ * the illustration scaling inside it.
+ *
+ * This is deliberately not the resting-`shadow-xl` -> `hover:shadow-2xl` pair,
+ * which docs/ui/design-system.md reserves for bordered *image wrappers* (hero
+ * art, avatars). An earlier version of this file used that pairing and it read
+ * as inert — the shadow was already there, so hover barely registered.
+ *
+ * `group` is what lets the illustration respond; see `group-hover:scale-110`
+ * on the `<Image>` below. Never combine this with `pressableShadow`, which owns
+ * its own `hover:translate-*` on the same axis and would fight the lift.
+ */
 const cardShell = cn(
-  "flex min-h-105 flex-col overflow-hidden rounded-lg border-3 border-border bg-card",
-  "shadow-xl transition-shadow duration-press ease-snap",
-  "hover:shadow-2xl"
+  "group flex min-h-105 flex-col overflow-hidden rounded-lg border-3 border-border bg-card",
+  // An explicit resting `translate-y-0` matters: without a declared start value
+  // the transform is absent at rest, and the browser has nothing to interpolate
+  // *from* on hover / *back to* on unhover. That asymmetry is what read as jank
+  // on the way out. `transform-gpu` promotes the card to its own layer so the
+  // lift composites instead of repainting the bordered box every frame.
+  "translate-y-0 transform-gpu will-change-transform",
+  "transition-[transform,box-shadow] duration-press ease-snap",
+  "hover:-translate-y-2 hover:shadow-xl",
+  // Reduced motion: keep the shadow cue, drop the travel.
+  "motion-reduce:transition-[box-shadow] motion-reduce:hover:translate-y-0"
 )
 
 function ServiceCard({ service }: { service: Service }) {
@@ -50,7 +72,17 @@ function ServiceCard({ service }: { service: Service }) {
             width={dimensions?.width ?? 140}
             height={dimensions?.height ?? 140}
             sizes="140px"
-            className="h-auto w-full max-w-35 object-contain"
+            className={cn(
+              "h-auto w-full max-w-35 object-contain",
+              // Paired with `group` on `cardShell` — v1 scaled the cover art on
+              // card hover, which is what makes the lift feel like one gesture
+              // rather than the frame moving on its own. Same explicit resting
+              // value + GPU promotion as the shell, for the same reason: the
+              // scale has to interpolate symmetrically in both directions.
+              "scale-100 transform-gpu will-change-transform",
+              "transition-transform duration-press ease-snap group-hover:scale-110",
+              "motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            )}
           />
         )}
       </div>

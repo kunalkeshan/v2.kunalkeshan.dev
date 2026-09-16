@@ -15,6 +15,146 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: schema.json
+export type OrganizationReference = {
+  _ref: string
+  _type: "reference"
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: "organization"
+}
+
+export type ExperienceReference = {
+  _ref: string
+  _type: "reference"
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: "experience"
+}
+
+export type SkillReference = {
+  _ref: string
+  _type: "reference"
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: "skill"
+}
+
+export type SanityImageAssetReference = {
+  _ref: string
+  _type: "reference"
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset"
+}
+
+export type Project = {
+  _id: string
+  _type: "project"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  slug?: Slug
+  kind?: "professional" | "freelance" | "personal" | "open-source" | "research"
+  status?: "live" | "in-development" | "unlaunched" | "archived"
+  tagline?: string
+  summary?: string
+  body?: BlockContent
+  organization?: OrganizationReference
+  relatedExperience?: ExperienceReference
+  skills?: Array<
+    {
+      _key: string
+    } & SkillReference
+  >
+  icon?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  coverImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  gallery?: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    caption?: string
+    _type: "image"
+    _key: string
+  }>
+  links?: Array<{
+    label?: string
+    url?: string
+    type?: "live-site" | "repo" | "case-study" | "video" | "paper"
+    _key: string
+  }>
+  githubRepo?: string
+  startDate?: string
+  completedAt?: string
+  featured?: boolean
+  archived?: boolean
+  orderRank?: string
+}
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop"
+  top?: number
+  bottom?: number
+  left?: number
+  right?: number
+}
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot"
+  x?: number
+  y?: number
+  height?: number
+  width?: number
+}
+
+export type BlockContent = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>
+        text?: string
+        _type: "span"
+        _key: string
+      }>
+      style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote"
+      listItem?: "bullet"
+      markDefs?: Array<{
+        href?: string
+        _type: "link"
+        _key: string
+      }>
+      level?: number
+      _type: "block"
+      _key: string
+    }
+  | {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: "image"
+      _key: string
+    }
+>
+
+export type Slug = {
+  _type: "slug"
+  current?: string
+  source?: string
+}
+
 export type Publication = {
   _id: string
   _type: "publication"
@@ -29,20 +169,6 @@ export type Publication = {
   url?: string
   abstract?: string
   orderRank?: string
-}
-
-export type OrganizationReference = {
-  _ref: string
-  _type: "reference"
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: "organization"
-}
-
-export type SkillReference = {
-  _ref: string
-  _type: "reference"
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: "skill"
 }
 
 export type Experience = {
@@ -85,13 +211,6 @@ export type Experience = {
   orderRank?: string
 }
 
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: "reference"
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset"
-}
-
 export type Organization = {
   _id: string
   _type: "organization"
@@ -110,22 +229,6 @@ export type Organization = {
   website?: string
   description?: string
   orderRank?: string
-}
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop"
-  top?: number
-  bottom?: number
-  left?: number
-  right?: number
-}
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot"
-  x?: number
-  y?: number
-  height?: number
-  width?: number
 }
 
 export type Service = {
@@ -205,42 +308,6 @@ export type Legal = {
   slug?: Slug
   description?: string
   content?: BlockContent
-}
-
-export type BlockContent = Array<
-  | {
-      children?: Array<{
-        marks?: Array<string>
-        text?: string
-        _type: "span"
-        _key: string
-      }>
-      style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote"
-      listItem?: "bullet"
-      markDefs?: Array<{
-        href?: string
-        _type: "link"
-        _key: string
-      }>
-      level?: number
-      _type: "block"
-      _key: string
-    }
-  | {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      alt?: string
-      _type: "image"
-      _key: string
-    }
->
-
-export type Slug = {
-  _type: "slug"
-  current?: string
-  source?: string
 }
 
 export type SanityFileAssetReference = {
@@ -449,20 +516,22 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
-  | Publication
   | OrganizationReference
+  | ExperienceReference
   | SkillReference
-  | Experience
   | SanityImageAssetReference
-  | Organization
+  | Project
   | SanityImageCrop
   | SanityImageHotspot
+  | BlockContent
+  | Slug
+  | Publication
+  | Experience
+  | Organization
   | Service
   | Skill
   | Faqs
   | Legal
-  | BlockContent
-  | Slug
   | SanityFileAssetReference
   | LegalReference
   | SiteConfig
@@ -1045,6 +1114,404 @@ export type PUBLICATIONS_QUERY_RESULT = Array<{
   abstract: string | null
 }>
 
+// Source: ../../packages/sanity/src/query.ts
+// Variable: FEATURED_PROJECTS_QUERY
+// Query: *[_type == "project" && featured == true && archived != true] | order(orderRank asc) {    _id,    title,    slug,    kind,    status,    tagline,    summary,    "hasBody": defined(body),    icon {      asset->,      alt    },    coverImage {      asset->,      alt    },    organization-> {      _id,      name,      website    },    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt  }
+export type FEATURED_PROJECTS_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  slug: Slug | null
+  kind:
+    | "freelance"
+    | "open-source"
+    | "personal"
+    | "professional"
+    | "research"
+    | null
+  status: "archived" | "in-development" | "live" | "unlaunched" | null
+  tagline: string | null
+  summary: string | null
+  hasBody: false | true
+  icon: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+  } | null
+  coverImage: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+  } | null
+  organization: {
+    _id: string
+    name: string | null
+    website: string | null
+  } | null
+  skills: Array<{
+    _id: string
+    name: string | null
+  }> | null
+  links: Array<{
+    label: string | null
+    url: string | null
+    type: "case-study" | "live-site" | "paper" | "repo" | "video" | null
+  }> | null
+  githubRepo: string | null
+  startDate: string | null
+  completedAt: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: PROJECTS_QUERY
+// Query: *[_type == "project"] | order(orderRank asc) {    _id,    title,    slug,    kind,    status,    tagline,    summary,    "hasBody": defined(body),    archived,    featured,    icon {      asset->,      alt    },    coverImage {      asset->,      alt    },    organization-> {      _id,      name,      website    },    relatedExperience-> {      _id,      role,      employmentType    },    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt  }
+export type PROJECTS_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  slug: Slug | null
+  kind:
+    | "freelance"
+    | "open-source"
+    | "personal"
+    | "professional"
+    | "research"
+    | null
+  status: "archived" | "in-development" | "live" | "unlaunched" | null
+  tagline: string | null
+  summary: string | null
+  hasBody: false | true
+  archived: boolean | null
+  featured: boolean | null
+  icon: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+  } | null
+  coverImage: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+  } | null
+  organization: {
+    _id: string
+    name: string | null
+    website: string | null
+  } | null
+  relatedExperience: {
+    _id: string
+    role: string | null
+    employmentType:
+      | "contract"
+      | "freelance"
+      | "full-time"
+      | "internship"
+      | "part-time"
+      | "volunteer"
+      | null
+  } | null
+  skills: Array<{
+    _id: string
+    name: string | null
+  }> | null
+  links: Array<{
+    label: string | null
+    url: string | null
+    type: "case-study" | "live-site" | "paper" | "repo" | "video" | null
+  }> | null
+  githubRepo: string | null
+  startDate: string | null
+  completedAt: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: PROJECT_BY_SLUG_QUERY
+// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    body,    archived,    icon {      asset->,      alt    },    coverImage {      asset->,      alt    },    gallery[] {      asset->,      alt,      caption    },    organization-> {      _id,      name,      website,      description,      logo {        asset->,        alt      }    },    relatedExperience-> {      _id,      role,      employmentType,      startDate,      endDate,      isCurrent,      organization-> {        _id,        name      }    },    skills[]-> {      _id,      name,      category    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt,    _updatedAt  }
+export type PROJECT_BY_SLUG_QUERY_RESULT = {
+  _id: string
+  title: string | null
+  slug: Slug | null
+  kind:
+    | "freelance"
+    | "open-source"
+    | "personal"
+    | "professional"
+    | "research"
+    | null
+  status: "archived" | "in-development" | "live" | "unlaunched" | null
+  tagline: string | null
+  summary: string | null
+  body: BlockContent | null
+  archived: boolean | null
+  icon: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+  } | null
+  coverImage: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+  } | null
+  gallery: Array<{
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+    caption: string | null
+  }> | null
+  organization: {
+    _id: string
+    name: string | null
+    website: string | null
+    description: string | null
+    logo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      alt: string | null
+    } | null
+  } | null
+  relatedExperience: {
+    _id: string
+    role: string | null
+    employmentType:
+      | "contract"
+      | "freelance"
+      | "full-time"
+      | "internship"
+      | "part-time"
+      | "volunteer"
+      | null
+    startDate: string | null
+    endDate: string | null
+    isCurrent: boolean | null
+    organization: {
+      _id: string
+      name: string | null
+    } | null
+  } | null
+  skills: Array<{
+    _id: string
+    name: string | null
+    category:
+      | "ai-ml"
+      | "auth-security"
+      | "backend"
+      | "cloud-infrastructure"
+      | "cms"
+      | "collaboration"
+      | "databases"
+      | "devops-tooling"
+      | "frontend-mobile"
+      | "languages"
+      | "messaging-integrations"
+      | "other"
+      | "payments-security"
+      | "testing"
+      | null
+  }> | null
+  links: Array<{
+    label: string | null
+    url: string | null
+    type: "case-study" | "live-site" | "paper" | "repo" | "video" | null
+  }> | null
+  githubRepo: string | null
+  startDate: string | null
+  completedAt: string | null
+  _updatedAt: string
+} | null
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: PROJECT_SLUGS_QUERY
+// Query: *[_type == "project" && defined(slug.current)] | order(orderRank asc) {    _id,    title,    slug,    coverImage {      asset->,      alt    }  }
+export type PROJECT_SLUGS_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  slug: Slug | null
+  coverImage: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    alt: string | null
+  } | null
+}>
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
@@ -1060,6 +1527,10 @@ declare global {
     '\n  *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {\n    _id,\n    role,\n    kind,\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    employmentType,\n    workMode,\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EXPERIENCES_QUERY_RESULT
     '\n  *[_type == "experience" && kind == "education"] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    credential,\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EDUCATION_QUERY_RESULT
     '\n  *[_type == "publication"] | order(orderRank asc) {\n    _id,\n    title,\n    venue,\n    publishedAt,\n    authors,\n    doi,\n    url,\n    abstract\n  }\n': PUBLICATIONS_QUERY_RESULT
+    '\n  *[_type == "project" && featured == true && archived != true] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    icon {\n      asset->,\n      alt\n    },\n    coverImage {\n      asset->,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': FEATURED_PROJECTS_QUERY_RESULT
+    '\n  *[_type == "project"] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    archived,\n    featured,\n    icon {\n      asset->,\n      alt\n    },\n    coverImage {\n      asset->,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': PROJECTS_QUERY_RESULT
+    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    body,\n    archived,\n    icon {\n      asset->,\n      alt\n    },\n    coverImage {\n      asset->,\n      alt\n    },\n    gallery[] {\n      asset->,\n      alt,\n      caption\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        alt\n      }\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType,\n      startDate,\n      endDate,\n      isCurrent,\n      organization-> {\n        _id,\n        name\n      }\n    },\n    skills[]-> {\n      _id,\n      name,\n      category\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt,\n    _updatedAt\n  }\n': PROJECT_BY_SLUG_QUERY_RESULT
+    '\n  *[_type == "project" && defined(slug.current)] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    coverImage {\n      asset->,\n      alt\n    }\n  }\n': PROJECT_SLUGS_QUERY_RESULT
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

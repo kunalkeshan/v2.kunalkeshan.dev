@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { motion, useReducedMotion } from "motion/react"
 import { Briefcase, MailIcon } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 import { Button } from "@workspace/ui/components/button"
 import { Container } from "@workspace/ui/components/container"
@@ -94,7 +95,7 @@ const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
                 size="lg"
                 variant="outline"
                 className="w-full md:w-1/2"
-                render={<a href="/projects" />}
+                render={<Link href="/projects" />}
                 nativeButton={false}
               >
                 <Briefcase data-icon="inline-start" />

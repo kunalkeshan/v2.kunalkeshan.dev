@@ -242,3 +242,183 @@ export const PUBLICATIONS_QUERY = defineQuery(`
     abstract
   }
 `);
+
+/**
+ * The condensed home page section: featured projects only, and never the
+ * archived/earlier-work ones — those exist for the full page's lower section.
+ *
+ * `hasBody` rather than `body`: the card only needs to know whether to offer a
+ * "Read case study" CTA, and projecting every case study's portable-text array
+ * into the listing payload would bloat it for no rendering benefit.
+ */
+export const FEATURED_PROJECTS_QUERY = defineQuery(`
+  *[_type == "project" && featured == true && archived != true] | order(orderRank asc) {
+    _id,
+    title,
+    slug,
+    kind,
+    status,
+    tagline,
+    summary,
+    "hasBody": defined(body),
+    icon {
+      asset->,
+      alt
+    },
+    coverImage {
+      asset->,
+      alt
+    },
+    organization-> {
+      _id,
+      name,
+      website
+    },
+    skills[]-> {
+      _id,
+      name
+    },
+    links[] {
+      label,
+      url,
+      type
+    },
+    githubRepo,
+    startDate,
+    completedAt
+  }
+`);
+
+/**
+ * Everything on /projects, in Studio drag order. `archived` is projected so the
+ * page can split the main grid from the quieter "Earlier work" section without
+ * a second query.
+ */
+export const PROJECTS_QUERY = defineQuery(`
+  *[_type == "project"] | order(orderRank asc) {
+    _id,
+    title,
+    slug,
+    kind,
+    status,
+    tagline,
+    summary,
+    "hasBody": defined(body),
+    archived,
+    featured,
+    icon {
+      asset->,
+      alt
+    },
+    coverImage {
+      asset->,
+      alt
+    },
+    organization-> {
+      _id,
+      name,
+      website
+    },
+    relatedExperience-> {
+      _id,
+      role,
+      employmentType
+    },
+    skills[]-> {
+      _id,
+      name
+    },
+    links[] {
+      label,
+      url,
+      type
+    },
+    githubRepo,
+    startDate,
+    completedAt
+  }
+`);
+
+/**
+ * One project page. Full projection including the case-study body and gallery,
+ * plus the cross-references (`relatedExperience`, `skills`) that v1 had no way
+ * of expressing.
+ */
+export const PROJECT_BY_SLUG_QUERY = defineQuery(`
+  *[_type == "project" && slug.current == $slug][0] {
+    _id,
+    title,
+    slug,
+    kind,
+    status,
+    tagline,
+    summary,
+    body,
+    archived,
+    icon {
+      asset->,
+      alt
+    },
+    coverImage {
+      asset->,
+      alt
+    },
+    gallery[] {
+      asset->,
+      alt,
+      caption
+    },
+    organization-> {
+      _id,
+      name,
+      website,
+      description,
+      logo {
+        asset->,
+        alt
+      }
+    },
+    relatedExperience-> {
+      _id,
+      role,
+      employmentType,
+      startDate,
+      endDate,
+      isCurrent,
+      organization-> {
+        _id,
+        name
+      }
+    },
+    skills[]-> {
+      _id,
+      name,
+      category
+    },
+    links[] {
+      label,
+      url,
+      type
+    },
+    githubRepo,
+    startDate,
+    completedAt,
+    _updatedAt
+  }
+`);
+
+/**
+ * Slugs for `generateStaticParams`, and the ordered list the project page uses
+ * to resolve its previous/next neighbours.
+ */
+export const PROJECT_SLUGS_QUERY = defineQuery(`
+  *[_type == "project" && defined(slug.current)] | order(orderRank asc) {
+    _id,
+    title,
+    slug,
+    coverImage {
+      asset->,
+      alt
+    }
+  }
+`);

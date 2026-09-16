@@ -112,6 +112,37 @@ keep that boundary when porting more components. The `shadow-reverse-sm` variant
 same idea but for small circular avatar thumbnails, paired with a resting
 `shadow-reverse-sm` (not `shadow-sm`) and `hover:shadow-reverse`.
 
+**Content-card hover — rest flat, lift on hover.** This is a *different* pattern
+from the image-wrapper one above, and the two are easy to confuse. A content card
+(service card, project card — a bordered panel holding text) **rests with no
+shadow at all** and gains both the lift and the shadow on hover:
+
+```tsx
+const cardShell = cn(
+  "group … rounded-lg border-3 border-border bg-card",
+  "transition-[transform,box-shadow] duration-press ease-snap",
+  "hover:-translate-y-2 hover:shadow-xl",
+  "motion-reduce:hover:translate-y-0"
+)
+```
+
+with the card's image scaling in sympathy via `group-hover:scale-110`
+(`motion-reduce:group-hover:scale-100`). This is the literal v1 behaviour —
+`hover:-translate-y-2 hover:shadow-3d` on the card, `group-hover:scale-110` on
+the cover art, where `shadow-3d` is `8px 8px` = this repo's `shadow-xl`.
+
+Why it matters: an earlier version of `services.tsx` used the image-wrapper
+pairing (resting `shadow-xl` → `hover:shadow-2xl`) on its content cards. The
+shadow was already present at rest, so hover only nudged it 8px → 10px and the
+card read as inert — and it borrowed a pairing the section above explicitly
+scopes to image wrappers. Use resting-flat → `hover:shadow-xl` for cards; use
+resting-`shadow-xl` → `hover:shadow-2xl` only for bordered image wrappers.
+
+**Never combine either pattern with `pressableShadow`** — that utility owns
+`hover:translate-x-0.5 hover:translate-y-0.5` on the same axis as the card lift,
+and the two transforms fight. Buttons *inside* a card keep their own
+`pressableShadow` independently; the card itself must not have it.
+
 ## `pressableShadow` — the "press into shadow" interaction
 
 Exported from `packages/ui/src/lib/utils.ts`. Rest state carries the full shadow;
@@ -309,20 +340,83 @@ holds its contrast against both the dark light-mode ground and the lifted
 dark-mode one, where the default orange `--primary` competes with the
 highlight sweep.
 
-## Interaction timing: `--ease-snap` / `--dur-press`
+## Interaction timing — the easing standard
 
-Both live in `packages/ui/src/styles/globals.css` (`:root`, theme-independent — not
-redefined in `.dark`) and back every `pressableShadow` consumer (every solid/bordered
-Button variant, and any future component that opts into the same utility). Current
-values: `--ease-snap: cubic-bezier(0.4, 0, 0.2, 1)` (the widely-used "standard" Material
-ease — fast start, gentle settle) at `--dur-press: 180ms`. These were tuned once during
-the navbar port after the original `cubic-bezier(0.2, 0.8, 0.2, 1)` at `120ms` read as
-too abrupt/janky when a hover simultaneously changes transform, shadow, _and_ color —
-`pressableShadow` transitions all three (`transform,box-shadow,background-color,color`)
-off this one pair of tokens, so changing either value here retunes every button's hover
-feel at once. Don't introduce a second timing pair for "just this one button" — if
-something feels off, it's almost always because a class is fighting `pressableShadow`
-(see the hover-color rules above) rather than needing its own duration/easing.
+All tokens live in `packages/ui/src/styles/globals.css` (`:root`, theme-independent —
+not redefined in `.dark`).
+
+### The rule
+
+**Anything the user initiates decelerates only — use an `out` curve.** Hover, press,
+a panel opening on click, a card lifting: the motion should begin at full speed and
+ease to a stop. Motion the user did *not* trigger (autoplay, looping, scroll-linked
+progress) may use an `in-out` curve, where a soft start is honest.
+
+This is why the original `--ease-snap: cubic-bezier(0.4, 0, 0.2, 1)` was replaced. That
+is a *symmetric in-out* curve: it eases in at the start, so a 180ms hover spent its first
+frames barely moving, then accelerated, then settled — reading as sluggish and abrupt at
+the same time. A hover has no "wind-up" in the physical world; it is a response, and a
+response starts immediately.
+
+### The curves
+
+Standard Penner easings, values as published at
+[coss.com/origin/easings](https://coss.com/origin/easings):
+
+| Token                 | Value                              | Use for                                         |
+| --------------------- | ---------------------------------- | ----------------------------------------------- |
+| `--ease-out-expo`     | `cubic-bezier(0.16, 1, 0.3, 1)`    | the default; hover, press, card lift, reveals    |
+| `--ease-out-quint`    | `cubic-bezier(0.22, 1, 0.36, 1)`   | slightly softer alternative to expo              |
+| `--ease-out-quart`    | `cubic-bezier(0.25, 1, 0.5, 1)`    | medium decelerate                                |
+| `--ease-out-cubic`    | `cubic-bezier(0.33, 1, 0.68, 1)`   | gentle, for larger travel distances              |
+| `--ease-out-quad`     | `cubic-bezier(0.5, 1, 0.89, 1)`    | the subtlest; small opacity/color shifts         |
+| `--ease-in-out-quart` | `cubic-bezier(0.76, 0, 0.24, 1)`   | **non-user-initiated** motion only               |
+| `--ease-spring`       | `cubic-bezier(0.34, 1.56, 0.64, 1)`| overshoot; use sparingly, never on hover         |
+
+`--ease-snap` is aliased to `--ease-out-expo`. Keep writing `ease-snap` in components —
+it is the name every existing component already references, so retuning it reaches all
+of them at once. Reach for a specific `ease-out-*` token only when a particular element
+genuinely needs a different feel.
+
+### Durations
+
+`--dur-press: 260ms` and `--dur-reveal: 420ms` (Tailwind: `duration-press`,
+`duration-reveal`).
+
+These went up alongside the curve change, and the two are coupled: an out-expo curve
+spends most of its duration already nearly settled, so it needs a longer clock than a
+linear-ish curve to read as deliberate. At the old 180ms this curve looked like a jump
+cut. If you shorten the duration, you must soften the curve to match (expo → quart →
+quad), and vice versa.
+
+### Writing it
+
+Write the named utilities — `ease-snap`, `duration-press` — never the arbitrary bracket
+form (`ease-[cubic-bezier(...)]`), which bypasses the token and triggers a
+`suggestCanonicalClasses` editor warning.
+
+Only `--ease-snap`, `--ease-spring`, `--duration-press` and `--duration-reveal` are
+registered in `@theme inline`. The `--ease-out-*` curves are the palette that `:root`
+picks from, not utilities to reach for directly.
+
+> **Trap — a `@theme inline` key must dereference to a literal.**
+> `@theme inline` substitutes a token's value *where it is defined*. If a theme key
+> points at a `:root` var that itself holds another `var()`, the chain resolves to an
+> unresolvable value and the property is silently dropped — no error, no warning. For a
+> timing function that means **no easing at all**, so every transition snaps instantly.
+> This actually shipped: `--ease-snap: var(--ease-out-expo)` in `:root` produced a
+> circular `--ease-snap:var(--ease-snap)` → `var(--ease-out-expo)` → `var(--ease-out-expo)`
+> chain in the compiled CSS, and every hover in the app lost its easing while keeping its
+> duration. The fix is to write the literal `cubic-bezier(...)` in `:root`.
+> If motion ever starts feeling "sudden but not instant", check the **compiled** CSS in
+> `.next/static/chunks/*.css` for `--ease-snap:` before touching component classes —
+> the source will look perfectly correct.
+
+`pressableShadow` transitions `transform`, `box-shadow`, `background-color` and `color`
+off this one pair, so changing either value retunes every button at once. Don't
+introduce a bespoke duration/easing for "just this one component" — if something feels
+off, it is almost always a class fighting `pressableShadow` (see the hover-color rules
+above) rather than a genuine need for its own timing.
 
 ## Motion / animation conventions
 

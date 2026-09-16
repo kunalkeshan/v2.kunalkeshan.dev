@@ -26,6 +26,12 @@ export const structure: StructureResolver = (S, context) =>
         context,
       }),
       orderableDocumentListDeskItem({
+        type: "project",
+        title: "Projects",
+        S,
+        context,
+      }),
+      orderableDocumentListDeskItem({
         type: "experience",
         title: "Experience",
         S,
@@ -53,6 +59,7 @@ export const structure: StructureResolver = (S, context) =>
             "faqs",
             "skill",
             "service",
+            "project",
             "experience",
             "organization",
             "publication",

@@ -60,8 +60,20 @@ export async function POST(req: NextRequest) {
         break;
 
       case "skill":
-        // Revalidate skills list (home page featured strip + /skills page)
+        // Revalidate skills list (home page featured strip + /skills page).
+        // Projects dereference skills for their tech chips, so a rename has to
+        // bust the project collection too — same reasoning as `organization`.
         tags.push(createCollectionTag("skill"));
+        tags.push(createCollectionTag("project"));
+        break;
+
+      case "project":
+        // Revalidate the project grid (home page section + /projects) and the
+        // individual project page.
+        tags.push(createCollectionTag("project"));
+        if (body.slug) {
+          tags.push(createDocumentTag("project", body.slug));
+        }
         break;
 
       case "service":
@@ -70,15 +82,19 @@ export async function POST(req: NextRequest) {
         break;
 
       case "experience":
-        // Revalidate the timeline (home page section + /experience page)
+        // Revalidate the timeline (home page section + /experience page).
+        // Projects cross-reference the role they were built in, so an edited
+        // role title has to bust the project collection as well.
         tags.push(createCollectionTag("experience"));
+        tags.push(createCollectionTag("project"));
         break;
 
       case "organization":
-        // Organizations are only ever read through an experience reference,
-        // so a logo or name edit has to bust the experience collection too.
+        // Organizations are only ever read through an experience or project
+        // reference, so a logo or name edit has to bust both collections too.
         tags.push(createCollectionTag("organization"));
         tags.push(createCollectionTag("experience"));
+        tags.push(createCollectionTag("project"));
         break;
 
       case "publication":

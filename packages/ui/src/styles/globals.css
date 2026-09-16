@@ -69,7 +69,16 @@
   /* bare `border` utility = 2px (controls tier); containers use border-3 */
   --default-border-width: 2px;
 
-  /* motion */
+  /* motion — registered so `ease-snap`, `duration-press` etc. resolve as real
+   * utilities; never write the arbitrary bracket form.
+   *
+   * Every key here must dereference to a LITERAL in `:root`, never to another
+   * `var()`. `@theme inline` substitutes at definition time, so a chain of
+   * indirection resolves to an unresolvable value and the property is silently
+   * dropped — for a timing function that means no easing at all, and the
+   * transition snaps. The `--ease-out-*` curves are deliberately NOT registered
+   * here: they are the palette `:root` picks from, not utilities components
+   * reach for directly. Use `ease-snap`. */
   --ease-snap: var(--ease-snap);
   --ease-spring: var(--ease-spring);
   --duration-press: var(--dur-press);
@@ -135,11 +144,45 @@
   --radius-pill: 999px;
   --radius: var(--radius-base);
 
-  /* motion */
-  --ease-snap: cubic-bezier(0.4, 0, 0.2, 1);
+  /* motion
+   *
+   * Curves are the standard Penner set (the values published at
+   * coss.com/origin/easings). The rule behind the choice: anything the *user*
+   * initiates — hover, press, a panel opening on click — must start at full
+   * speed and only decelerate, i.e. an "out" curve. An in-out curve like the
+   * old `cubic-bezier(0.4, 0, 0.2, 1)` eases IN at the start, so a 180ms hover
+   * spent its first frames barely moving and then snapped, which read as
+   * sluggish and abrupt at once. Reserve in-out for motion the user did not
+   * trigger (autoplay, looping, scroll-linked), where a soft start is honest.
+   */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-out-quad: cubic-bezier(0.5, 1, 0.89, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* `--ease-snap` stays the name every component already references, so this
+   * retune reaches all of them at once. It is ease-out-expo: the strongest
+   * decelerate-only curve in the set, and the same default coss.com ships.
+   *
+   * Written as a LITERAL, not `var(--ease-out-expo)`. `@theme inline`
+   * substitutes a token's value where it is defined, so a theme key pointing at
+   * a `:root` var that itself holds another `var()` resolves to an
+   * unresolvable timing function — the transition is then dropped and the state
+   * change happens instantly, which reads as "sudden, not gradual". Every other
+   * token in the `@theme inline` block dereferences to a literal for exactly
+   * this reason; keep it that way. */
+  --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --dur-press: 180ms;
-  --dur-reveal: 300ms;
+
+  /* An out-expo curve spends most of its duration nearly settled, so it needs
+   * a longer clock than a linear-ish one to read as deliberate rather than
+   * instant. 180ms on this curve looked like a jump cut; 260ms still read as
+   * fast. 400ms lets the shadow visibly grow in and back out again while
+   * staying responsive enough to sweep across a grid of cards. */
+  --dur-press: 400ms;
+  --dur-reveal: 600ms;
 
   --font-sans: Nunito Sans, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Montserrat, ui-sans-serif, sans-serif, system-ui;

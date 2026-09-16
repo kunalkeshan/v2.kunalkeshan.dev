@@ -6,12 +6,14 @@ import {
   FEATURED_SKILLS_QUERY,
   SERVICES_QUERY,
   FEATURED_EXPERIENCES_QUERY,
+  FEATURED_PROJECTS_QUERY,
 } from "@workspace/sanity/query"
 import type {
   SITE_CONFIG_QUERY_RESULT,
   FEATURED_SKILLS_QUERY_RESULT,
   SERVICES_QUERY_RESULT,
   FEATURED_EXPERIENCES_QUERY_RESULT,
+  FEATURED_PROJECTS_QUERY_RESULT,
 } from "@workspace/sanity/types"
 
 import Hero from "@/components/sections/hero"
@@ -19,6 +21,8 @@ import Skills from "@/components/sections/skills"
 import Services from "@/components/sections/services"
 import About from "@/components/sections/about"
 import Experience from "@/components/sections/experience"
+import Projects from "@/components/sections/projects"
+import { fetchStars } from "@/lib/github"
 
 /**
  * Kunal has been building for the web since 2021, and working as a software
@@ -30,24 +34,37 @@ import Experience from "@/components/sections/experience"
 const BUILDING_SINCE = 2021
 
 export default async function Home() {
-  const [siteConfig, skills, services, experiences] = await Promise.all([
-    sanityFetch<SITE_CONFIG_QUERY_RESULT>({
-      query: SITE_CONFIG_QUERY,
-      tags: [createCollectionTag("siteConfig")],
-    }),
-    sanityFetch<FEATURED_SKILLS_QUERY_RESULT>({
-      query: FEATURED_SKILLS_QUERY,
-      tags: [createCollectionTag("skill")],
-    }),
-    sanityFetch<SERVICES_QUERY_RESULT>({
-      query: SERVICES_QUERY,
-      tags: [createCollectionTag("service")],
-    }),
-    sanityFetch<FEATURED_EXPERIENCES_QUERY_RESULT>({
-      query: FEATURED_EXPERIENCES_QUERY,
-      tags: [createCollectionTag("experience")],
-    }),
-  ])
+  const [siteConfig, skills, services, experiences, projects] =
+    await Promise.all([
+      sanityFetch<SITE_CONFIG_QUERY_RESULT>({
+        query: SITE_CONFIG_QUERY,
+        tags: [createCollectionTag("siteConfig")],
+      }),
+      sanityFetch<FEATURED_SKILLS_QUERY_RESULT>({
+        query: FEATURED_SKILLS_QUERY,
+        tags: [createCollectionTag("skill")],
+      }),
+      sanityFetch<SERVICES_QUERY_RESULT>({
+        query: SERVICES_QUERY,
+        tags: [createCollectionTag("service")],
+      }),
+      sanityFetch<FEATURED_EXPERIENCES_QUERY_RESULT>({
+        query: FEATURED_EXPERIENCES_QUERY,
+        tags: [createCollectionTag("experience")],
+      }),
+      sanityFetch<FEATURED_PROJECTS_QUERY_RESULT>({
+        query: FEATURED_PROJECTS_QUERY,
+        tags: [createCollectionTag("project")],
+      }),
+    ])
+
+  // Batched once for the section rather than per card — see lib/github.ts on
+  // why the unauthenticated rate limit makes that distinction matter.
+  const projectStars = await fetchStars(
+    (projects ?? [])
+      .map((project) => project.githubRepo)
+      .filter((repo): repo is string => Boolean(repo))
+  )
 
   const heroImageUrl = siteConfig?.heroImage?.asset
     ? urlFor(siteConfig.heroImage).width(1433).height(1956).url()
@@ -98,6 +115,10 @@ export default async function Home() {
         }
       />
       <Experience experiences={experiences} yearsBuilding={yearsBuilding} />
+      {/* After Experience: that section closes on the inverted panel, so the
+          project grid reads as a return to the page's normal ground rather
+          than a second dark break. */}
+      <Projects projects={projects} stars={projectStars} />
     </main>
   )
 }
