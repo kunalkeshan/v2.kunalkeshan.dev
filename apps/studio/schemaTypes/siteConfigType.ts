@@ -25,6 +25,10 @@ export const siteConfigType = defineType({
       title: "About Page",
     },
     {
+      name: "testimonials",
+      title: "Testimonials Section (Home)",
+    },
+    {
       name: "contact",
       title: "Contact Information",
     },
@@ -330,6 +334,34 @@ export const siteConfigType = defineType({
       ],
       description:
         "The portrait on /about, rendered as a circle. Kept separate from the home About Image so the two surfaces can use different photos.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "testimonialsHeadingLead",
+      title: "Testimonials Heading (lead)",
+      type: "string",
+      group: "testimonials",
+      description:
+        "The un-highlighted first half of the testimonials heading, e.g. 'What do clients and collaborators say'.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "testimonialsHeadingHighlight",
+      title: "Testimonials Heading (highlighted)",
+      type: "string",
+      group: "testimonials",
+      description:
+        "The highlighted second half, e.g. 'about me'. Rendered with the highlighter sweep in blue — the home page's other sweeps are orange, and the two alternate.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
+      name: "testimonialsIntro",
+      title: "Testimonials Intro",
+      type: "text",
+      rows: 3,
+      group: "testimonials",
+      description:
+        "The lead paragraph under the heading. Your words about the testimonials as a whole — the quotes themselves are never edited.",
       validation: (Rule) => Rule.required(),
     },
     {

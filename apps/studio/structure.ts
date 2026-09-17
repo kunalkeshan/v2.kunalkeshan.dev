@@ -13,6 +13,8 @@ import { ProjectsIcon } from "@sanity/icons/Projects";
 import { CaseIcon } from "@sanity/icons/Case";
 import { UsersIcon } from "@sanity/icons/Users";
 import { BookIcon } from "@sanity/icons/Book";
+import { UserIcon } from "@sanity/icons/User";
+import { DoubleQuoteIcon } from "@sanity/icons/DoubleQuote";
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S, context) =>
@@ -70,6 +72,23 @@ export const structure: StructureResolver = (S, context) =>
         S,
         context,
       }),
+      // People sit next to Organizations rather than next to Testimonials:
+      // both are the reference targets other documents point at, and grouping
+      // them keeps the "edit the shared record once" surfaces together.
+      orderableDocumentListDeskItem({
+        type: "person",
+        title: "People",
+        icon: UserIcon,
+        S,
+        context,
+      }),
+      orderableDocumentListDeskItem({
+        type: "testimonial",
+        title: "Testimonials",
+        icon: DoubleQuoteIcon,
+        S,
+        context,
+      }),
       orderableDocumentListDeskItem({
         type: "publication",
         title: "Publications",
@@ -92,6 +111,8 @@ export const structure: StructureResolver = (S, context) =>
             "experience",
             "organization",
             "publication",
+            "person",
+            "testimonial",
           ].includes(item.getId()!)
       ),
     ]);

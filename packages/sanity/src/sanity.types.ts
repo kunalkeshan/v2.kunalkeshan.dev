@@ -15,6 +15,27 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: schema.json
+export type PersonReference = {
+  _ref: string
+  _type: "reference"
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: "person"
+}
+
+export type Testimonial = {
+  _id: string
+  _type: "testimonial"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  quote?: string
+  author?: PersonReference
+  context?: string
+  featured?: boolean
+  givenAt?: string
+  orderRank?: string
+}
+
 export type SanityImageAssetReference = {
   _ref: string
   _type: "reference"
@@ -27,6 +48,49 @@ export type OrganizationReference = {
   _type: "reference"
   _weak?: boolean
   [internalGroqTypeReferenceTo]?: "organization"
+}
+
+export type Person = {
+  _id: string
+  _type: "person"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name?: string
+  photo?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  position?: string
+  organization?: OrganizationReference
+  organizationName?: string
+  website?: string
+  socials?: Array<{
+    platform?: "linkedin" | "twitter" | "instagram" | "youtube" | "github"
+    url?: string
+    _key: string
+  }>
+  orderRank?: string
+}
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop"
+  top?: number
+  bottom?: number
+  left?: number
+  right?: number
+}
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot"
+  x?: number
+  y?: number
+  height?: number
+  width?: number
 }
 
 export type ExperienceReference = {
@@ -108,22 +172,6 @@ export type Project = {
   featured?: boolean
   archived?: boolean
   orderRank?: string
-}
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop"
-  top?: number
-  bottom?: number
-  left?: number
-  right?: number
-}
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot"
-  x?: number
-  y?: number
-  height?: number
-  width?: number
 }
 
 export type BlockContent = Array<
@@ -425,6 +473,9 @@ export type SiteConfig = {
     alt?: string
     _type: "image"
   }
+  testimonialsHeadingLead?: string
+  testimonialsHeadingHighlight?: string
+  testimonialsIntro?: string
   phoneNumbers?: Array<{
     number?: string
     label?: string
@@ -559,13 +610,16 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
+  | PersonReference
+  | Testimonial
   | SanityImageAssetReference
   | OrganizationReference
+  | Person
+  | SanityImageCrop
+  | SanityImageHotspot
   | ExperienceReference
   | SkillReference
   | Project
-  | SanityImageCrop
-  | SanityImageHotspot
   | BlockContent
   | Slug
   | Publication
@@ -590,7 +644,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: SITE_CONFIG_QUERY
-// Query: *[_type == "siteConfig"][0] {    _id,    title,    description,    ogImage {      asset->,      hotspot,      crop,      alt    },    twitterImage {      asset->,      hotspot,      crop,      alt    },    logo {      asset->,      hotspot,      crop,      alt    },    heroName,    heroRoles,    heroImage {      asset->,      hotspot,      crop,      alt    },    aboutHeadingLead,    aboutHeadingHighlight,    aboutBody,    aboutHighlights[] {      title,      description    },    aboutImage {      asset->,      hotspot,      crop,      alt    },    phoneNumbers[] {      number,      label    },    emails[] {      email,      label    },    address {      street,      city,      state,      postalCode,      country    },    socialMedia[] {      platform,      url,      label    },    resumePdf {      asset->    }  }
+// Query: *[_type == "siteConfig"][0] {    _id,    title,    description,    ogImage {      asset->,      hotspot,      crop,      alt    },    twitterImage {      asset->,      hotspot,      crop,      alt    },    logo {      asset->,      hotspot,      crop,      alt    },    heroName,    heroRoles,    heroImage {      asset->,      hotspot,      crop,      alt    },    aboutHeadingLead,    aboutHeadingHighlight,    aboutBody,    aboutHighlights[] {      title,      description    },    aboutImage {      asset->,      hotspot,      crop,      alt    },    testimonialsHeadingLead,    testimonialsHeadingHighlight,    testimonialsIntro,    phoneNumbers[] {      number,      label    },    emails[] {      email,      label    },    address {      street,      city,      state,      postalCode,      country    },    socialMedia[] {      platform,      url,      label    },    resumePdf {      asset->    }  }
 export type SITE_CONFIG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -739,6 +793,9 @@ export type SITE_CONFIG_QUERY_RESULT = {
     crop: SanityImageCrop | null
     alt: string | null
   } | null
+  testimonialsHeadingLead: string | null
+  testimonialsHeadingHighlight: string | null
+  testimonialsIntro: string | null
   phoneNumbers: Array<{
     number: string | null
     label: string | null
@@ -1698,10 +1755,162 @@ export type PROJECT_SLUGS_QUERY_RESULT = Array<{
   } | null
 }>
 
+// Source: ../../packages/sanity/src/query.ts
+// Variable: TESTIMONIALS_QUERY
+// Query: *[_type == "testimonial"] | order(orderRank asc) {      _id,  quote,  context,  givenAt,  author-> {    _id,    name,    position,    website,    organizationName,    photo {      asset->,      hotspot,      crop,      alt    },    organization-> {      _id,      name,      website,      logo {        asset->,        hotspot,        crop,        alt      }    }  }  }
+export type TESTIMONIALS_QUERY_RESULT = Array<{
+  _id: string
+  quote: string | null
+  context: string | null
+  givenAt: string | null
+  author: {
+    _id: string
+    name: string | null
+    position: string | null
+    website: string | null
+    organizationName: string | null
+    photo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
+      alt: string | null
+    } | null
+    organization: {
+      _id: string
+      name: string | null
+      website: string | null
+      logo: {
+        asset: {
+          _id: string
+          _type: "sanity.imageAsset"
+          _createdAt: string
+          _updatedAt: string
+          _rev: string
+          originalFilename?: string
+          label?: string
+          title?: string
+          description?: string
+          altText?: string
+          sha1hash?: string
+          extension?: string
+          mimeType?: string
+          size?: number
+          assetId?: string
+          uploadId?: string
+          path?: string
+          url?: string
+          metadata?: SanityImageMetadata
+          source?: SanityAssetSourceData
+        } | null
+        hotspot: SanityImageHotspot | null
+        crop: SanityImageCrop | null
+        alt: string | null
+      } | null
+    } | null
+  } | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: FEATURED_TESTIMONIALS_QUERY
+// Query: *[_type == "testimonial" && featured == true] | order(orderRank asc) {      _id,  quote,  context,  givenAt,  author-> {    _id,    name,    position,    website,    organizationName,    photo {      asset->,      hotspot,      crop,      alt    },    organization-> {      _id,      name,      website,      logo {        asset->,        hotspot,        crop,        alt      }    }  }  }
+export type FEATURED_TESTIMONIALS_QUERY_RESULT = Array<{
+  _id: string
+  quote: string | null
+  context: string | null
+  givenAt: string | null
+  author: {
+    _id: string
+    name: string | null
+    position: string | null
+    website: string | null
+    organizationName: string | null
+    photo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
+      alt: string | null
+    } | null
+    organization: {
+      _id: string
+      name: string | null
+      website: string | null
+      logo: {
+        asset: {
+          _id: string
+          _type: "sanity.imageAsset"
+          _createdAt: string
+          _updatedAt: string
+          _rev: string
+          originalFilename?: string
+          label?: string
+          title?: string
+          description?: string
+          altText?: string
+          sha1hash?: string
+          extension?: string
+          mimeType?: string
+          size?: number
+          assetId?: string
+          uploadId?: string
+          path?: string
+          url?: string
+          metadata?: SanityImageMetadata
+          source?: SanityAssetSourceData
+        } | null
+        hotspot: SanityImageHotspot | null
+        crop: SanityImageCrop | null
+        alt: string | null
+      } | null
+    } | null
+  } | null
+}>
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    twitterImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    logo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    },\n    resumePdf {\n      asset->\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
+    '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    twitterImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    logo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    testimonialsHeadingLead,\n    testimonialsHeadingHighlight,\n    testimonialsIntro,\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    },\n    resumePdf {\n      asset->\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0] {\n    aboutPageHeadingLead,\n    aboutPageHeadingHighlight,\n    aboutPageIntro,\n    aboutPageStoryHeadingLead,\n    aboutPageStoryHeadingHighlight,\n    aboutPageStoryHeadingTrail,\n    aboutPageStory,\n    aboutPageValuesHeading,\n    aboutPageValuesIntro,\n    aboutPagePortrait {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': ABOUT_PAGE_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0].footerLegalLinks[]-> {\n    _id,\n    title,\n    slug,\n    description,\n    _updatedAt\n  }\n': FOOTER_LEGAL_LINKS_QUERY_RESULT
     '\n  *[_type == "faqs"][0] {\n    ...,\n    faqItems[]{ ... }\n  }\n': FAQS_QUERY_RESULT
@@ -1719,6 +1928,8 @@ declare global {
     '\n  *[_type == "project"] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    archived,\n    featured,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': PROJECTS_QUERY_RESULT
     '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    body,\n    archived,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    gallery[] {\n      asset->,\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType,\n      startDate,\n      endDate,\n      isCurrent,\n      organization-> {\n        _id,\n        name\n      }\n    },\n    skills[]-> {\n      _id,\n      name,\n      category\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt,\n    _updatedAt\n  }\n': PROJECT_BY_SLUG_QUERY_RESULT
     '\n  *[_type == "project" && defined(slug.current)] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': PROJECT_SLUGS_QUERY_RESULT
+    '\n  *[_type == "testimonial"] | order(orderRank asc) {\n    \n  _id,\n  quote,\n  context,\n  givenAt,\n  author-> {\n    _id,\n    name,\n    position,\n    website,\n    organizationName,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    }\n  }\n\n  }\n': TESTIMONIALS_QUERY_RESULT
+    '\n  *[_type == "testimonial" && featured == true] | order(orderRank asc) {\n    \n  _id,\n  quote,\n  context,\n  givenAt,\n  author-> {\n    _id,\n    name,\n    position,\n    website,\n    organizationName,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    }\n  }\n\n  }\n': FEATURED_TESTIMONIALS_QUERY_RESULT
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

@@ -44,6 +44,9 @@ export const SITE_CONFIG_QUERY = defineQuery(`
       crop,
       alt
     },
+    testimonialsHeadingLead,
+    testimonialsHeadingHighlight,
+    testimonialsIntro,
     phoneNumbers[] {
       number,
       label
@@ -518,5 +521,78 @@ export const PROJECT_SLUGS_QUERY = defineQuery(`
       crop,
       alt
     }
+  }
+`);
+
+/**
+ * Shared projection for a testimonial and the person who gave it.
+ *
+ * `author->` is dereferenced so one `person` document can back several
+ * testimonials without any identity field being re-authored per quote — the
+ * duplication v1 carried for Diveakssh Schae's two entries.
+ *
+ * `organization->` is dereferenced one level further for the logo, with
+ * `organizationName` as the flat fallback for people whose company has no
+ * Organization document of its own. The card picks whichever is present.
+ *
+ * Both images project `hotspot`/`crop` alongside `asset->` and `alt`: the
+ * headshot is rendered through `.fit("crop")`, and omitting them degrades every
+ * crop to a blind center-crop that cuts faces off — see
+ * docs/runbooks/sanity-workflow.md.
+ */
+const TESTIMONIAL_FIELDS = `
+  _id,
+  quote,
+  context,
+  givenAt,
+  author-> {
+    _id,
+    name,
+    position,
+    website,
+    organizationName,
+    photo {
+      asset->,
+      hotspot,
+      crop,
+      alt
+    },
+    organization-> {
+      _id,
+      name,
+      website,
+      logo {
+        asset->,
+        hotspot,
+        crop,
+        alt
+      }
+    }
+  }
+`;
+
+/**
+ * Every testimonial, in Studio drag order — for a future dedicated surface.
+ */
+export const TESTIMONIALS_QUERY = defineQuery(`
+  *[_type == "testimonial"] | order(orderRank asc) {
+    ${TESTIMONIAL_FIELDS}
+  }
+`);
+
+/**
+ * The home page carousel: curated in the Studio via `featured`.
+ *
+ * Unlike FEATURED_PROJECTS_QUERY there is no `[0...n]` ceiling. The carousel
+ * shows one quote at a time and its dot indicator is windowed, so the section's
+ * footprint is constant no matter how many are flagged — the reason a slice was
+ * needed for the project grid (a ragged final row) does not arise here.
+ *
+ * `featured` is also the intended lever for quotes that shouldn't lead the home
+ * page — the quote text itself is a third party's words and is never edited.
+ */
+export const FEATURED_TESTIMONIALS_QUERY = defineQuery(`
+  *[_type == "testimonial" && featured == true] | order(orderRank asc) {
+    ${TESTIMONIAL_FIELDS}
   }
 `);

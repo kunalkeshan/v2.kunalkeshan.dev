@@ -95,11 +95,26 @@ export async function POST(req: NextRequest) {
         break;
 
       case "organization":
-        // Organizations are only ever read through an experience or project
-        // reference, so a logo or name edit has to bust both collections too.
+        // Organizations are only ever read through an experience, project, or
+        // testimonial-author reference, so a logo or name edit has to bust
+        // those collections too.
         tags.push(createCollectionTag("organization"));
         tags.push(createCollectionTag("experience"));
         tags.push(createCollectionTag("project"));
+        tags.push(createCollectionTag("testimonial"));
+        break;
+
+      case "person":
+        // A person is only rendered through a testimonial's `author->`
+        // dereference, so editing their photo, position or employer changes
+        // already-cached testimonial payloads and must bust that collection.
+        tags.push(createCollectionTag("person"));
+        tags.push(createCollectionTag("testimonial"));
+        break;
+
+      case "testimonial":
+        // Revalidate the testimonials carousel on the home page
+        tags.push(createCollectionTag("testimonial"));
         break;
 
       case "publication":

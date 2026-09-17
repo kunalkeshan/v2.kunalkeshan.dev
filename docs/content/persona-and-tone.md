@@ -73,6 +73,27 @@ still ask before extending them to a *new* kind of copy.
   Kunal's own master CV (`~/Desktop/kunalkeshan/resume/master-resume.md`) and
   his LinkedIn, so nothing here is inferred. This does **not** loosen the About
   section, which keeps its existing framing.
+- **Testimonials are quoted material and are never edited (asked and answered).**
+  A `testimonial`'s `quote` is a third party's own words. It is the one copy
+  field in this dataset that the student → professional rule above does **not**
+  apply to: quotes are migrated from v1's `data/tributes.ts` verbatim, and are
+  never reworded, tightened, condensed, or reframed — not for tone, not for
+  grammar, not for student-era framing. Only whitespace was normalised on
+  migration (v1 stored several as template literals whose continuation lines
+  carried source indentation); the words are byte-identical.
+
+  Three migrated quotes mention student life — Yakub Mathew, GS Thina ("working
+  with students", "a typical college student"), and Raman Shekhawat ("started
+  college life"). These were reviewed with Kunal and **deliberately kept as
+  written**: GS Thina's is a founder favourably contrasting Kunal against a
+  student, and Raman's is past-tense backstory about how they met, which this
+  document already permits. The `featured` boolean is the only lever for a quote
+  that shouldn't lead the home page — never an edit to the text.
+
+  **Attribution follows the resume exemption, not the About restriction.** A
+  testimonial's credibility rests entirely on who said it, so the card shows the
+  person's real name, position, employer, and company logo. Same reasoning as
+  the resume bullet above; likewise it does not loosen the About section.
 - **Club and community roles are written in a working-professional voice.**
   The underlying LinkedIn/CV bullets for the student-era club roles (IEEE
   SRMIST, Think-Digital, SRMpedia, CodeChef) were written at the time and read

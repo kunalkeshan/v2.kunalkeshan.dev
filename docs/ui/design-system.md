@@ -700,6 +700,106 @@ Ported from `kunalkeshan.dev` v1's `SkillsInText`.
 - Speed is set per call site via `durationSeconds`, which the component writes to
   `--marquee-duration`.
 
+## Carousel (`@workspace/ui/components/carousel`)
+
+Embla-backed, adapted from shadcn/ui. The testimonials section on the home page is the
+reference implementation. Embla is not a motion library, so `packages/ui`'s
+no-motion-dependency rule is intact.
+
+**Why a real carousel rather than swapping a card's props.** Every slide is a persistent
+DOM node laid out side by side and moved with one CSS transform. That is the whole point:
+v1's testimonial section re-rendered a single card with new props and **no `key`**, so the
+`<img>` kept its DOM node and had its `src` re-pointed. React repainted the text
+synchronously while the browser decoded the new image asynchronously — the quote changed
+and the portrait arrived late. With one node per slide that desync is structurally
+impossible, not merely animated over.
+
+**Image loading.** Don't eagerly load every slide. Give the active slide's image
+`priority`, mark its immediate neighbours `eager`, and leave the rest `lazy` — the
+distance is measured around the loop so slide 0's "previous" neighbour is the last slide.
+Costs ~3 images on load instead of one per slide.
+
+**Deviations from upstream shadcn, all deliberate:**
+
+- **Arrows go through `Button`**, so they inherit `pressableShadow` and the focus ring
+  instead of the stock `rounded-full` outline treatment.
+- **The root is `tabIndex={0}`**, so arrow keys work after tabbing onto the carousel —
+  upstream only responds while a nav button holds focus. `Home`/`End` jump to the ends,
+  and typing in a focused input is left alone.
+- **Wheel support is added.** Embla handles pointer drag but ignores the wheel entirely,
+  so shift+wheel and a trackpad's horizontal swipe did nothing on a visibly horizontal
+  control. Registered natively (`{ passive: false }`) because React's `onWheel` is passive
+  and cannot `preventDefault` the browser's own horizontal scroll.
+- **The wheel gate is per-gesture, not a time debounce.** A trackpad flick emits a
+  decaying burst of events for up to ~1s; a short debounce lets the tail fire a second
+  advance (the carousel visibly skips a slide) and a long one swallows a deliberate second
+  swipe. So: fire once, then stay locked until the wheel has been quiet for ~140ms, with a
+  sharp re-acceleration treated as a genuine new swipe since momentum only ever decays.
+- **The `reInit` listener is actually removed on cleanup.** Upstream registers an inline
+  arrow for `reInit` and only ever detaches `select`, leaking a listener per remount.
+- **`CarouselContent` takes `viewportClassName`** for when slide content deliberately
+  overhangs its slide (see below).
+
+**Content that overhangs its slide.** The testimonial portrait overlaps its card's right
+edge. Three rules make that work:
+
+1. **Overlap, don't displace.** Position the overhanging element `absolute` over the card.
+   Negative margins on an in-flow child instead pull the card's own borders inward to meet
+   it, which visibly breaks the card open. Reserve the space it covers with padding
+   (`lg:pr-80`) so the copy never runs underneath.
+2. **Clip on one axis only.** `viewportClassName="overflow-x-clip overflow-y-visible"` —
+   plain `overflow-hidden` shaves the circle off at the slide boundary, and
+   `overflow-visible` leaks neighbouring slides into view. Prefer `overflow-x-clip` over
+   `overflow-x-hidden` for the same reason the marquee does: `hidden` creates a scroll
+   container and silently breaks `position: sticky` ancestors.
+3. **Clip again further out.** The section carries `overflow-hidden` so the overhang can
+   never widen the page into a horizontal scrollbar.
+
+**Fixed `min-height` for uneven content.** The migrated quotes span 334–975 characters
+(2.9x). A self-sizing card changes height on every slide change and shoves the page around
+mid-read. Reserve height for the longest entry per breakpoint instead: some whitespace
+under the shortest quotes buys a section whose geometry never moves, and nothing is
+clamped behind a "read more". This is a floor, not a fixed height — a longer quote added
+later still grows the card. (Contrast the values grid above, where the fix for uneven copy
+is a column flow; that works because those cards tile, and carousel slides don't.)
+
+**Dot indicators must be windowed** (`@workspace/ui/components/carousel-dots`). A
+dot-per-slide row is fine at ten and unusable at a hundred. `CarouselDots` renders a
+fixed-width window (default 5) that slides with the active index, shrinking only the
+dots at an edge that is actually hiding slides, plus an `n / total` counter for absolute
+position. The control's width is constant regardless of slide count.
+
+**No autoplay on long-form content.** Testimonials run to ~975 characters; advancing the
+card out from under someone mid-sentence is hostile, and moving content that can't be
+paused is an accessibility problem.
+
+**`align: "center"`, not `"start"`.** With one slide per view and a card whose right
+margin is asymmetric (it reserves room for the portrait's overhang), `start` lets Embla
+settle *between* two snap points — the carousel rests showing ~60% of one slide and ~38%
+of the next. `center` makes every rest position a whole slide.
+
+## Sizing logos of mixed aspect ratios
+
+A row of company logos is never a set of matching squares: expect anything from a 1:1
+roundel to a ~3:1 wordmark. Sizing the `<img>` itself — a fixed height, a max-width cap,
+or both — makes each logo's rendered size depend on its own proportions, and they come out
+wildly inconsistent. Capping both axes is worse than either alone: a wide mark hits the
+width cap, which scales its height back down until it reads as a stamp.
+
+**Give every logo an identical fixed box and let it fit inside.** A `relative` wrapper at
+the target size, `<Image fill>`, and `object-contain`. A wide mark then spends the width, a
+square one spends the height, and both occupy the same box. Make the box wider than tall
+(`h-10 w-28` / `md:h-12 md:w-36` on the testimonial card) so a wordmark isn't the one that
+suffers. Request the URL at 2x the CSS box with `fit=max` via `logoUrlFor`
+(`@workspace/sanity/image`), which scales down to fit without padding back out.
+
+**What CSS cannot fix: padding baked into the asset.** Several logo files park the mark in
+a square canvas with a wide margin around it. That margin is pixels — indistinguishable
+from artwork — so such a logo renders optically smaller than a tight crop beside it, in any
+box. **Sanity's image API has no auto-trim parameter** (`w`/`h`/`dpr`/`fit`/`crop`/`rect`/
+`bg`/`pad` and the filters; `rect` needs exact per-asset coordinates). Fix it in the asset:
+crop the margin out of the source file, or set a tight crop in the Studio.
+
 ## Related
 
 - [`font-stack.md`](./font-stack.md) — font loading convention and the `font-heading` →

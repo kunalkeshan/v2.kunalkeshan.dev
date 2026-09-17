@@ -7,6 +7,7 @@ import {
   SERVICES_QUERY,
   FEATURED_EXPERIENCES_QUERY,
   FEATURED_PROJECTS_QUERY,
+  FEATURED_TESTIMONIALS_QUERY,
 } from "@workspace/sanity/query"
 import type {
   SITE_CONFIG_QUERY_RESULT,
@@ -14,6 +15,7 @@ import type {
   SERVICES_QUERY_RESULT,
   FEATURED_EXPERIENCES_QUERY_RESULT,
   FEATURED_PROJECTS_QUERY_RESULT,
+  FEATURED_TESTIMONIALS_QUERY_RESULT,
 } from "@workspace/sanity/types"
 
 import Hero from "@/components/sections/hero"
@@ -22,6 +24,7 @@ import Services from "@/components/sections/services"
 import About from "@/components/sections/about"
 import Experience from "@/components/sections/experience"
 import Projects from "@/components/sections/projects"
+import Testimonials from "@/components/sections/testimonials"
 import { fetchStars } from "@/lib/github"
 
 /**
@@ -34,7 +37,7 @@ import { fetchStars } from "@/lib/github"
 const BUILDING_SINCE = 2021
 
 export default async function Home() {
-  const [siteConfig, skills, services, experiences, projects] =
+  const [siteConfig, skills, services, experiences, projects, testimonials] =
     await Promise.all([
       sanityFetch<SITE_CONFIG_QUERY_RESULT>({
         query: SITE_CONFIG_QUERY,
@@ -55,6 +58,10 @@ export default async function Home() {
       sanityFetch<FEATURED_PROJECTS_QUERY_RESULT>({
         query: FEATURED_PROJECTS_QUERY,
         tags: [createCollectionTag("project")],
+      }),
+      sanityFetch<FEATURED_TESTIMONIALS_QUERY_RESULT>({
+        query: FEATURED_TESTIMONIALS_QUERY,
+        tags: [createCollectionTag("testimonial")],
       }),
     ])
 
@@ -119,6 +126,20 @@ export default async function Home() {
           project grid reads as a return to the page's normal ground rather
           than a second dark break. */}
       <Projects projects={projects} stars={projectStars} />
+      {/* Last section on the page, as in v1: the testimonials close the pitch
+          after the work itself has been shown. Kept clear of the Experience
+          section's inverted panel so it reads on normal ground. */}
+      <Testimonials
+        testimonials={testimonials}
+        headingLead={siteConfig?.testimonialsHeadingLead ?? "Don't take"}
+        headingHighlight={
+          siteConfig?.testimonialsHeadingHighlight ?? "my word for it"
+        }
+        intro={
+          siteConfig?.testimonialsIntro ??
+          "Clients and collaborators I've built things with and for, in their own words."
+        }
+      />
     </main>
   )
 }
