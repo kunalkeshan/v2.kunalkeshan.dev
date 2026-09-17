@@ -147,20 +147,11 @@ function TestimonialCard({
           {testimonial.quote}
         </blockquote>
 
-        <figcaption className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 lg:pr-11">
-          <div className="min-w-0">
-            <p className="font-heading font-black">{nameNode}</p>
-            {(author?.position || companyName) && (
-              <p className="text-sm text-body-foreground">
-                {[author?.position, companyName].filter(Boolean).join(" at ")}
-              </p>
-            )}
-          </div>
-
+        <figcaption className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 lg:pr-11">
           {logoUrl && (
             /*
-             * Intrinsic sizing with a max box on both axes — deliberately not
-             * `fill` inside a fixed-aspect wrapper.
+             * Height-capped, width-free — deliberately not `fill` inside a
+             * fixed-aspect wrapper, and deliberately no `max-w-*` either.
              *
              * `fill` forces every logo into one box's aspect ratio. Next then
              * re-encodes the image to that aspect, so a 1.41:1 logo dropped in
@@ -168,11 +159,11 @@ function TestimonialCard({
              * source) — `object-contain` was faithfully rendering an
              * already-mangled file, which is why artwork went missing.
              *
-             * Capping both axes instead lets each logo keep its own shape and
-             * simply bounds how big it gets: a wide wordmark spends the width,
-             * a square mark spends the height, and neither is ever cropped.
-             * Nothing here assumes an aspect ratio, so future uploads of any
-             * shape just work.
+             * A fixed height plus free-running width lets a logo of any shape
+             * render at its true proportions: a wide wordmark simply runs
+             * wider, a square mark stays square, neither is ever cropped or
+             * squeezed into a box. Nothing here assumes an aspect ratio, so
+             * future uploads of any shape just work.
              *
              * Caveat no code can fix: a file with a margin baked into its
              * canvas still reads optically smaller, because that padding is
@@ -189,9 +180,18 @@ function TestimonialCard({
               // is what was physically cropping these (a 1:1 source arriving as
               // 3:1). Without it, the declared width/height are honoured and
               // the image keeps its own proportions.
-              className="h-auto max-h-10 w-auto max-w-28 shrink-0 object-contain object-left md:max-h-12 md:max-w-36"
+              className="h-10 w-auto shrink-0 object-contain object-left md:h-12"
             />
           )}
+
+          <div className="min-w-0">
+            <p className="font-heading font-black">{nameNode}</p>
+            {(author?.position || companyName) && (
+              <p className="text-sm text-body-foreground">
+                {[author?.position, companyName].filter(Boolean).join(" at ")}
+              </p>
+            )}
+          </div>
         </figcaption>
       </div>
 
