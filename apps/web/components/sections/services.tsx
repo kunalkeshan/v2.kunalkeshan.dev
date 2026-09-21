@@ -5,7 +5,7 @@ import { motion } from "motion/react"
 import { ArrowRightIcon, MailIcon } from "lucide-react"
 
 import { Container } from "@workspace/ui/components/container"
-import { cardLift, cn } from "@workspace/ui/lib/utils"
+import { cardLift, cardLiftActive, cn } from "@workspace/ui/lib/utils"
 import { urlFor } from "@workspace/sanity/image"
 import type { SERVICES_QUERY_RESULT } from "@workspace/sanity/types"
 
@@ -27,10 +27,10 @@ interface ServicesGridProps {
  * `group-hover:scale-110` on the `<Image>` below. The lift itself lives in
  * `cardLift` (@workspace/ui/lib/utils).
  */
-const cardShell = cn(
-  "group flex min-h-105 flex-col overflow-hidden rounded-lg border-3 border-border bg-card",
-  cardLift
-)
+const cardShellBase =
+  "group flex min-h-105 flex-col overflow-hidden rounded-lg border-3 border-border bg-card"
+
+const cardShell = cn(cardShellBase, cardLift)
 
 function ServiceCard({ service }: { service: Service }) {
   // No `.height()`: Sanity ignores w/h/rect for SVGs and serves the original
@@ -80,7 +80,7 @@ function ServiceCard({ service }: { service: Service }) {
 
 function ContactCard() {
   return (
-    <div className={cn(cardShell, "bg-secondary")}>
+    <div className={cn(cardShellBase, cardLiftActive, "bg-secondary")}>
       <div className="flex min-h-45 items-center justify-center bg-secondary p-8">
         {/* Intrinsic size of public/mailbox.svg (576.5 x 493.5), not the
             rendered size — `max-w-35` still caps how large it paints. */}

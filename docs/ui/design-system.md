@@ -147,6 +147,15 @@ a -10px translate only on `:hover`.
 Never combine `cardLift` with `pressableShadow`: both own `hover:translate-*` on the
 same axis and would fight each other.
 
+**`cardLiftActive` — the same lift, permanently on.** For a card that should always
+read as elevated (e.g. a highlighted "Get in touch" card in a services grid) rather
+than only on hover, use `cardLiftActive` instead of `cardLift`. It hardcodes the exact
+same tokens as `cardLift`'s hover step (`-translate-y-2 shadow-xl`) unconditionally, so
+the card stays visually consistent with its resting-hover siblings — just permanently
+in that position instead of transitioning into it. It carries no `hover:`/
+`motion-reduce:` logic of its own (nothing to reduce if it never moves). Never combine
+`cardLiftActive` with `cardLift` or `pressableShadow` on the same element.
+
 Why it matters: an earlier version of `services.tsx` used the image-wrapper
 pairing (resting `shadow-xl` → `hover:shadow-2xl`) on its content cards. The
 shadow was already present at rest, so hover only nudged it 8px → 10px and the

@@ -60,3 +60,15 @@ export const cardLift =
   "hover:-translate-y-2 hover:shadow-xl " +
   // Reduced motion: keep the shadow cue, drop the travel.
   "motion-reduce:transition-[box-shadow] motion-reduce:hover:translate-y-0"
+
+/**
+ * `cardLift`'s hovered state, applied unconditionally instead of on `:hover`.
+ * For a card that should always read as "elevated" — e.g. a card the user
+ * points to first. Same tokens as `cardLift`'s hover step (`-translate-y-2
+ * shadow-xl`) so it stays visually consistent with the rest of the card grid;
+ * just permanently in that position instead of transitioning into it.
+ * Motion only — layout, colour and border classes stay at the call site.
+ * Never combine with `cardLift` or `pressableShadow` on the same element.
+ */
+export const cardLiftActive =
+  "-translate-y-2 shadow-xl transform-gpu will-change-transform"
