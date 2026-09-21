@@ -226,6 +226,21 @@ export type Publication = {
   orderRank?: string
 }
 
+export type Certification = {
+  _id: string
+  _type: "certification"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  organization?: OrganizationReference
+  issuedAt?: string
+  credentialId?: string
+  verifyUrl?: string
+  archived?: boolean
+  orderRank?: string
+}
+
 export type Experience = {
   _id: string
   _type: "experience"
@@ -623,6 +638,7 @@ export type AllSanitySchemaTypes =
   | BlockContent
   | Slug
   | Publication
+  | Certification
   | Experience
   | Organization
   | Value
@@ -1302,6 +1318,92 @@ export type EDUCATION_QUERY_RESULT = Array<{
 }>
 
 // Source: ../../packages/sanity/src/query.ts
+// Variable: CERTIFICATIONS_QUERY
+// Query: *[_type == "certification" && archived != true] | order(orderRank asc) {    _id,    title,    organization-> {      _id,      name,      website,      logo {        asset->,        hotspot,        crop,        alt      }    },    issuedAt,    credentialId,    verifyUrl  }
+export type CERTIFICATIONS_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  organization: {
+    _id: string
+    name: string | null
+    website: string | null
+    logo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
+      alt: string | null
+    } | null
+  } | null
+  issuedAt: string | null
+  credentialId: string | null
+  verifyUrl: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: ARCHIVED_CERTIFICATIONS_QUERY
+// Query: *[_type == "certification" && archived == true] | order(orderRank asc) {    _id,    title,    organization-> {      _id,      name,      website,      logo {        asset->,        hotspot,        crop,        alt      }    },    issuedAt,    credentialId,    verifyUrl  }
+export type ARCHIVED_CERTIFICATIONS_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  organization: {
+    _id: string
+    name: string | null
+    website: string | null
+    logo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
+      alt: string | null
+    } | null
+  } | null
+  issuedAt: string | null
+  credentialId: string | null
+  verifyUrl: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
 // Variable: PUBLICATIONS_QUERY
 // Query: *[_type == "publication"] | order(orderRank asc) {    _id,    title,    venue,    publishedAt,    authors,    doi,    url,    abstract  }
 export type PUBLICATIONS_QUERY_RESULT = Array<{
@@ -1923,6 +2025,8 @@ declare global {
     '\n  *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    employmentType,\n    startDate,\n    endDate,\n    isCurrent,\n    summary\n  }\n': FEATURED_EXPERIENCES_QUERY_RESULT
     '\n  *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {\n    _id,\n    role,\n    kind,\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    employmentType,\n    workMode,\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EXPERIENCES_QUERY_RESULT
     '\n  *[_type == "experience" && kind == "education"] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    credential,\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EDUCATION_QUERY_RESULT
+    '\n  *[_type == "certification" && archived != true] | order(orderRank asc) {\n    _id,\n    title,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    issuedAt,\n    credentialId,\n    verifyUrl\n  }\n': CERTIFICATIONS_QUERY_RESULT
+    '\n  *[_type == "certification" && archived == true] | order(orderRank asc) {\n    _id,\n    title,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    issuedAt,\n    credentialId,\n    verifyUrl\n  }\n': ARCHIVED_CERTIFICATIONS_QUERY_RESULT
     '\n  *[_type == "publication"] | order(orderRank asc) {\n    _id,\n    title,\n    venue,\n    publishedAt,\n    authors,\n    doi,\n    url,\n    abstract\n  }\n': PUBLICATIONS_QUERY_RESULT
     '\n  *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': FEATURED_PROJECTS_QUERY_RESULT
     '\n  *[_type == "project"] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    archived,\n    featured,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': PROJECTS_QUERY_RESULT

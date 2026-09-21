@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import { motion } from "motion/react"
 import {
   ArrowRightIcon,
@@ -16,7 +15,6 @@ import {
 import { Button } from "@workspace/ui/components/button"
 import { Container } from "@workspace/ui/components/container"
 import { cn } from "@workspace/ui/lib/utils"
-import { urlFor } from "@workspace/sanity/image"
 import type {
   EDUCATION_QUERY_RESULT,
   EXPERIENCES_QUERY_RESULT,
@@ -24,6 +22,7 @@ import type {
 } from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
+import { OrganizationLogoMark } from "@/components/organization-logo-mark"
 import { formatDateRange, formatDuration, spanOf } from "@/lib/dates"
 import {
   sectionReveal,
@@ -59,75 +58,6 @@ const LINK_ICONS = {
   patent: ScrollTextIcon,
   publication: ScrollTextIcon,
 } as const
-
-function logoUrl(logo: OrganizationLogo, size: number) {
-  // `fit("crop")` so Sanity returns a square that fills the circular lockup,
-  // rather than letterboxing a non-square source inside it.
-  return logo?.asset
-    ? urlFor(logo).width(size).height(size).fit("crop").url()
-    : undefined
-}
-
-/**
- * The bordered circular logo lockup, carried over from v1 where it was the
- * recognisable mark of the resume cards. `shadow-xl` -> `shadow-2xl` on hover
- * is the design system's image-wrapper treatment, and this is a bordered image
- * wrapper — the one place that pairing is allowed.
- */
-function OrganizationLogoMark({
-  logo,
-  name,
-  website,
-  size = 64,
-}: {
-  logo: OrganizationLogo
-  name: string | null
-  website: string | null
-  size?: number
-}) {
-  const src = logoUrl(logo, 160)
-  if (!src) return null
-
-  const mark = (
-    <span
-      className={cn(
-        "flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-card",
-        "border-2 border-border shadow-sm",
-        website &&
-          "transition-shadow duration-press ease-snap hover:shadow"
-      )}
-      style={{ width: size, height: size }}
-    >
-      {/*
-        `object-cover` rather than `contain`: several of these marks are
-        wordmarks with generous built-in whitespace, which `contain` plus
-        padding shrank to a stamp floating in a large circle. Cover fills the
-        lockup edge to edge and crops the dead margin instead.
-      */}
-      <Image
-        src={src}
-        alt={logo?.alt ?? name ?? ""}
-        width={size * 2}
-        height={size * 2}
-        className="h-full w-full object-cover"
-      />
-    </span>
-  )
-
-  if (!website) return mark
-
-  return (
-    <a
-      href={website}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="rounded-full focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
-      aria-label={`${name ?? "Organization"} website`}
-    >
-      {mark}
-    </a>
-  )
-}
 
 function MetaLine({ items }: { items: Array<string | null | undefined> }) {
   const shown = items.filter((item): item is string => Boolean(item))

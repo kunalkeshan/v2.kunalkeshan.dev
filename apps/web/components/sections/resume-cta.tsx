@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, useReducedMotion } from "motion/react"
-import { DownloadIcon } from "lucide-react"
+import { BadgeCheckIcon, DownloadIcon } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
@@ -11,6 +11,13 @@ interface ResumeCtaProps {
   fileUrl: string | null
   /** Shown as the saved filename, e.g. "Kunal Keshan - Resume.pdf". */
   fileName?: string
+  /**
+   * Path to the certifications page. When set, renders a secondary
+   * "See certifications" button beside the download — the two were
+   * floating as separate page elements before, which read as an
+   * afterthought rather than a related action.
+   */
+  certificationsHref?: string
 }
 
 /**
@@ -23,13 +30,20 @@ interface ResumeCtaProps {
  * with the house card treatment. The rest was replaced: the neobrutalist system
  * has no pill radius and no mono display type.
  *
- * Renders `null` when no PDF has been uploaded in the Studio, so the page can
- * never ship a dead download link.
+ * Renders `null` when there's neither a resume to download nor a
+ * certifications link to offer, so the page never ships an empty card. A
+ * missing resume alone still renders the card for the certifications link —
+ * losing that link entirely because the PDF isn't uploaded yet would be a
+ * silent regression versus its previous standalone button.
  */
-export function ResumeCta({ fileUrl, fileName }: ResumeCtaProps) {
+export function ResumeCta({
+  fileUrl,
+  fileName,
+  certificationsHref,
+}: ResumeCtaProps) {
   const reduceMotion = useReducedMotion()
 
-  if (!fileUrl) return null
+  if (!fileUrl && !certificationsHref) return null
 
   const rings = [
     { size: "size-72 md:size-96", from: 1.4, opacity: "border-border/25" },
@@ -72,27 +86,44 @@ export function ResumeCta({ fileUrl, fileName }: ResumeCtaProps) {
           id="resume-download-heading"
           className="font-heading text-2xl font-black text-balance sm:text-3xl"
         >
-          Prefer the one-page version?
+          {fileUrl ? "Prefer the one-page version?" : "Want the receipts?"}
         </h2>
         <p className="max-w-prose text-base leading-relaxed text-body-foreground">
-          The same history, condensed to a PDF you can skim, print, or forward.
+          {fileUrl
+            ? "The same history, condensed to a PDF you can skim, print, or forward."
+            : "The courses and credentials behind everything above."}
         </p>
-        <Button
-          size="lg"
-          className="mt-2"
-          render={
-            <a
-              href={fileUrl}
-              download={fileName}
-              target="_blank"
-              rel="noopener noreferrer"
-            />
-          }
-          nativeButton={false}
-        >
-          <DownloadIcon data-icon="inline-start" />
-          Download resume
-        </Button>
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
+          {fileUrl && (
+            <Button
+              size="lg"
+              render={
+                <a
+                  href={fileUrl}
+                  download={fileName}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+              nativeButton={false}
+            >
+              <DownloadIcon data-icon="inline-start" />
+              Download resume
+            </Button>
+          )}
+
+          {certificationsHref && (
+            <Button
+              size="lg"
+              variant={fileUrl ? "secondary" : "default"}
+              render={<a href={certificationsHref} />}
+              nativeButton={false}
+            >
+              <BadgeCheckIcon data-icon="inline-start" />
+              See certifications
+            </Button>
+          )}
+        </div>
       </div>
     </section>
   )

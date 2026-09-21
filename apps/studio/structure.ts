@@ -11,6 +11,7 @@ import { WrenchIcon } from "@sanity/icons/Wrench";
 import { HeartIcon } from "@sanity/icons/Heart";
 import { ProjectsIcon } from "@sanity/icons/Projects";
 import { CaseIcon } from "@sanity/icons/Case";
+import { CheckmarkCircleIcon } from "@sanity/icons/CheckmarkCircle";
 import { UsersIcon } from "@sanity/icons/Users";
 import { BookIcon } from "@sanity/icons/Book";
 import { UserIcon } from "@sanity/icons/User";
@@ -72,6 +73,13 @@ export const structure: StructureResolver = (S, context) =>
         S,
         context,
       }),
+      orderableDocumentListDeskItem({
+        type: "certification",
+        title: "Certifications",
+        icon: CheckmarkCircleIcon,
+        S,
+        context,
+      }),
       // People sit next to Organizations rather than next to Testimonials:
       // both are the reference targets other documents point at, and grouping
       // them keeps the "edit the shared record once" surfaces together.
@@ -110,6 +118,7 @@ export const structure: StructureResolver = (S, context) =>
             "project",
             "experience",
             "organization",
+            "certification",
             "publication",
             "person",
             "testimonial",

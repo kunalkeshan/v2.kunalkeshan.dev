@@ -95,13 +95,19 @@ export async function POST(req: NextRequest) {
         break;
 
       case "organization":
-        // Organizations are only ever read through an experience, project, or
-        // testimonial-author reference, so a logo or name edit has to bust
-        // those collections too.
+        // Organizations are only ever read through an experience, project,
+        // certification-issuer, or testimonial-author reference, so a logo
+        // or name edit has to bust those collections too.
         tags.push(createCollectionTag("organization"));
         tags.push(createCollectionTag("experience"));
         tags.push(createCollectionTag("project"));
+        tags.push(createCollectionTag("certification"));
         tags.push(createCollectionTag("testimonial"));
+        break;
+
+      case "certification":
+        // Revalidate the /certifications page.
+        tags.push(createCollectionTag("certification"));
         break;
 
       case "person":

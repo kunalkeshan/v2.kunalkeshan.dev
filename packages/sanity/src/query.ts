@@ -307,6 +307,48 @@ export const EDUCATION_QUERY = defineQuery(`
   }
 `);
 
+export const CERTIFICATIONS_QUERY = defineQuery(`
+  *[_type == "certification" && archived != true] | order(orderRank asc) {
+    _id,
+    title,
+    organization-> {
+      _id,
+      name,
+      website,
+      logo {
+        asset->,
+        hotspot,
+        crop,
+        alt
+      }
+    },
+    issuedAt,
+    credentialId,
+    verifyUrl
+  }
+`);
+
+export const ARCHIVED_CERTIFICATIONS_QUERY = defineQuery(`
+  *[_type == "certification" && archived == true] | order(orderRank asc) {
+    _id,
+    title,
+    organization-> {
+      _id,
+      name,
+      website,
+      logo {
+        asset->,
+        hotspot,
+        crop,
+        alt
+      }
+    },
+    issuedAt,
+    credentialId,
+    verifyUrl
+  }
+`);
+
 export const PUBLICATIONS_QUERY = defineQuery(`
   *[_type == "publication"] | order(orderRank asc) {
     _id,

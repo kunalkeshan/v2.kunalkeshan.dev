@@ -90,6 +90,7 @@ export default async function ExperiencePage() {
             <ResumeCta
               fileUrl={resumeUrl}
               fileName="Kunal Keshan - Resume.pdf"
+              certificationsHref="/certifications"
             />
           </div>
         )}
