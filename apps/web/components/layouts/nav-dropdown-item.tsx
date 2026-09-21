@@ -11,14 +11,10 @@ export function NavDropdownItem({
   href,
   className,
 }: LinkItemType & { className?: string }) {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-muted",
-        className
-      )}
-    >
+  const isExternal = href.startsWith("http")
+
+  const content = (
+    <>
       {icon && (
         <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-sm border-2 border-border bg-background [&_svg]:size-4">
           {icon}
@@ -32,6 +28,30 @@ export function NavDropdownItem({
           </span>
         )}
       </div>
+    </>
+  )
+
+  const itemClassName = cn(
+    "flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-muted",
+    className
+  )
+
+  if (isExternal) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={itemClassName}
+      >
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <Link href={href} className={itemClassName}>
+      {content}
     </Link>
   )
 }

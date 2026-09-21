@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react"
 import { MailIcon } from "lucide-react"
+import Link from "next/link"
 
 import { Logo } from "@workspace/ui/components/logo"
 import { Button } from "@workspace/ui/components/button"
@@ -71,7 +72,7 @@ const Navbar = ({ siteConfig }: Props) => {
           size="icon"
           aria-label="Contact"
           nativeButton={false}
-          render={<a href="/contact" />}
+          render={<Link href="/contact" />}
           className="rounded-lg border-border bg-foreground text-background hover:bg-primary hover:text-primary-foreground"
         >
           <MailIcon />

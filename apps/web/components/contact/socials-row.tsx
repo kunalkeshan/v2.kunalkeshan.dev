@@ -1,4 +1,3 @@
-import Link from "next/link"
 import {
   FaBlog,
   FaDiscord,
@@ -44,7 +43,7 @@ export function SocialsRow({ socialMedia }: SocialsRowProps) {
         if (!Icon) return null
 
         return (
-          <Link
+          <a
             key={social.url}
             href={social.url}
             target="_blank"
@@ -54,7 +53,7 @@ export function SocialsRow({ socialMedia }: SocialsRowProps) {
             className="flex size-10 items-center justify-center rounded-full border-2 border-border bg-card text-lg shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap hover:-translate-y-0.5 hover:shadow-lg"
           >
             <Icon />
-          </Link>
+          </a>
         )
       })}
     </div>

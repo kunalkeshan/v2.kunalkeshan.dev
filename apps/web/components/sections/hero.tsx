@@ -85,7 +85,7 @@ const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
               <Button
                 size="lg"
                 className="w-full md:w-1/2"
-                render={<a href="/contact" />}
+                render={<Link href="/contact" />}
                 nativeButton={false}
               >
                 <MailIcon data-icon="inline-start" />

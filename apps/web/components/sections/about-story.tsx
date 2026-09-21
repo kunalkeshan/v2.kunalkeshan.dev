@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { motion } from "motion/react"
 import { ArrowRightIcon, FileTextIcon, MailIcon } from "lucide-react"
 
@@ -112,7 +113,7 @@ const AboutStory = ({
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
                 size="lg"
-                render={<a href="/experience" />}
+                render={<Link href="/experience" />}
                 nativeButton={false}
               >
                 <FileTextIcon data-icon="inline-start" />
@@ -122,7 +123,7 @@ const AboutStory = ({
               <Button
                 size="lg"
                 variant="outline"
-                render={<a href="/contact" />}
+                render={<Link href="/contact" />}
                 nativeButton={false}
               >
                 <MailIcon data-icon="inline-start" />

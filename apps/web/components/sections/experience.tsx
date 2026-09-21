@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "motion/react"
 import {
   ArrowRightIcon,
@@ -500,7 +501,7 @@ const Experience = ({ experiences, yearsBuilding }: ExperienceProps) => {
                 size="lg"
                 variant="secondary"
                 className="mt-8 w-full md:w-fit"
-                render={<a href="/experience" />}
+                render={<Link href="/experience" />}
                 nativeButton={false}
               >
                 <FileTextIcon data-icon="inline-start" />

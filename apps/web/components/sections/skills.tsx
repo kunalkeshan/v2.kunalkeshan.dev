@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { motion } from "motion/react"
 import { ArrowRightIcon } from "lucide-react"
 
@@ -82,7 +83,7 @@ const Skills = ({ skills }: SkillsProps) => {
           <Button
             variant="outline"
             className="h-auto rounded-lg border-2 px-3 py-2.5 text-xs font-bold sm:text-sm"
-            render={<a href="/skills" />}
+            render={<Link href="/skills" />}
             nativeButton={false}
           >
             And more

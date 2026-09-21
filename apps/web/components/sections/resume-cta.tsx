@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion, useReducedMotion } from "motion/react"
 import { BadgeCheckIcon, DownloadIcon } from "lucide-react"
 
@@ -116,7 +117,7 @@ export function ResumeCta({
             <Button
               size="lg"
               variant={fileUrl ? "secondary" : "default"}
-              render={<a href={certificationsHref} />}
+              render={<Link href={certificationsHref} />}
               nativeButton={false}
             >
               <BadgeCheckIcon data-icon="inline-start" />

@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { motion } from "motion/react"
 import { UserIcon } from "lucide-react"
 
@@ -116,7 +117,7 @@ const About = ({
             <Button
               size="lg"
               className="mt-8 w-full md:w-fit"
-              render={<a href="/about" />}
+              render={<Link href="/about" />}
               nativeButton={false}
             >
               <UserIcon data-icon="inline-start" />
