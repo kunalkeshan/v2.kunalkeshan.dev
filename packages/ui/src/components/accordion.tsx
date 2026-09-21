@@ -1,7 +1,7 @@
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion"
 
-import { cn } from "@workspace/ui/lib/utils"
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { cardLift, cn } from "@workspace/ui/lib/utils"
+import { PlusIcon } from "lucide-react"
 
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
   return (
@@ -18,7 +18,12 @@ function AccordionItem({ className, ...props }: AccordionPrimitive.Item.Props) {
     <AccordionPrimitive.Item
       data-slot="accordion-item"
       className={cn(
-        "not-last:mb-4 rounded-lg border-3 border-border bg-card px-4 shadow-none transition-shadow duration-reveal ease-snap data-open:shadow-lg",
+        // `cardLift` covers the hover lift/shadow (ported from v1's FaqCard
+        // `hover:-translate-y-1 hover:shadow-3d`); `data-open:shadow-lg`
+        // layers on top so an expanded item stays visibly lifted even
+        // without the pointer over it.
+        "not-last:mb-4 rounded-lg border-3 border-border bg-card px-4 shadow-none data-open:shadow-lg",
+        cardLift,
         className
       )}
       {...props}
@@ -36,14 +41,19 @@ function AccordionTrigger({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "group/accordion-trigger relative flex flex-1 items-start justify-between rounded-md border-2 border-transparent py-3.5 text-left font-heading text-sm font-black outline-none transition-all focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-disabled:pointer-events-none aria-disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 **:data-[slot=accordion-trigger-icon]:text-muted-foreground",
+          "group/accordion-trigger relative flex flex-1 items-start justify-between rounded-md border-2 border-transparent py-3.5 text-left font-heading text-sm font-black outline-none transition-all focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-disabled:pointer-events-none aria-disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4",
           className
         )}
         {...props}
       >
         {children}
-        <ChevronDownIcon data-slot="accordion-trigger-icon" className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden" />
-        <ChevronUpIcon data-slot="accordion-trigger-icon" className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline" />
+        {/* A plus that rotates 45° into an X on open — v1's FaqCard treatment,
+         * reused here instead of shadcn's default chevron swap. One icon,
+         * animated, rather than two icons toggled by visibility. */}
+        <PlusIcon
+          data-slot="accordion-trigger-icon"
+          className="pointer-events-none shrink-0 rounded-md border-2 border-border bg-card p-0.5 text-foreground transition-transform duration-press ease-snap group-aria-expanded/accordion-trigger:rotate-45 group-aria-expanded/accordion-trigger:bg-primary group-aria-expanded/accordion-trigger:text-primary-foreground"
+        />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   )

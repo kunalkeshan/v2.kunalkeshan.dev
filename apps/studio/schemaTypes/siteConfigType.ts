@@ -415,6 +415,15 @@ export const siteConfigType = defineType({
       ],
     },
     {
+      name: "contactNotificationEmail",
+      title: "Contact Form Notification Email",
+      type: "string",
+      group: "contact",
+      description:
+        "Where new /contact form submissions are sent. Not shown publicly — separate from the Email Addresses list above, which is displayed on the site.",
+      validation: (Rule) => Rule.required().email(),
+    },
+    {
       name: "address",
       title: "Address",
       type: "object",
@@ -465,12 +474,16 @@ export const siteConfigType = defineType({
               type: "string",
               options: {
                 list: [
+                  { title: "GitHub", value: "github" },
+                  { title: "LinkedIn", value: "linkedin" },
                   { title: "Twitter (X)", value: "twitter" },
-                  { title: "YouTube", value: "youtube" },
                   { title: "Instagram", value: "instagram" },
+                  { title: "YouTube", value: "youtube" },
+                  { title: "Blog", value: "blog" },
                   { title: "Facebook", value: "facebook" },
                   { title: "WhatsApp", value: "whatsapp" },
-                  { title: "LinkedIn", value: "linkedin" },
+                  { title: "Discord", value: "discord" },
+                  { title: "Telegram", value: "telegram" },
                 ],
                 layout: "dropdown",
               },

@@ -55,6 +55,7 @@ export const SITE_CONFIG_QUERY = defineQuery(`
       email,
       label
     },
+    contactNotificationEmail,
     address {
       street,
       city,
@@ -175,6 +176,7 @@ export const SERVICES_QUERY = defineQuery(`
     _id,
     name,
     description,
+    icon,
     illustration {
       asset->,
       hotspot,

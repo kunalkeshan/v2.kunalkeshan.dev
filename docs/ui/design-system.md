@@ -809,7 +809,18 @@ box. **Sanity's image API has no auto-trim parameter** (`w`/`h`/`dpr`/`fit`/`cro
 `bg`/`pad` and the filters; `rect` needs exact per-asset coordinates). Fix it in the asset:
 crop the margin out of the source file, or set a tight crop in the Studio.
 
+## Email templates carry a separate, hand-maintained color mirror
+
+`packages/emails/src/_theme/colors.ts` hardcodes a hex copy of this file's light-mode
+`:root` tokens (background/foreground/primary/border/etc.), for use in the HTML emails
+sent by `apps/web/app/api/contact/route.ts`. Email clients cannot read CSS custom
+properties, so `colors.ts` can't `@import` or otherwise derive from this file — it has to
+be updated by hand whenever the `:root` palette above changes. See
+`docs/runbooks/contact-form.md` for the full email-package layout.
+
 ## Related
 
 - [`font-stack.md`](./font-stack.md) — font loading convention and the `font-heading` →
   `--font-serif` (Montserrat) wiring.
+- [`contact-form.md`](../runbooks/contact-form.md) — the `@workspace/emails` package and
+  its hand-maintained color mirror.

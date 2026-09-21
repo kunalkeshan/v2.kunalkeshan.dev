@@ -328,6 +328,19 @@ export type Service = {
   _rev: string
   name?: string
   description?: string
+  icon?:
+    | "Code2"
+    | "Database"
+    | "Search"
+    | "Cloud"
+    | "Wrench"
+    | "Rocket"
+    | "Server"
+    | "FileCode"
+    | "Globe"
+    | "Sparkles"
+    | "Layers"
+    | "Terminal"
   illustration?: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -501,6 +514,7 @@ export type SiteConfig = {
     label?: string
     _key: string
   }>
+  contactNotificationEmail?: string
   address?: {
     street?: string
     city?: string
@@ -510,7 +524,16 @@ export type SiteConfig = {
   }
   socialMedia?: Array<{
     platform?:
-      "twitter" | "youtube" | "instagram" | "facebook" | "whatsapp" | "linkedin"
+      | "github"
+      | "linkedin"
+      | "twitter"
+      | "instagram"
+      | "youtube"
+      | "blog"
+      | "facebook"
+      | "whatsapp"
+      | "discord"
+      | "telegram"
     url?: string
     label?: string
     _key: string
@@ -660,7 +683,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: SITE_CONFIG_QUERY
-// Query: *[_type == "siteConfig"][0] {    _id,    title,    description,    ogImage {      asset->,      hotspot,      crop,      alt    },    twitterImage {      asset->,      hotspot,      crop,      alt    },    logo {      asset->,      hotspot,      crop,      alt    },    heroName,    heroRoles,    heroImage {      asset->,      hotspot,      crop,      alt    },    aboutHeadingLead,    aboutHeadingHighlight,    aboutBody,    aboutHighlights[] {      title,      description    },    aboutImage {      asset->,      hotspot,      crop,      alt    },    testimonialsHeadingLead,    testimonialsHeadingHighlight,    testimonialsIntro,    phoneNumbers[] {      number,      label    },    emails[] {      email,      label    },    address {      street,      city,      state,      postalCode,      country    },    socialMedia[] {      platform,      url,      label    },    resumePdf {      asset->    }  }
+// Query: *[_type == "siteConfig"][0] {    _id,    title,    description,    ogImage {      asset->,      hotspot,      crop,      alt    },    twitterImage {      asset->,      hotspot,      crop,      alt    },    logo {      asset->,      hotspot,      crop,      alt    },    heroName,    heroRoles,    heroImage {      asset->,      hotspot,      crop,      alt    },    aboutHeadingLead,    aboutHeadingHighlight,    aboutBody,    aboutHighlights[] {      title,      description    },    aboutImage {      asset->,      hotspot,      crop,      alt    },    testimonialsHeadingLead,    testimonialsHeadingHighlight,    testimonialsIntro,    phoneNumbers[] {      number,      label    },    emails[] {      email,      label    },    contactNotificationEmail,    address {      street,      city,      state,      postalCode,      country    },    socialMedia[] {      platform,      url,      label    },    resumePdf {      asset->    }  }
 export type SITE_CONFIG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -820,6 +843,7 @@ export type SITE_CONFIG_QUERY_RESULT = {
     email: string | null
     label: string | null
   }> | null
+  contactNotificationEmail: string | null
   address: {
     street: string | null
     city: string | null
@@ -829,9 +853,13 @@ export type SITE_CONFIG_QUERY_RESULT = {
   } | null
   socialMedia: Array<{
     platform:
+      | "blog"
+      | "discord"
       | "facebook"
+      | "github"
       | "instagram"
       | "linkedin"
+      | "telegram"
       | "twitter"
       | "whatsapp"
       | "youtube"
@@ -1063,11 +1091,25 @@ export type SKILLS_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: SERVICES_QUERY
-// Query: *[_type == "service"] | order(orderRank asc) {    _id,    name,    description,    illustration {      asset->,      hotspot,      crop,      alt    }  }
+// Query: *[_type == "service"] | order(orderRank asc) {    _id,    name,    description,    icon,    illustration {      asset->,      hotspot,      crop,      alt    }  }
 export type SERVICES_QUERY_RESULT = Array<{
   _id: string
   name: string | null
   description: string | null
+  icon:
+    | "Cloud"
+    | "Code2"
+    | "Database"
+    | "FileCode"
+    | "Globe"
+    | "Layers"
+    | "Rocket"
+    | "Search"
+    | "Server"
+    | "Sparkles"
+    | "Terminal"
+    | "Wrench"
+    | null
   illustration: {
     asset: {
       _id: string
@@ -2012,7 +2054,7 @@ export type FEATURED_TESTIMONIALS_QUERY_RESULT = Array<{
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    twitterImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    logo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    testimonialsHeadingLead,\n    testimonialsHeadingHighlight,\n    testimonialsIntro,\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    },\n    resumePdf {\n      asset->\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
+    '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    twitterImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    logo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    testimonialsHeadingLead,\n    testimonialsHeadingHighlight,\n    testimonialsIntro,\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    contactNotificationEmail,\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    },\n    resumePdf {\n      asset->\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0] {\n    aboutPageHeadingLead,\n    aboutPageHeadingHighlight,\n    aboutPageIntro,\n    aboutPageStoryHeadingLead,\n    aboutPageStoryHeadingHighlight,\n    aboutPageStoryHeadingTrail,\n    aboutPageStory,\n    aboutPageValuesHeading,\n    aboutPageValuesIntro,\n    aboutPagePortrait {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': ABOUT_PAGE_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0].footerLegalLinks[]-> {\n    _id,\n    title,\n    slug,\n    description,\n    _updatedAt\n  }\n': FOOTER_LEGAL_LINKS_QUERY_RESULT
     '\n  *[_type == "faqs"][0] {\n    ...,\n    faqItems[]{ ... }\n  }\n': FAQS_QUERY_RESULT
@@ -2020,7 +2062,7 @@ declare global {
     '\n  *[_type == "legal" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    description,\n    content,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT
     '\n  *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    category\n  }\n': FEATURED_SKILLS_QUERY_RESULT
     '\n  *[_type == "skill"] | order(category asc, orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    category\n  }\n': SKILLS_QUERY_RESULT
-    '\n  *[_type == "service"] | order(orderRank asc) {\n    _id,\n    name,\n    description,\n    illustration {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': SERVICES_QUERY_RESULT
+    '\n  *[_type == "service"] | order(orderRank asc) {\n    _id,\n    name,\n    description,\n    icon,\n    illustration {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': SERVICES_QUERY_RESULT
     '\n  *[_type == "value"] | order(orderRank asc) {\n    _id,\n    title,\n    description,\n    illustration {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': VALUES_QUERY_RESULT
     '\n  *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    employmentType,\n    startDate,\n    endDate,\n    isCurrent,\n    summary\n  }\n': FEATURED_EXPERIENCES_QUERY_RESULT
     '\n  *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {\n    _id,\n    role,\n    kind,\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    employmentType,\n    workMode,\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EXPERIENCES_QUERY_RESULT

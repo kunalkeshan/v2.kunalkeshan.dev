@@ -1,0 +1,32 @@
+{
+  "name": "@workspace/emails",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "eslint",
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit",
+    "dev": "email dev --dir ./src --port 8000"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-email": "^6.9.5"
+  },
+  "devDependencies": {
+    "@react-email/ui": "^6.9.5",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "eslint": "^9.39.5",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    "./contact-notification": "./src/contact/contact-notification.tsx",
+    "./registry": "./src/registry.ts",
+    "./render": "./src/render-email.tsx"
+  }
+}

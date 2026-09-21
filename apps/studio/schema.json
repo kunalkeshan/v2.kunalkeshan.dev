@@ -1986,6 +1986,63 @@
         },
         "optional": true
       },
+      "icon": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "Code2"
+            },
+            {
+              "type": "string",
+              "value": "Database"
+            },
+            {
+              "type": "string",
+              "value": "Search"
+            },
+            {
+              "type": "string",
+              "value": "Cloud"
+            },
+            {
+              "type": "string",
+              "value": "Wrench"
+            },
+            {
+              "type": "string",
+              "value": "Rocket"
+            },
+            {
+              "type": "string",
+              "value": "Server"
+            },
+            {
+              "type": "string",
+              "value": "FileCode"
+            },
+            {
+              "type": "string",
+              "value": "Globe"
+            },
+            {
+              "type": "string",
+              "value": "Sparkles"
+            },
+            {
+              "type": "string",
+              "value": "Layers"
+            },
+            {
+              "type": "string",
+              "value": "Terminal"
+            }
+          ]
+        },
+        "optional": true
+      },
       "illustration": {
         "type": "objectAttribute",
         "value": {
@@ -3043,6 +3100,13 @@
         },
         "optional": true
       },
+      "contactNotificationEmail": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "address": {
         "type": "objectAttribute",
         "value": {
@@ -3101,7 +3165,19 @@
                   "of": [
                     {
                       "type": "string",
+                      "value": "github"
+                    },
+                    {
+                      "type": "string",
+                      "value": "linkedin"
+                    },
+                    {
+                      "type": "string",
                       "value": "twitter"
+                    },
+                    {
+                      "type": "string",
+                      "value": "instagram"
                     },
                     {
                       "type": "string",
@@ -3109,7 +3185,7 @@
                     },
                     {
                       "type": "string",
-                      "value": "instagram"
+                      "value": "blog"
                     },
                     {
                       "type": "string",
@@ -3121,7 +3197,11 @@
                     },
                     {
                       "type": "string",
-                      "value": "linkedin"
+                      "value": "discord"
+                    },
+                    {
+                      "type": "string",
+                      "value": "telegram"
                     }
                   ]
                 },

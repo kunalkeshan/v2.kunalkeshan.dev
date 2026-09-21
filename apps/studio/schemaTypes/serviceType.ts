@@ -37,6 +37,31 @@ export const serviceType = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "icon",
+      title: "Icon",
+      type: "string",
+      description:
+        "A small inline icon shown in the contact form's service picker (distinct from the illustration below, which is a larger graphic used elsewhere). Name must match a lucide-react icon exported from PLATFORM_ICONS in apps/web/components/contact/service-multi-select.tsx.",
+      options: {
+        list: [
+          { title: "Code", value: "Code2" },
+          { title: "Database", value: "Database" },
+          { title: "Search", value: "Search" },
+          { title: "Cloud", value: "Cloud" },
+          { title: "Wrench", value: "Wrench" },
+          { title: "Rocket", value: "Rocket" },
+          { title: "Server", value: "Server" },
+          { title: "File Code", value: "FileCode" },
+          { title: "Globe", value: "Globe" },
+          { title: "Sparkles", value: "Sparkles" },
+          { title: "Layers", value: "Layers" },
+          { title: "Terminal", value: "Terminal" },
+        ],
+        layout: "dropdown",
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: "illustration",
       title: "Illustration",
       type: "image",
