@@ -1,65 +1,42 @@
-import {DocumentTextIcon} from '@sanity/icons/DocumentText'
-import {defineArrayMember, defineField, defineType} from 'sanity'
+import { defineType } from "sanity";
+import { ComposeIcon } from "@sanity/icons/Compose";
 
+import { writingFields } from "./writingFields";
+
+/**
+ * A blog post at /blog/<slug> — technical/professional writing.
+ *
+ * Kept as its own document type rather than merged with `journalEntry` via a
+ * discriminator field: separate Studio lists, separate GROQ queries, and
+ * separate routes stay cleaner than one type branching on a `kind` field,
+ * even though the two share an identical field shape (see writingFields.ts).
+ *
+ * Sorted by `publishedAt desc` rather than a manual `orderRank` — unlike the
+ * curated types (projects, skills, ...), a growing list of dated posts is
+ * always read newest-first, so there's nothing to hand-order.
+ */
 export const postType = defineType({
-  name: 'post',
-  title: 'Post',
-  type: 'document',
-  icon: DocumentTextIcon,
-  fields: [
-    defineField({
-      name: 'title',
-      type: 'string',
-    }),
-    defineField({
-      name: 'slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-      },
-    }),
-    defineField({
-      name: 'author',
-      type: 'reference',
-      to: {type: 'author'},
-    }),
-    defineField({
-      name: 'mainImage',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-      fields: [
-        defineField({
-          name: 'alt',
-          type: 'string',
-          title: 'Alternative text',
-        })
-      ]
-    }),
-    defineField({
-      name: 'categories',
-      type: 'array',
-      of: [defineArrayMember({type: 'reference', to: {type: 'category'}})],
-    }),
-    defineField({
-      name: 'publishedAt',
-      type: 'datetime',
-    }),
-    defineField({
-      name: 'body',
-      type: 'blockContent',
-    }),
-  ],
+  name: "post",
+  title: "Post",
+  type: "document",
+  icon: ComposeIcon,
+  fields: writingFields("/blog"),
   preview: {
     select: {
-      title: 'title',
-      author: 'author.name',
-      media: 'mainImage',
+      title: "title",
+      authorName: "author.name",
+      media: "coverImage",
+      publishedAt: "publishedAt",
     },
-    prepare(selection) {
-      const {author} = selection
-      return {...selection, subtitle: author && `by ${author}`}
+    prepare({ title, authorName, media, publishedAt }) {
+      const date = publishedAt
+        ? new Date(publishedAt).toLocaleDateString()
+        : "Unpublished";
+      return {
+        title,
+        subtitle: [authorName, date].filter(Boolean).join(" — "),
+        media,
+      };
     },
   },
-})
+});

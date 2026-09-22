@@ -14,6 +14,9 @@ import { publicationType } from "./publicationType";
 import { projectType } from "./projectType";
 import { personType } from "./personType";
 import { testimonialType } from "./testimonialType";
+import { tagType } from "./tagType";
+import { postType } from "./postType";
+import { journalEntryType } from "./journalEntryType";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -31,5 +34,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     projectType,
     personType,
     testimonialType,
+    tagType,
+    postType,
+    journalEntryType,
   ],
 };

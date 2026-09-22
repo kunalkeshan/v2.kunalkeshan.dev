@@ -22,6 +22,155 @@ export type PersonReference = {
   [internalGroqTypeReferenceTo]?: "person"
 }
 
+export type SanityImageAssetReference = {
+  _ref: string
+  _type: "reference"
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset"
+}
+
+export type TagReference = {
+  _ref: string
+  _type: "reference"
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: "tag"
+}
+
+export type JournalEntry = {
+  _id: string
+  _type: "journalEntry"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  slug?: Slug
+  author?: PersonReference
+  excerpt?: string
+  coverImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  ogImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  tags?: Array<
+    {
+      _key: string
+    } & TagReference
+  >
+  body?: BlockContent
+  publishedAt?: string
+  featured?: boolean
+}
+
+export type BlockContent = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>
+        text?: string
+        _type: "span"
+        _key: string
+      }>
+      style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote"
+      listItem?: "bullet"
+      markDefs?: Array<{
+        href?: string
+        _type: "link"
+        _key: string
+      }>
+      level?: number
+      _type: "block"
+      _key: string
+    }
+  | {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: "image"
+      _key: string
+    }
+>
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop"
+  top?: number
+  bottom?: number
+  left?: number
+  right?: number
+}
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot"
+  x?: number
+  y?: number
+  height?: number
+  width?: number
+}
+
+export type Slug = {
+  _type: "slug"
+  current?: string
+  source?: string
+}
+
+export type Post = {
+  _id: string
+  _type: "post"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  slug?: Slug
+  author?: PersonReference
+  excerpt?: string
+  coverImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  ogImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: "image"
+  }
+  tags?: Array<
+    {
+      _key: string
+    } & TagReference
+  >
+  body?: BlockContent
+  publishedAt?: string
+  featured?: boolean
+}
+
+export type Tag = {
+  _id: string
+  _type: "tag"
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name?: string
+  slug?: Slug
+  description?: string
+}
+
 export type Testimonial = {
   _id: string
   _type: "testimonial"
@@ -34,13 +183,6 @@ export type Testimonial = {
   featured?: boolean
   givenAt?: string
   orderRank?: string
-}
-
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: "reference"
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset"
 }
 
 export type OrganizationReference = {
@@ -75,22 +217,6 @@ export type Person = {
     _key: string
   }>
   orderRank?: string
-}
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop"
-  top?: number
-  bottom?: number
-  left?: number
-  right?: number
-}
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot"
-  x?: number
-  y?: number
-  height?: number
-  width?: number
 }
 
 export type ExperienceReference = {
@@ -172,42 +298,6 @@ export type Project = {
   featured?: boolean
   archived?: boolean
   orderRank?: string
-}
-
-export type BlockContent = Array<
-  | {
-      children?: Array<{
-        marks?: Array<string>
-        text?: string
-        _type: "span"
-        _key: string
-      }>
-      style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote"
-      listItem?: "bullet"
-      markDefs?: Array<{
-        href?: string
-        _type: "link"
-        _key: string
-      }>
-      level?: number
-      _type: "block"
-      _key: string
-    }
-  | {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      alt?: string
-      _type: "image"
-      _key: string
-    }
->
-
-export type Slug = {
-  _type: "slug"
-  current?: string
-  source?: string
 }
 
 export type Publication = {
@@ -649,17 +739,21 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | PersonReference
-  | Testimonial
   | SanityImageAssetReference
-  | OrganizationReference
-  | Person
+  | TagReference
+  | JournalEntry
+  | BlockContent
   | SanityImageCrop
   | SanityImageHotspot
+  | Slug
+  | Post
+  | Tag
+  | Testimonial
+  | OrganizationReference
+  | Person
   | ExperienceReference
   | SkillReference
   | Project
-  | BlockContent
-  | Slug
   | Publication
   | Certification
   | Experience
@@ -2051,6 +2145,623 @@ export type FEATURED_TESTIMONIALS_QUERY_RESULT = Array<{
   } | null
 }>
 
+// Source: ../../packages/sanity/src/query.ts
+// Variable: POSTS_QUERY
+// Query: *[_type == "post" &&   (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&  (!defined($search) || title match $search + "*" || excerpt match $search + "*")] | order(publishedAt desc) [$start...$end] {      _id,  title,  slug,  excerpt,  publishedAt,  "hasBody": defined(body),  coverImage {    asset->,    hotspot,    crop,    alt  },    author-> {    _id,    name,    photo {      asset->,      hotspot,      crop,      alt    },    website,    socials[] {      platform,      url    }  },  tags[]-> {    _id,    name,    slug  }  }
+export type POSTS_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  slug: Slug | null
+  excerpt: string | null
+  publishedAt: string | null
+  hasBody: false | true
+  coverImage: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
+    alt: string | null
+  } | null
+  author: {
+    _id: string
+    name: string | null
+    photo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
+      alt: string | null
+    } | null
+    website: string | null
+    socials: Array<{
+      platform:
+        "github" | "instagram" | "linkedin" | "twitter" | "youtube" | null
+      url: string | null
+    }> | null
+  } | null
+  tags: Array<{
+    _id: string
+    name: string | null
+    slug: Slug | null
+  }> | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: POST_COUNT_QUERY
+// Query: count(*[_type == "post" &&   (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&  (!defined($search) || title match $search + "*" || excerpt match $search + "*")])
+export type POST_COUNT_QUERY_RESULT = number
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: POST_BY_SLUG_QUERY
+// Query: *[_type == "post" && slug.current == $slug][0] {      _id,  title,  slug,  excerpt,  publishedAt,  body,  coverImage {    asset->,    hotspot,    crop,    alt  },  ogImage {    asset->,    hotspot,    crop,    alt  },    author-> {    _id,    name,    photo {      asset->,      hotspot,      crop,      alt    },    website,    socials[] {      platform,      url    }  },  tags[]-> {    _id,    name,    slug  },  _updatedAt  }
+export type POST_BY_SLUG_QUERY_RESULT = {
+  _id: string
+  title: string | null
+  slug: Slug | null
+  excerpt: string | null
+  publishedAt: string | null
+  body: BlockContent | null
+  coverImage: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
+    alt: string | null
+  } | null
+  ogImage: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
+    alt: string | null
+  } | null
+  author: {
+    _id: string
+    name: string | null
+    photo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
+      alt: string | null
+    } | null
+    website: string | null
+    socials: Array<{
+      platform:
+        "github" | "instagram" | "linkedin" | "twitter" | "youtube" | null
+      url: string | null
+    }> | null
+  } | null
+  tags: Array<{
+    _id: string
+    name: string | null
+    slug: Slug | null
+  }> | null
+  _updatedAt: string
+} | null
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: POST_SLUGS_QUERY
+// Query: *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {    _id,    title,    slug,    publishedAt  }
+export type POST_SLUGS_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  slug: Slug | null
+  publishedAt: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: LATEST_POSTS_QUERY
+// Query: *[_type == "post"] | order(publishedAt desc) [0...5] {    _id,    title,    slug,    publishedAt  }
+export type LATEST_POSTS_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  slug: Slug | null
+  publishedAt: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: JOURNAL_ENTRIES_QUERY
+// Query: *[_type == "journalEntry" &&   (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&  (!defined($search) || title match $search + "*" || excerpt match $search + "*")] | order(publishedAt desc) [$start...$end] {      _id,  title,  slug,  excerpt,  publishedAt,  "hasBody": defined(body),  coverImage {    asset->,    hotspot,    crop,    alt  },    author-> {    _id,    name,    photo {      asset->,      hotspot,      crop,      alt    },    website,    socials[] {      platform,      url    }  },  tags[]-> {    _id,    name,    slug  }  }
+export type JOURNAL_ENTRIES_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  slug: Slug | null
+  excerpt: string | null
+  publishedAt: string | null
+  hasBody: false | true
+  coverImage: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
+    alt: string | null
+  } | null
+  author: {
+    _id: string
+    name: string | null
+    photo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
+      alt: string | null
+    } | null
+    website: string | null
+    socials: Array<{
+      platform:
+        "github" | "instagram" | "linkedin" | "twitter" | "youtube" | null
+      url: string | null
+    }> | null
+  } | null
+  tags: Array<{
+    _id: string
+    name: string | null
+    slug: Slug | null
+  }> | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: JOURNAL_ENTRY_COUNT_QUERY
+// Query: count(*[_type == "journalEntry" &&   (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&  (!defined($search) || title match $search + "*" || excerpt match $search + "*")])
+export type JOURNAL_ENTRY_COUNT_QUERY_RESULT = number
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: JOURNAL_ENTRY_BY_SLUG_QUERY
+// Query: *[_type == "journalEntry" && slug.current == $slug][0] {      _id,  title,  slug,  excerpt,  publishedAt,  body,  coverImage {    asset->,    hotspot,    crop,    alt  },  ogImage {    asset->,    hotspot,    crop,    alt  },    author-> {    _id,    name,    photo {      asset->,      hotspot,      crop,      alt    },    website,    socials[] {      platform,      url    }  },  tags[]-> {    _id,    name,    slug  },  _updatedAt  }
+export type JOURNAL_ENTRY_BY_SLUG_QUERY_RESULT = {
+  _id: string
+  title: string | null
+  slug: Slug | null
+  excerpt: string | null
+  publishedAt: string | null
+  body: BlockContent | null
+  coverImage: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
+    alt: string | null
+  } | null
+  ogImage: {
+    asset: {
+      _id: string
+      _type: "sanity.imageAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      metadata?: SanityImageMetadata
+      source?: SanityAssetSourceData
+    } | null
+    hotspot: SanityImageHotspot | null
+    crop: SanityImageCrop | null
+    alt: string | null
+  } | null
+  author: {
+    _id: string
+    name: string | null
+    photo: {
+      asset: {
+        _id: string
+        _type: "sanity.imageAsset"
+        _createdAt: string
+        _updatedAt: string
+        _rev: string
+        originalFilename?: string
+        label?: string
+        title?: string
+        description?: string
+        altText?: string
+        sha1hash?: string
+        extension?: string
+        mimeType?: string
+        size?: number
+        assetId?: string
+        uploadId?: string
+        path?: string
+        url?: string
+        metadata?: SanityImageMetadata
+        source?: SanityAssetSourceData
+      } | null
+      hotspot: SanityImageHotspot | null
+      crop: SanityImageCrop | null
+      alt: string | null
+    } | null
+    website: string | null
+    socials: Array<{
+      platform:
+        "github" | "instagram" | "linkedin" | "twitter" | "youtube" | null
+      url: string | null
+    }> | null
+  } | null
+  tags: Array<{
+    _id: string
+    name: string | null
+    slug: Slug | null
+  }> | null
+  _updatedAt: string
+} | null
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: JOURNAL_ENTRY_SLUGS_QUERY
+// Query: *[_type == "journalEntry" && defined(slug.current)] | order(publishedAt desc) {    _id,    title,    slug,    publishedAt  }
+export type JOURNAL_ENTRY_SLUGS_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  slug: Slug | null
+  publishedAt: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: LATEST_JOURNAL_ENTRIES_QUERY
+// Query: *[_type == "journalEntry"] | order(publishedAt desc) [0...5] {    _id,    title,    slug,    publishedAt  }
+export type LATEST_JOURNAL_ENTRIES_QUERY_RESULT = Array<{
+  _id: string
+  title: string | null
+  slug: Slug | null
+  publishedAt: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: TAGS_QUERY
+// Query: *[_type == "tag"] | order(name asc) {    _id,    name,    slug,    description  }
+export type TAGS_QUERY_RESULT = Array<{
+  _id: string
+  name: string | null
+  slug: Slug | null
+  description: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: TAG_BY_SLUG_QUERY
+// Query: *[_type == "tag" && slug.current == $slug][0] {    _id,    name,    slug,    description  }
+export type TAG_BY_SLUG_QUERY_RESULT = {
+  _id: string
+  name: string | null
+  slug: Slug | null
+  description: string | null
+} | null
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: WRITING_BY_TAG_QUERY
+// Query: *[(_type == "post" || _type == "journalEntry") && $tagSlug in tags[]->slug.current] | order(publishedAt desc) [$start...$end] {    "kind": _type,      _id,  title,  slug,  excerpt,  publishedAt,  "hasBody": defined(body),  coverImage {    asset->,    hotspot,    crop,    alt  },    author-> {    _id,    name,    photo {      asset->,      hotspot,      crop,      alt    },    website,    socials[] {      platform,      url    }  },  tags[]-> {    _id,    name,    slug  }  }
+export type WRITING_BY_TAG_QUERY_RESULT = Array<
+  | {
+      kind: "journalEntry"
+      _id: string
+      title: string | null
+      slug: Slug | null
+      excerpt: string | null
+      publishedAt: string | null
+      hasBody: false | true
+      coverImage: {
+        asset: {
+          _id: string
+          _type: "sanity.imageAsset"
+          _createdAt: string
+          _updatedAt: string
+          _rev: string
+          originalFilename?: string
+          label?: string
+          title?: string
+          description?: string
+          altText?: string
+          sha1hash?: string
+          extension?: string
+          mimeType?: string
+          size?: number
+          assetId?: string
+          uploadId?: string
+          path?: string
+          url?: string
+          metadata?: SanityImageMetadata
+          source?: SanityAssetSourceData
+        } | null
+        hotspot: SanityImageHotspot | null
+        crop: SanityImageCrop | null
+        alt: string | null
+      } | null
+      author: {
+        _id: string
+        name: string | null
+        photo: {
+          asset: {
+            _id: string
+            _type: "sanity.imageAsset"
+            _createdAt: string
+            _updatedAt: string
+            _rev: string
+            originalFilename?: string
+            label?: string
+            title?: string
+            description?: string
+            altText?: string
+            sha1hash?: string
+            extension?: string
+            mimeType?: string
+            size?: number
+            assetId?: string
+            uploadId?: string
+            path?: string
+            url?: string
+            metadata?: SanityImageMetadata
+            source?: SanityAssetSourceData
+          } | null
+          hotspot: SanityImageHotspot | null
+          crop: SanityImageCrop | null
+          alt: string | null
+        } | null
+        website: string | null
+        socials: Array<{
+          platform:
+            "github" | "instagram" | "linkedin" | "twitter" | "youtube" | null
+          url: string | null
+        }> | null
+      } | null
+      tags: Array<{
+        _id: string
+        name: string | null
+        slug: Slug | null
+      }> | null
+    }
+  | {
+      kind: "post"
+      _id: string
+      title: string | null
+      slug: Slug | null
+      excerpt: string | null
+      publishedAt: string | null
+      hasBody: false | true
+      coverImage: {
+        asset: {
+          _id: string
+          _type: "sanity.imageAsset"
+          _createdAt: string
+          _updatedAt: string
+          _rev: string
+          originalFilename?: string
+          label?: string
+          title?: string
+          description?: string
+          altText?: string
+          sha1hash?: string
+          extension?: string
+          mimeType?: string
+          size?: number
+          assetId?: string
+          uploadId?: string
+          path?: string
+          url?: string
+          metadata?: SanityImageMetadata
+          source?: SanityAssetSourceData
+        } | null
+        hotspot: SanityImageHotspot | null
+        crop: SanityImageCrop | null
+        alt: string | null
+      } | null
+      author: {
+        _id: string
+        name: string | null
+        photo: {
+          asset: {
+            _id: string
+            _type: "sanity.imageAsset"
+            _createdAt: string
+            _updatedAt: string
+            _rev: string
+            originalFilename?: string
+            label?: string
+            title?: string
+            description?: string
+            altText?: string
+            sha1hash?: string
+            extension?: string
+            mimeType?: string
+            size?: number
+            assetId?: string
+            uploadId?: string
+            path?: string
+            url?: string
+            metadata?: SanityImageMetadata
+            source?: SanityAssetSourceData
+          } | null
+          hotspot: SanityImageHotspot | null
+          crop: SanityImageCrop | null
+          alt: string | null
+        } | null
+        website: string | null
+        socials: Array<{
+          platform:
+            "github" | "instagram" | "linkedin" | "twitter" | "youtube" | null
+          url: string | null
+        }> | null
+      } | null
+      tags: Array<{
+        _id: string
+        name: string | null
+        slug: Slug | null
+      }> | null
+    }
+>
+
+// Source: ../../packages/sanity/src/query.ts
+// Variable: WRITING_COUNT_BY_TAG_QUERY
+// Query: count(*[(_type == "post" || _type == "journalEntry") && $tagSlug in tags[]->slug.current])
+export type WRITING_COUNT_BY_TAG_QUERY_RESULT = number
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
@@ -2076,6 +2787,20 @@ declare global {
     '\n  *[_type == "project" && defined(slug.current)] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': PROJECT_SLUGS_QUERY_RESULT
     '\n  *[_type == "testimonial"] | order(orderRank asc) {\n    \n  _id,\n  quote,\n  context,\n  givenAt,\n  author-> {\n    _id,\n    name,\n    position,\n    website,\n    organizationName,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    }\n  }\n\n  }\n': TESTIMONIALS_QUERY_RESULT
     '\n  *[_type == "testimonial" && featured == true] | order(orderRank asc) {\n    \n  _id,\n  quote,\n  context,\n  givenAt,\n  author-> {\n    _id,\n    name,\n    position,\n    website,\n    organizationName,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    }\n  }\n\n  }\n': FEATURED_TESTIMONIALS_QUERY_RESULT
+    '\n  *[_type == "post" && \n  (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&\n  (!defined($search) || title match $search + "*" || excerpt match $search + "*")\n] | order(publishedAt desc) [$start...$end] {\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  "hasBody": defined(body),\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  }\n\n  }\n': POSTS_QUERY_RESULT
+    '\n  count(*[_type == "post" && \n  (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&\n  (!defined($search) || title match $search + "*" || excerpt match $search + "*")\n])\n': POST_COUNT_QUERY_RESULT
+    '\n  *[_type == "post" && slug.current == $slug][0] {\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  body,\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  ogImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  },\n  _updatedAt\n\n  }\n': POST_BY_SLUG_QUERY_RESULT
+    '\n  *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {\n    _id,\n    title,\n    slug,\n    publishedAt\n  }\n': POST_SLUGS_QUERY_RESULT
+    '\n  *[_type == "post"] | order(publishedAt desc) [0...5] {\n    _id,\n    title,\n    slug,\n    publishedAt\n  }\n': LATEST_POSTS_QUERY_RESULT
+    '\n  *[_type == "journalEntry" && \n  (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&\n  (!defined($search) || title match $search + "*" || excerpt match $search + "*")\n] | order(publishedAt desc) [$start...$end] {\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  "hasBody": defined(body),\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  }\n\n  }\n': JOURNAL_ENTRIES_QUERY_RESULT
+    '\n  count(*[_type == "journalEntry" && \n  (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&\n  (!defined($search) || title match $search + "*" || excerpt match $search + "*")\n])\n': JOURNAL_ENTRY_COUNT_QUERY_RESULT
+    '\n  *[_type == "journalEntry" && slug.current == $slug][0] {\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  body,\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  ogImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  },\n  _updatedAt\n\n  }\n': JOURNAL_ENTRY_BY_SLUG_QUERY_RESULT
+    '\n  *[_type == "journalEntry" && defined(slug.current)] | order(publishedAt desc) {\n    _id,\n    title,\n    slug,\n    publishedAt\n  }\n': JOURNAL_ENTRY_SLUGS_QUERY_RESULT
+    '\n  *[_type == "journalEntry"] | order(publishedAt desc) [0...5] {\n    _id,\n    title,\n    slug,\n    publishedAt\n  }\n': LATEST_JOURNAL_ENTRIES_QUERY_RESULT
+    '\n  *[_type == "tag"] | order(name asc) {\n    _id,\n    name,\n    slug,\n    description\n  }\n': TAGS_QUERY_RESULT
+    '\n  *[_type == "tag" && slug.current == $slug][0] {\n    _id,\n    name,\n    slug,\n    description\n  }\n': TAG_BY_SLUG_QUERY_RESULT
+    '\n  *[(_type == "post" || _type == "journalEntry") && $tagSlug in tags[]->slug.current] | order(publishedAt desc) [$start...$end] {\n    "kind": _type,\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  "hasBody": defined(body),\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  }\n\n  }\n': WRITING_BY_TAG_QUERY_RESULT
+    '\n  count(*[(_type == "post" || _type == "journalEntry") && $tagSlug in tags[]->slug.current])\n': WRITING_COUNT_BY_TAG_QUERY_RESULT
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

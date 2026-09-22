@@ -16,6 +16,8 @@ import { UsersIcon } from "@sanity/icons/Users";
 import { BookIcon } from "@sanity/icons/Book";
 import { UserIcon } from "@sanity/icons/User";
 import { DoubleQuoteIcon } from "@sanity/icons/DoubleQuote";
+import { ComposeIcon } from "@sanity/icons/Compose";
+import { TagIcon } from "@sanity/icons/Tag";
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S, context) =>
@@ -105,6 +107,14 @@ export const structure: StructureResolver = (S, context) =>
         context,
       }),
       S.divider(),
+      // Date-sorted, not manually curated — plain document type lists, not
+      // orderableDocumentListDeskItem, matching how `legal` is listed above.
+      S.documentTypeListItem("post").title("Blog Posts").icon(ComposeIcon),
+      S.documentTypeListItem("journalEntry")
+        .title("Journal Entries")
+        .icon(BookIcon),
+      S.documentTypeListItem("tag").title("Tags").icon(TagIcon),
+      S.divider(),
       ...S.documentTypeListItems().filter(
         (item) =>
           item.getId() &&
@@ -122,6 +132,9 @@ export const structure: StructureResolver = (S, context) =>
             "publication",
             "person",
             "testimonial",
+            "post",
+            "journalEntry",
+            "tag",
           ].includes(item.getId()!)
       ),
     ]);

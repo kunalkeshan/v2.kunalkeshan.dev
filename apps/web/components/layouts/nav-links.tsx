@@ -3,6 +3,7 @@ import {
   HandshakeIcon,
   BadgeCheckIcon,
   NewspaperIcon,
+  BookOpenIcon,
   HelpCircleIcon,
   RssIcon,
   LinkIcon,
@@ -51,10 +52,16 @@ export const workLinks: LinkItemType[] = [
 
 export const moreLinks: LinkItemType[] = [
   {
-    label: "Blog",
-    href: "https://blog.kunalkeshan.dev",
+    label: "Blogs",
+    href: "/blog",
     description: "Notes and writing on things I'm learning",
     icon: <NewspaperIcon />,
+  },
+  {
+    label: "Journal",
+    href: "/journal",
+    description: "A running, more personal log of what I'm up to",
+    icon: <BookOpenIcon />,
   },
   {
     label: "FAQs",

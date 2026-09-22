@@ -111,11 +111,13 @@ export async function POST(req: NextRequest) {
         break;
 
       case "person":
-        // A person is only rendered through a testimonial's `author->`
-        // dereference, so editing their photo, position or employer changes
-        // already-cached testimonial payloads and must bust that collection.
+        // A person is dereferenced by a testimonial's `author->` and by a
+        // post/journalEntry's `author->`, so editing their photo or name
+        // changes already-cached payloads in all three collections.
         tags.push(createCollectionTag("person"));
         tags.push(createCollectionTag("testimonial"));
+        tags.push(createCollectionTag("post"));
+        tags.push(createCollectionTag("journalEntry"));
         break;
 
       case "testimonial":
@@ -126,6 +128,33 @@ export async function POST(req: NextRequest) {
       case "publication":
         // Revalidate the publication callout on /experience
         tags.push(createCollectionTag("publication"));
+        break;
+
+      case "post":
+        // Revalidate the /blog listing (and its tag-filtered views) and the
+        // individual post page.
+        tags.push(createCollectionTag("post"));
+        if (body.slug) {
+          tags.push(createDocumentTag("post", body.slug));
+        }
+        break;
+
+      case "journalEntry":
+        // Revalidate the /journal listing (and its tag-filtered views) and
+        // the individual entry page.
+        tags.push(createCollectionTag("journalEntry"));
+        if (body.slug) {
+          tags.push(createDocumentTag("journalEntry", body.slug));
+        }
+        break;
+
+      case "tag":
+        // A tag is only rendered through a post/journalEntry's `tags[]->`
+        // dereference and its own /tags/<slug> archive page, so a rename has
+        // to bust both writing collections as well as the tag itself.
+        tags.push(createCollectionTag("tag"));
+        tags.push(createCollectionTag("post"));
+        tags.push(createCollectionTag("journalEntry"));
         break;
 
       default:

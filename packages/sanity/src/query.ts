@@ -640,3 +640,238 @@ export const FEATURED_TESTIMONIALS_QUERY = defineQuery(`
     ${TESTIMONIAL_FIELDS}
   }
 `);
+
+/**
+ * Shared author projection for `post` and `journalEntry`.
+ *
+ * Only the fields a byline/author-card actually needs — not the full
+ * `person` document (position/organization are testimonial-specific and
+ * don't apply to a writing byline).
+ */
+const WRITING_AUTHOR_FIELDS = `
+  author-> {
+    _id,
+    name,
+    photo {
+      asset->,
+      hotspot,
+      crop,
+      alt
+    },
+    website,
+    socials[] {
+      platform,
+      url
+    }
+  }
+`;
+
+/**
+ * Shared listing-card projection for `post` and `journalEntry`.
+ *
+ * Deliberately excludes `body` — the listing page never renders full post
+ * content, only cards, so projecting the whole portable-text array would
+ * bloat every paginated page's payload for no rendering benefit (same
+ * reasoning as \`"hasBody": defined(body)\` on FEATURED_PROJECTS_QUERY).
+ */
+const WRITING_CARD_FIELDS = `
+  _id,
+  title,
+  slug,
+  excerpt,
+  publishedAt,
+  "hasBody": defined(body),
+  coverImage {
+    asset->,
+    hotspot,
+    crop,
+    alt
+  },
+  ${WRITING_AUTHOR_FIELDS},
+  tags[]-> {
+    _id,
+    name,
+    slug
+  }
+`;
+
+/**
+ * Full single-document projection for `post` and `journalEntry` detail pages.
+ */
+const WRITING_DETAIL_FIELDS = `
+  _id,
+  title,
+  slug,
+  excerpt,
+  publishedAt,
+  body,
+  coverImage {
+    asset->,
+    hotspot,
+    crop,
+    alt
+  },
+  ogImage {
+    asset->,
+    hotspot,
+    crop,
+    alt
+  },
+  ${WRITING_AUTHOR_FIELDS},
+  tags[]-> {
+    _id,
+    name,
+    slug
+  },
+  _updatedAt
+`;
+
+/**
+ * The listing filter every /blog, /journal and /tags/<slug> query shares:
+ * \`$tagSlug\`/\`$search\` are both nullable, and \`null in [...]\` / a \`null\`
+ * \`match\` target both evaluate to \`false\` in GROQ — so passing null for
+ * either simply matches everything, letting one query serve the unfiltered
+ * listing, a tag archive, a search, and any combination of the two, rather
+ * than a separate query per combination.
+ */
+const WRITING_FILTER = `
+  (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&
+  (!defined($search) || title match $search + "*" || excerpt match $search + "*")
+`;
+
+/**
+ * One page of blog posts, newest first, optionally filtered by tag and/or a
+ * search term. \`$start\`/\`$end\` are the GROQ slice bounds (e.g. 0 and 9 for
+ * a 9-per-page first page) — pagination is numbered and server-rendered, not
+ * client-side "fetch everything and slice," since the post count is expected
+ * to grow indefinitely over time (unlike /projects, which fetches its whole
+ * — bounded — list at once). Pass \`null\` for \`$tagSlug\`/\`$search\` to skip
+ * that filter.
+ */
+export const POSTS_QUERY = defineQuery(`
+  *[_type == "post" && ${WRITING_FILTER}] | order(publishedAt desc) [$start...$end] {
+    ${WRITING_CARD_FIELDS}
+  }
+`);
+
+/**
+ * Total matching post count, for computing page count alongside POSTS_QUERY
+ * — same \`$tagSlug\`/\`$search\` params, no slice.
+ */
+export const POST_COUNT_QUERY = defineQuery(`
+  count(*[_type == "post" && ${WRITING_FILTER}])
+`);
+
+export const POST_BY_SLUG_QUERY = defineQuery(`
+  *[_type == "post" && slug.current == $slug][0] {
+    ${WRITING_DETAIL_FIELDS}
+  }
+`);
+
+/**
+ * Slugs (+ publishedAt, for prev/next ordering) for \`generateStaticParams\`
+ * and the detail page's previous/next neighbour resolution — mirrors
+ * PROJECT_SLUGS_QUERY.
+ */
+export const POST_SLUGS_QUERY = defineQuery(`
+  *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {
+    _id,
+    title,
+    slug,
+    publishedAt
+  }
+`);
+
+/**
+ * The five most recent posts, for the detail page sidebar's "Latest
+ * Articles" panel. Capped, unlike POSTS_QUERY, since the sidebar always
+ * shows a short fixed list regardless of total post count.
+ */
+export const LATEST_POSTS_QUERY = defineQuery(`
+  *[_type == "post"] | order(publishedAt desc) [0...5] {
+    _id,
+    title,
+    slug,
+    publishedAt
+  }
+`);
+
+/**
+ * Journal entry equivalent of the post queries above — same shape and same
+ * \`$tagSlug\`/\`$search\` filter, separate collection. See postType.ts /
+ * journalEntryType.ts for why the two stay distinct document types despite
+ * the identical field set.
+ */
+export const JOURNAL_ENTRIES_QUERY = defineQuery(`
+  *[_type == "journalEntry" && ${WRITING_FILTER}] | order(publishedAt desc) [$start...$end] {
+    ${WRITING_CARD_FIELDS}
+  }
+`);
+
+export const JOURNAL_ENTRY_COUNT_QUERY = defineQuery(`
+  count(*[_type == "journalEntry" && ${WRITING_FILTER}])
+`);
+
+export const JOURNAL_ENTRY_BY_SLUG_QUERY = defineQuery(`
+  *[_type == "journalEntry" && slug.current == $slug][0] {
+    ${WRITING_DETAIL_FIELDS}
+  }
+`);
+
+export const JOURNAL_ENTRY_SLUGS_QUERY = defineQuery(`
+  *[_type == "journalEntry" && defined(slug.current)] | order(publishedAt desc) {
+    _id,
+    title,
+    slug,
+    publishedAt
+  }
+`);
+
+export const LATEST_JOURNAL_ENTRIES_QUERY = defineQuery(`
+  *[_type == "journalEntry"] | order(publishedAt desc) [0...5] {
+    _id,
+    title,
+    slug,
+    publishedAt
+  }
+`);
+
+/**
+ * Every tag, for filter chips on /blog and /journal and for resolving a tag's
+ * name/description on its /tags/<slug> archive page.
+ */
+export const TAGS_QUERY = defineQuery(`
+  *[_type == "tag"] | order(name asc) {
+    _id,
+    name,
+    slug,
+    description
+  }
+`);
+
+export const TAG_BY_SLUG_QUERY = defineQuery(`
+  *[_type == "tag" && slug.current == $slug][0] {
+    _id,
+    name,
+    slug,
+    description
+  }
+`);
+
+/**
+ * One page of a tag archive: posts and journal entries carrying the tag,
+ * combined into one publishedAt-ordered feed — a tag is shared across both
+ * content types (see tagType.ts), so its archive page shows both rather
+ * than picking one. \`"kind"\` lets the page route each card to the right
+ * href prefix without a second lookup.
+ */
+export const WRITING_BY_TAG_QUERY = defineQuery(`
+  *[(_type == "post" || _type == "journalEntry") && $tagSlug in tags[]->slug.current] | order(publishedAt desc) [$start...$end] {
+    "kind": _type,
+    ${WRITING_CARD_FIELDS}
+  }
+`);
+
+export const WRITING_COUNT_BY_TAG_QUERY = defineQuery(`
+  count(*[(_type == "post" || _type == "journalEntry") && $tagSlug in tags[]->slug.current])
+`);

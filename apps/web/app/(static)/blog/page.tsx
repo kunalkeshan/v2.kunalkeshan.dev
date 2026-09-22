@@ -1,0 +1,108 @@
+import { Suspense } from "react"
+import type { Metadata } from "next"
+
+import { Container } from "@workspace/ui/components/container"
+import { sanityFetch } from "@workspace/sanity/fetch"
+import { createCollectionTag } from "@workspace/sanity/cache-tags"
+import { POSTS_QUERY, POST_COUNT_QUERY, TAGS_QUERY } from "@workspace/sanity/query"
+import type {
+  POSTS_QUERY_RESULT,
+  POST_COUNT_QUERY_RESULT,
+  TAGS_QUERY_RESULT,
+} from "@workspace/sanity/types"
+
+import { HighlightText } from "@/components/highlight-text"
+import { PostsGrid } from "@/components/blog/post-card"
+import { PostListingControls } from "@/components/blog/post-listing-controls"
+import { PostPagination } from "@/components/blog/post-pagination"
+import { pageCount, pageSlice, parsePage } from "@/lib/posts"
+
+export const metadata: Metadata = {
+  title: "Blog",
+  description:
+    "Notes and write-ups on the tools, decisions, and problems I run into building software.",
+}
+
+interface BlogPageProps {
+  searchParams: Promise<{ q?: string; tag?: string; page?: string }>
+}
+
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const params = await searchParams
+  const search = params.q?.trim() || null
+  const tagSlug = params.tag?.trim() || null
+  const page = parsePage(params.page)
+  const { start, end } = pageSlice(page)
+
+  const [posts, totalCount, tags] = await Promise.all([
+    sanityFetch<POSTS_QUERY_RESULT>({
+      query: POSTS_QUERY,
+      params: { start, end, search, tagSlug },
+      tags: [createCollectionTag("post")],
+    }),
+    sanityFetch<POST_COUNT_QUERY_RESULT>({
+      query: POST_COUNT_QUERY,
+      params: { search, tagSlug },
+      tags: [createCollectionTag("post")],
+    }),
+    sanityFetch<TAGS_QUERY_RESULT>({
+      query: TAGS_QUERY,
+      tags: [createCollectionTag("tag")],
+    }),
+  ])
+
+  const totalPages = pageCount(totalCount ?? 0)
+
+  function hrefForPage(targetPage: number) {
+    const next = new URLSearchParams()
+    if (search) next.set("q", search)
+    if (tagSlug) next.set("tag", tagSlug)
+    if (targetPage > 1) next.set("page", String(targetPage))
+    const query = next.toString()
+    return query ? `/blog?${query}` : "/blog"
+  }
+
+  return (
+    <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <Container>
+        <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
+          Notes and <HighlightText variant="primary">write-ups</HighlightText>
+        </h1>
+        <p className="mt-4 max-w-2xl leading-relaxed text-body-foreground md:text-lg">
+          Things I run into building software — tools, decisions, and the
+          occasional mistake worth writing down.
+        </p>
+
+        <div className="mt-10">
+          <Suspense
+            fallback={
+              <div className="text-sm text-muted-foreground">Loading…</div>
+            }
+          >
+            <PostListingControls tags={tags ?? []} />
+          </Suspense>
+        </div>
+
+        <div className="mt-8">
+          {posts && posts.length > 0 ? (
+            <PostsGrid posts={posts} hrefPrefix="/blog" />
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No posts match your search.
+            </p>
+          )}
+        </div>
+
+        {totalPages > 1 && (
+          <div className="mt-12">
+            <PostPagination
+              currentPage={page}
+              totalPages={totalPages}
+              hrefForPage={hrefForPage}
+            />
+          </div>
+        )}
+      </Container>
+    </main>
+  )
+}
