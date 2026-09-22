@@ -6,7 +6,13 @@
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "env": ["SITE_URL", "SANITY_WEBHOOK_SECRET"]
+      "env": [
+        "SITE_URL",
+        "SANITY_WEBHOOK_SECRET",
+        "NODEMAILER_EMAIL",
+        "NODEMAILER_PASSWORD",
+        "TURNSTILE_SECRET_KEY"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
