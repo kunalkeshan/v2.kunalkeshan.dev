@@ -5,8 +5,6 @@ import {
   NewspaperIcon,
   BookOpenIcon,
   HelpCircleIcon,
-  RssIcon,
-  LinkIcon,
   SparklesIcon,
 } from "lucide-react"
 
@@ -68,17 +66,5 @@ export const moreLinks: LinkItemType[] = [
     href: "/contact#faqs",
     description: "Answers to things people keep asking me",
     icon: <HelpCircleIcon />,
-  },
-  {
-    label: "Feed",
-    href: "/feed",
-    description: "A running log of what I'm up to",
-    icon: <RssIcon />,
-  },
-  {
-    label: "Links",
-    href: "/links",
-    description: "Everywhere else you can find me",
-    icon: <LinkIcon />,
   },
 ]
