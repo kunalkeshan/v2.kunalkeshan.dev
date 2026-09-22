@@ -1,14 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { SearchIcon } from "lucide-react"
+import { useTransition } from "react"
+import { parseAsArrayOf, parseAsString, useQueryStates } from "nuqs"
 
-import { Badge } from "@workspace/ui/components/badge"
-import { Button } from "@workspace/ui/components/button"
-import { Input } from "@workspace/ui/components/input"
-import { cn } from "@workspace/ui/lib/utils"
 import type { SKILLS_QUERY_RESULT } from "@workspace/sanity/types"
 
+import { FilterChipGroup } from "@/components/filters/filter-chip-group"
+import { FilterClearButton } from "@/components/filters/filter-clear-button"
+import { FilterResultsTransition } from "@/components/filters/filter-results-transition"
+import { FilterSearchInput } from "@/components/filters/filter-search-input"
 import { SkillChip } from "@/components/sections/skill-chip"
 import {
   SKILL_CATEGORY_LABELS,
@@ -19,11 +19,23 @@ interface SkillsFilteredProps {
   skills: SKILLS_QUERY_RESULT
 }
 
+/**
+ * URL-backed filter state (via nuqs), matching the convention already used
+ * on /blog, /journal and /projects — a filtered skills view is then
+ * shareable and survives back/forward, instead of resetting on navigation
+ * the way the previous local `useState` version did.
+ */
 export function SkillsFiltered({ skills }: SkillsFilteredProps) {
-  const [activeCategories, setActiveCategories] = useState<Set<string>>(
-    new Set()
+  const [isPending, startTransition] = useTransition()
+  const [filters, setFilters] = useQueryStates(
+    {
+      q: parseAsString.withDefault("").withOptions({ clearOnDefault: true }),
+      category: parseAsArrayOf(parseAsString)
+        .withDefault([])
+        .withOptions({ clearOnDefault: true }),
+    },
+    { startTransition }
   )
-  const [query, setQuery] = useState("")
 
   const byCategory = new Map<string, NonNullable<SKILLS_QUERY_RESULT>>()
   for (const skill of skills ?? []) {
@@ -37,87 +49,65 @@ export function SkillsFiltered({ skills }: SkillsFilteredProps) {
     byCategory.has(category)
   )
 
-  function toggleCategory(category: string) {
-    setActiveCategories((current) => {
-      const next = new Set(current)
-      if (next.has(category)) {
-        next.delete(category)
-      } else {
-        next.add(category)
-      }
-      return next
-    })
-  }
-
-  const normalizedQuery = query.trim().toLowerCase()
+  const normalizedQuery = filters.q.trim().toLowerCase()
 
   const visibleSkills = (skills ?? []).filter((skill) => {
     const matchesCategory =
-      activeCategories.size === 0 ||
-      (skill.category && activeCategories.has(skill.category))
+      filters.category.length === 0 ||
+      (skill.category && filters.category.includes(skill.category))
     const matchesQuery =
       normalizedQuery.length === 0 ||
       skill.name?.toLowerCase().includes(normalizedQuery)
     return matchesCategory && matchesQuery
   })
 
+  const hasFilters = filters.category.length > 0 || filters.q.length > 0
+  const resultsKey = visibleSkills.map((skill) => skill._id).join(",")
+
   return (
     <div>
-      <div className="relative max-w-sm">
-        <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          type="text"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search skills..."
-          className="h-10 pl-8"
+      <FilterSearchInput
+        value={filters.q}
+        onChange={(value) => setFilters({ q: value || null })}
+        placeholder="Search skills..."
+        aria-label="Search skills"
+        isPending={isPending}
+      />
+
+      <div className="mt-6">
+        <FilterChipGroup
+          options={availableCategories.map((category) => ({
+            value: category,
+            label: SKILL_CATEGORY_LABELS[category] ?? category,
+          }))}
+          selectionMode="multiple"
+          value={filters.category}
+          onChange={(next) =>
+            setFilters({ category: next.length > 0 ? next : null })
+          }
+          aria-label="Filter by skill category"
         />
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2">
-        {availableCategories.map((category) => {
-          const isActive = activeCategories.has(category)
-          return (
-            <Badge
-              key={category}
-              onClick={() => toggleCategory(category)}
-              aria-pressed={isActive}
-              className={cn(
-                "h-auto cursor-pointer rounded-lg border-2 border-border px-3 py-1.5 text-xs normal-case",
-                "shadow-sm transition-[translate,transform,box-shadow,background-color,color] duration-press ease-snap",
-                "hover:translate-x-px hover:translate-y-px hover:shadow-none",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card text-foreground"
-              )}
-            >
-              {SKILL_CATEGORY_LABELS[category] ?? category}
-            </Badge>
-          )
-        })}
+      <FilterClearButton
+        show={hasFilters}
+        onClick={() => setFilters({ q: null, category: null })}
+      />
 
-        {activeCategories.size > 0 && (
-          <Button
-            variant="link"
-            size="xs"
-            className="text-muted-foreground hover:text-foreground"
-            onClick={() => setActiveCategories(new Set())}
-          >
-            Clear
-          </Button>
-        )}
-      </div>
+      <div className="mt-8">
+        <FilterResultsTransition resultsKey={resultsKey}>
+          <div className="flex flex-wrap gap-2">
+            {visibleSkills.map((skill) => (
+              <SkillChip key={skill._id} skill={skill} />
+            ))}
 
-      <div className="mt-8 flex flex-wrap gap-2">
-        {visibleSkills.map((skill) => (
-          <SkillChip key={skill._id} skill={skill} />
-        ))}
-
-        {visibleSkills.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            No skills match your search.
-          </p>
-        )}
+            {visibleSkills.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                No skills match your search.
+              </p>
+            )}
+          </div>
+        </FilterResultsTransition>
       </div>
     </div>
   )

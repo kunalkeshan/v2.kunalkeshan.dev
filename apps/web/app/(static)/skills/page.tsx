@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import type { Metadata } from "next"
 
 import { Container } from "@workspace/ui/components/container"
@@ -37,7 +38,13 @@ export default async function SkillsPage() {
         </p>
 
         <div className="mt-10">
-          <SkillsFiltered skills={skills} />
+          <Suspense
+            fallback={
+              <div className="text-sm text-muted-foreground">Loading…</div>
+            }
+          >
+            <SkillsFiltered skills={skills} />
+          </Suspense>
         </div>
       </Container>
     </main>

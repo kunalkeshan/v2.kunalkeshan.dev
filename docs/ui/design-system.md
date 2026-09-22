@@ -578,6 +578,36 @@ transition={sectionRevealTransition} viewport={sectionRevealViewport}`. Import f
   until a real cross-route transition is actually requested; don't add
   `AnimatePresence`-around-`{children}` speculatively.
 
+### Shared filter-bar components (`apps/web/components/filters/`)
+
+`/blog`, `/journal`, `/projects`, and `/skills` each had their own copy-pasted
+search-input + `Badge` chip-toggle + "Clear filters" markup (identical `chipClass`
+Tailwind string included) before this was extracted. All four now share:
+
+- `FilterSearchInput` — search icon swaps for a spinner via `AnimatePresence` while
+  `isPending` (driven by the caller's `useTransition`, wired into nuqs'
+  `startTransition` option), instead of separate loading chrome.
+- `FilterChipGroup` — a `selectionMode: "single" | "multiple"` chip toggle. Chips
+  press into their own shadow on click/tap (`whileTap={{ scale: 0.96 }}` plus the
+  existing `duration-press`/`ease-snap` hover styles) rather than using a new
+  spring-based motion language for a small, frequent control.
+- `FilterClearButton` — fades + slides in/out (`AnimatePresence`, matching
+  `sectionReveal`'s enter/exit language) only when a filter is active.
+- `FilterResultsTransition` — crossfades the whole results block
+  (`AnimatePresence mode="wait"`, keyed on a caller-supplied string that changes
+  whenever the visible result set changes) when filters change, instead of
+  animating individual card enter/exit/reorder — a filtered grid can reflow column
+  count between queries, which makes per-card position animation unreliable.
+
+All four call `useReducedMotion()` and zero out their transition duration/offset
+when it's set, per the reduced-motion rule above.
+
+`skills-filtered.tsx` was migrated from local `useState` to `nuqs` URL state as
+part of this extraction, so all four screens now share the same "filters live in
+the URL" behavior (shareable, survives back/forward) — see `projects-filtered.tsx`
+and `post-listing-controls.tsx`'s doc comments for why URL state was already
+preferred over client-only state on the other three.
+
 ## Highlight text sweep (mandatory for section-heading highlights)
 
 Every section heading that highlights a phrase (an inline colored-background span

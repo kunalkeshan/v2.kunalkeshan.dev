@@ -15,6 +15,7 @@ import { HighlightText } from "@/components/highlight-text"
 import { PostsGrid } from "@/components/blog/post-card"
 import { PostListingControls } from "@/components/blog/post-listing-controls"
 import { PostPagination } from "@/components/blog/post-pagination"
+import { FilterResultsTransition } from "@/components/filters/filter-results-transition"
 import { pageCount, pageSlice, parsePage } from "@/lib/posts"
 
 export const metadata: Metadata = {
@@ -84,13 +85,17 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         <div className="mt-8">
-          {posts && posts.length > 0 ? (
-            <PostsGrid posts={posts} hrefPrefix="/blog" />
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              No posts match your search.
-            </p>
-          )}
+          <FilterResultsTransition
+            resultsKey={`${search ?? ""}:${tagSlug ?? ""}:${page}`}
+          >
+            {posts && posts.length > 0 ? (
+              <PostsGrid posts={posts} hrefPrefix="/blog" />
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No posts match your search.
+              </p>
+            )}
+          </FilterResultsTransition>
         </div>
 
         {totalPages > 1 && (

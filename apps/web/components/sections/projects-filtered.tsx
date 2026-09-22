@@ -1,15 +1,14 @@
 "use client"
 
-import { useMemo } from "react"
-import { SearchIcon } from "lucide-react"
+import { useMemo, useTransition } from "react"
 import { parseAsString, parseAsArrayOf, useQueryState } from "nuqs"
 
-import { Badge } from "@workspace/ui/components/badge"
-import { Button } from "@workspace/ui/components/button"
-import { Input } from "@workspace/ui/components/input"
-import { cn } from "@workspace/ui/lib/utils"
 import type { PROJECTS_QUERY_RESULT } from "@workspace/sanity/types"
 
+import { FilterChipGroup } from "@/components/filters/filter-chip-group"
+import { FilterClearButton } from "@/components/filters/filter-clear-button"
+import { FilterResultsTransition } from "@/components/filters/filter-results-transition"
+import { FilterSearchInput } from "@/components/filters/filter-search-input"
 import { ProjectsGrid } from "@/components/sections/projects"
 import { PROJECT_KIND_LABELS, PROJECT_KIND_ORDER } from "@/lib/projects"
 
@@ -31,21 +30,24 @@ interface ProjectsFilteredProps {
  * nothing while its card sat in a section below.
  */
 export function ProjectsFiltered({ projects, stars }: ProjectsFilteredProps) {
+  const [isPending, startTransition] = useTransition()
   const [query, setQuery] = useQueryState(
     "q",
-    parseAsString.withDefault("").withOptions({ clearOnDefault: true })
+    parseAsString
+      .withDefault("")
+      .withOptions({ clearOnDefault: true, startTransition })
   )
   const [activeKinds, setActiveKinds] = useQueryState(
     "kind",
     parseAsArrayOf(parseAsString)
       .withDefault([])
-      .withOptions({ clearOnDefault: true })
+      .withOptions({ clearOnDefault: true, startTransition })
   )
   const [activeSkills, setActiveSkills] = useQueryState(
     "tech",
     parseAsArrayOf(parseAsString)
       .withDefault([])
-      .withOptions({ clearOnDefault: true })
+      .withOptions({ clearOnDefault: true, startTransition })
   )
 
   const all = useMemo(() => projects ?? [], [projects])
@@ -76,18 +78,6 @@ export function ProjectsFiltered({ projects, stars }: ProjectsFilteredProps) {
       .slice(0, 12)
       .map((entry) => entry.name)
   }, [all])
-
-  function toggle(
-    value: string,
-    current: string[],
-    setter: (next: string[] | null) => void
-  ) {
-    const next = current.includes(value)
-      ? current.filter((item) => item !== value)
-      : [...current, value]
-    // `null` clears the param entirely rather than leaving `?kind=` behind.
-    setter(next.length > 0 ? next : null)
-  }
 
   const normalizedQuery = query.trim().toLowerCase()
 
@@ -131,104 +121,89 @@ export function ProjectsFiltered({ projects, stars }: ProjectsFilteredProps) {
   const hasFilters =
     activeKinds.length > 0 || activeSkills.length > 0 || query.length > 0
 
-  const chipClass = (isActive: boolean) =>
-    cn(
-      "h-auto cursor-pointer rounded-lg border-2 border-border px-3 py-1.5 text-xs normal-case",
-      "shadow-sm transition-[translate,transform,box-shadow,background-color,color] duration-press ease-snap",
-      "hover:translate-x-px hover:translate-y-px hover:shadow-none",
-      isActive ? "bg-primary text-primary-foreground" : "bg-card text-foreground"
-    )
+  const resultsKey = visible.map((project) => project._id).join(",")
 
   return (
     <div>
-      <div className="relative max-w-sm">
-        <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value || null)}
-          placeholder="Search projects..."
-          aria-label="Search projects"
-          className="h-10 pl-8"
+      <FilterSearchInput
+        value={query}
+        onChange={(value) => setQuery(value || null)}
+        placeholder="Search projects..."
+        aria-label="Search projects"
+        isPending={isPending}
+      />
+
+      <div className="mt-6">
+        <FilterChipGroup
+          options={availableKinds.map((kind) => ({
+            value: kind,
+            label: PROJECT_KIND_LABELS[kind] ?? kind,
+          }))}
+          selectionMode="multiple"
+          value={activeKinds}
+          onChange={(next) => setActiveKinds(next.length > 0 ? next : null)}
+          aria-label="Filter by project kind"
         />
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2">
-        {availableKinds.map((kind) => (
-          <Badge
-            key={kind}
-            onClick={() => toggle(kind, activeKinds, setActiveKinds)}
-            aria-pressed={activeKinds.includes(kind)}
-            className={chipClass(activeKinds.includes(kind))}
-          >
-            {PROJECT_KIND_LABELS[kind] ?? kind}
-          </Badge>
-        ))}
-      </div>
-
       {availableSkills.length > 0 && (
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          {availableSkills.map((skill) => (
-            <Badge
-              key={skill}
-              onClick={() => toggle(skill, activeSkills, setActiveSkills)}
-              aria-pressed={activeSkills.includes(skill)}
-              className={chipClass(activeSkills.includes(skill))}
-            >
-              {skill}
-            </Badge>
-          ))}
+        <div className="mt-3">
+          <FilterChipGroup
+            options={availableSkills.map((skill) => ({
+              value: skill,
+              label: skill,
+            }))}
+            selectionMode="multiple"
+            value={activeSkills}
+            onChange={(next) => setActiveSkills(next.length > 0 ? next : null)}
+            aria-label="Filter by technology"
+          />
         </div>
       )}
 
-      {hasFilters && (
-        <div className="mt-3">
-          <Button
-            variant="link"
-            size="xs"
-            className="text-muted-foreground hover:text-foreground"
-            onClick={() => {
-              setQuery(null)
-              setActiveKinds(null)
-              setActiveSkills(null)
-            }}
-          >
-            Clear filters
-          </Button>
-        </div>
-      )}
+      <FilterClearButton
+        show={hasFilters}
+        onClick={() => {
+          setQuery(null)
+          setActiveKinds(null)
+          setActiveSkills(null)
+        }}
+      />
 
       <div className="mt-8">
-        {current.length > 0 && (
-          // `split` only here: /projects runs two per row, wide enough for the
-          // text-left/image-right layout. The home strip is 3-up and stays
-          // stacked.
-          <ProjectsGrid projects={current} stars={stars} split />
-        )}
+        <FilterResultsTransition resultsKey={resultsKey}>
+          {current.length > 0 && (
+            // `split` only here: /projects runs two per row, wide enough for the
+            // text-left/image-right layout. The home strip is 3-up and stays
+            // stacked.
+            <ProjectsGrid projects={current} stars={stars} split />
+          )}
 
-        {earlier.length > 0 && (
-          <section aria-labelledby="earlier-work" className="mt-16">
-            <h2
-              id="earlier-work"
-              className="font-heading text-2xl font-black sm:text-3xl"
-            >
-              Earlier work
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-body-foreground">
-              Projects from my university years — open-source initiatives,
-              hackathon builds, and coursework that&apos;s since been archived.
+          {earlier.length > 0 && (
+            <section aria-labelledby="earlier-work" className="mt-16">
+              <h2
+                id="earlier-work"
+                className="font-heading text-2xl font-black sm:text-3xl"
+              >
+                Earlier work
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-body-foreground">
+                Projects from my university years — open-source initiatives,
+                hackathon builds, and coursework that&apos;s since been
+                archived.
+              </p>
+              <div className="mt-6">
+                <ProjectsGrid projects={earlier} stars={stars} compact />
+              </div>
+            </section>
+          )}
+
+          {visible.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              No projects match your search.
             </p>
-            <div className="mt-6">
-              <ProjectsGrid projects={earlier} stars={stars} compact />
-            </div>
-          </section>
-        )}
-
-        {visible.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            No projects match your search.
-          </p>
-        )}
+          )}
+        </FilterResultsTransition>
       </div>
     </div>
   )
