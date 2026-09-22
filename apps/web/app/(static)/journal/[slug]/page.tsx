@@ -309,11 +309,12 @@ export default async function JournalEntryPage({
             )}
           </div>
 
-          <aside className="lg:h-fit lg:w-80 lg:shrink-0">
+          <aside className="lg:w-80 lg:shrink-0">
             {/*
-              See blog/[slug]/page.tsx's aside for why this caps height and
-              why it pads + negative-margins to keep the cards' hard offset
-              shadows from being clipped by overflow-y-auto.
+              See blog/[slug]/page.tsx's aside for why there's no `h-fit`
+              here, why the sticky div caps height and scrolls internally,
+              and why it pads + negative-margins to keep the cards' hard
+              offset shadows from being clipped by overflow-y-auto.
             */}
             <div className="lg:sticky lg:top-28 lg:z-10 lg:-mx-2 lg:-mb-2 lg:max-h-[calc(100vh-8rem+0.5rem)] lg:overflow-y-auto lg:overflow-x-hidden lg:p-2">
               <PostSidebar

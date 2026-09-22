@@ -83,7 +83,15 @@ export function PostSidebar({
           <h2 className="font-heading text-sm font-black tracking-wide uppercase">
             On this page
           </h2>
-          <nav aria-label="Table of contents" className="mt-3">
+          {/*
+            Capped independently of the other cards: a post with a long
+            table of contents must never push Latest Articles/Tags out of
+            reach below the fold. This card scrolls on its own instead.
+          */}
+          <nav
+            aria-label="Table of contents"
+            className="mt-3 max-h-64 overflow-y-auto overscroll-contain pr-1"
+          >
             <ul className="flex flex-col gap-2">
               {toc.map((entry) => (
                 <li key={entry.id} className={entry.level === 3 ? "pl-3" : undefined}>

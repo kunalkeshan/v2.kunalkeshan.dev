@@ -314,16 +314,22 @@ export default async function BlogPostPage({
             )}
           </div>
 
-          <aside className="lg:h-fit lg:w-80 lg:shrink-0">
+          <aside className="lg:w-80 lg:shrink-0">
             {/*
+              No `h-fit` here: the aside must stretch to the main column's
+              full height (the flex row's default `items-stretch`) so the
+              sticky div below has scroll room for the *entire* article, not
+              just its own shorter content height. With `h-fit`, a sidebar
+              shorter than the article would detach from `sticky` as soon as
+              its own bottom edge was reached and scroll away early.
+
               `max-h-[calc(100vh-...)]` + `overflow-y-auto`: the sidebar
-              stacks four cards (search/TOC/latest/tags), taller than the
-              viewport on most posts. Without a height cap, `sticky` keeps it
-              pinned only until its own bottom edge is reached, then it
-              scrolls normally with the page and can pass behind the fixed
-              navbar (z-50) at the top — capping the height keeps the whole
-              block within the viewport, under the navbar, for as long as
-              the article column scrolls.
+              stacks four cards (search/TOC/latest/tags), which can still be
+              taller than the viewport (e.g. a post with a long table of
+              contents). Capping the sticky div's own height and letting it
+              scroll internally keeps the whole block within the viewport,
+              under the navbar, instead of being clipped or pushing later
+              cards out of reach.
 
               The cards' own `shadow-lg` is a hard *offset* shadow (no blur —
               see design-system.md), which draws outside their border box.
