@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = siteConfig?.title || "Kunal Keshan — Software Engineer";
   const description =
     siteConfig?.description ||
-    "Portfolio of Kunal Keshan, a software engineer who builds products with clean design and systems that hold up over time.";
+    "Portfolio of Kunal Keshan, a software engineer based in India focused on clean design and systems that hold up over time.";
 
   const ogImageUrl = siteConfig?.ogImage?.asset
     ? urlFor(siteConfig.ogImage)

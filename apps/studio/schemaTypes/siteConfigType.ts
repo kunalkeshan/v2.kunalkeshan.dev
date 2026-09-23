@@ -57,6 +57,17 @@ export const siteConfigType = defineType({
       type: "text",
       group: "basic",
       rows: 3,
+      description:
+        "Used for SEO/meta <meta description> and social preview text. Plain, factual, third-person is fine here — this is not shown on the page itself. See footerBlurb for the first-person line shown in the footer.",
+    },
+    {
+      name: "footerBlurb",
+      title: "Footer Blurb",
+      type: "text",
+      group: "basic",
+      rows: 3,
+      description:
+        "Short first-person line shown under the logo in the footer. Separate from Site Description, which is SEO-only and not shown on the page.",
     },
     {
       name: "ogImage",

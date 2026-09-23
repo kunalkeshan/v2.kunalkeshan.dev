@@ -104,7 +104,7 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
               </Link>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              {siteConfig?.description}
+              {siteConfig?.footerBlurb}
             </p>
             <div className="mt-6">
               <SocialsRow socialMedia={siteConfig?.socialMedia ?? null} />

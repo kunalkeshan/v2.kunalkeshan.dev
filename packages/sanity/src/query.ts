@@ -5,6 +5,7 @@ export const SITE_CONFIG_QUERY = defineQuery(`
     _id,
     title,
     description,
+    footerBlurb,
     ogImage {
       asset->,
       hotspot,
