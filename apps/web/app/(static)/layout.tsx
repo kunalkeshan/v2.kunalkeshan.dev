@@ -94,7 +94,7 @@ export default async function RootLayout({
 
   return (
     <>
-      <Providers>
+      <Providers rickrollAudioUrl={siteConfig?.rickrollAudio?.asset?.url ?? null}>
         <ViewTransitionWrapper>
           <Navbar siteConfig={siteConfig} />
           {children}

@@ -10,7 +10,11 @@ export function NavDropdownItem({
   icon,
   href,
   className,
-}: LinkItemType & { className?: string }) {
+  onClick,
+}: LinkItemType & {
+  className?: string
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>
+}) {
   const isExternal = href.startsWith("http")
 
   const content = (
@@ -43,6 +47,7 @@ export function NavDropdownItem({
         target="_blank"
         rel="noopener noreferrer"
         className={itemClassName}
+        onClick={onClick}
       >
         {content}
       </a>
@@ -50,7 +55,7 @@ export function NavDropdownItem({
   }
 
   return (
-    <Link href={href} className={itemClassName}>
+    <Link href={href} className={itemClassName} onClick={onClick}>
       {content}
     </Link>
   )

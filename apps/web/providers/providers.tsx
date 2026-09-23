@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import React from "react";
+import { RickrollAudioProvider } from "@/providers/rickroll-audio-provider";
 
 /**
  * Create a QueryClient instance with default options
@@ -20,16 +21,21 @@ const queryClient = new QueryClient({
 
 interface ProvidersProps {
   children: React.ReactNode;
+  rickrollAudioUrl: string | null;
 }
 
 /**
  * Combined providers component
  * Wraps the app with TanStack Query and Nuqs providers
  */
-export function Providers({ children }: ProvidersProps) {
+export function Providers({ children, rickrollAudioUrl }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <NuqsAdapter>{children}</NuqsAdapter>
+      <NuqsAdapter>
+        <RickrollAudioProvider audioUrl={rickrollAudioUrl}>
+          {children}
+        </RickrollAudioProvider>
+      </NuqsAdapter>
     </QueryClientProvider>
   );
 }

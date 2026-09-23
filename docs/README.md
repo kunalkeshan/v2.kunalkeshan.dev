@@ -11,6 +11,7 @@ This is the documentation root for `v2.kunalkeshan.dev`. See `CLAUDE.md`/`AGENTS
 Per-feature deep dives — what the feature does, where its code lives, and any non-obvious decisions.
 
 - [`sanity-cms.md`](./feature/sanity-cms.md) — content modeling, the Studio app, and how `apps/web` consumes it
+- [`command-menu.md`](./feature/command-menu.md) — keyboard shortcut, searchable destinations, and optional portfolio actions
 
 ## Content docs (`docs/content/`)
 

@@ -76,7 +76,7 @@ export function MobileNav({ logoSrc }: Props) {
             </span>
             {workLinks.map((item) => (
               <motion.div key={item.href} variants={itemVariants}>
-                <NavDropdownItem {...item} />
+                <NavDropdownItem {...item} onClick={() => setOpen(false)} />
               </motion.div>
             ))}
 
@@ -85,7 +85,7 @@ export function MobileNav({ logoSrc }: Props) {
             </span>
             {moreLinks.map((item) => (
               <motion.div key={item.href} variants={itemVariants}>
-                <NavDropdownItem {...item} />
+                <NavDropdownItem {...item} onClick={() => setOpen(false)} />
               </motion.div>
             ))}
           </motion.nav>

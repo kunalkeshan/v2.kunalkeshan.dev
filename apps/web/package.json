@@ -20,6 +20,7 @@
     "@workspace/env": "workspace:*",
     "@workspace/sanity": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "cmdk": "^1.1.1",
     "lucide-react": "^1.45.0",
     "motion": "^12.23.24",
     "next": "16.3.5",

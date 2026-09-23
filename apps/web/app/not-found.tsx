@@ -14,6 +14,8 @@ import type {
 import Navbar from "@/components/layouts/navbar";
 import Footer from "@/components/layouts/footer";
 import NotFoundContent from "@/components/sections/not-found-content";
+import { Providers } from "@/providers/providers";
+import { Toaster } from "@workspace/ui/components/sonner";
 
 export const metadata: Metadata = {
   title: "Page Not Found | Kunal Keshan",
@@ -33,10 +35,11 @@ export default async function NotFound() {
   ]);
 
   return (
-    <>
+    <Providers rickrollAudioUrl={siteConfig?.rickrollAudio?.asset?.url ?? null}>
       <Navbar siteConfig={siteConfig} />
       <NotFoundContent />
       <Footer siteConfig={siteConfig} legalLinks={legalLinks} />
-    </>
+      <Toaster richColors />
+    </Providers>
   );
 }

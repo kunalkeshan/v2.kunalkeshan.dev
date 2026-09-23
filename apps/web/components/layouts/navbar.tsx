@@ -12,6 +12,7 @@ import type { SITE_CONFIG_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { DesktopNav } from "@/components/layouts/desktop-nav"
 import { MobileNav } from "@/components/layouts/mobile-nav"
+import { PortfolioCommandMenu } from "@/components/layouts/portfolio-command-menu"
 import { springTransition } from "@/lib/motion"
 
 const navVariants = {
@@ -68,6 +69,7 @@ const Navbar = ({ siteConfig }: Props) => {
       <DesktopNav />
 
       <div className="flex items-center gap-2">
+        <PortfolioCommandMenu siteConfig={siteConfig} />
         <Button
           size="icon"
           aria-label="Contact"

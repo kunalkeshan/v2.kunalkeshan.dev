@@ -1,6 +1,5 @@
 "use client"
 
-import React, { useCallback, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { FaGithub } from "react-icons/fa";
@@ -21,6 +20,7 @@ import {
 import { primaryLinks, workLinks, moreLinks } from "@/components/layouts/nav-links";
 import { SocialsRow } from "@/components/contact/socials-row";
 import { CopyEmailButton } from "@/components/contact/copy-email-button";
+import { useRickrollAudio } from "@/providers/rickroll-audio-provider";
 
 interface Props {
   siteConfig: SITE_CONFIG_QUERY_RESULT;
@@ -50,38 +50,7 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
     : undefined;
 
   const rickrollUrl = siteConfig?.rickrollAudio?.asset?.url ?? null;
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isRickrollPlaying, setIsRickrollPlaying] = useState(false);
-  const [tick, setTick] = useState(0);
-
-  // Audio is never constructed until the first click — the footer must not
-  // fetch the MP3 on initial page load, only on user interaction.
-  const toggleRickroll = useCallback(() => {
-    if (!rickrollUrl) return;
-
-    if (!audioRef.current) {
-      const audio = new Audio(rickrollUrl);
-      audio.addEventListener("timeupdate", () => {
-        setTick((t) => t + 1);
-      });
-      audio.addEventListener("ended", () => setIsRickrollPlaying(false));
-      audioRef.current = audio;
-    }
-
-    if (audioRef.current.paused) {
-      void audioRef.current.play();
-      setIsRickrollPlaying(true);
-    } else {
-      audioRef.current.pause();
-      setIsRickrollPlaying(false);
-    }
-  }, [rickrollUrl]);
-
-  React.useEffect(() => {
-    return () => {
-      audioRef.current?.pause();
-    };
-  }, []);
+  const { isPlaying: isRickrollPlaying, tick, toggleRickroll } = useRickrollAudio();
 
   const primaryEmail = siteConfig?.emails?.find((entry) => entry.email)?.email;
 
