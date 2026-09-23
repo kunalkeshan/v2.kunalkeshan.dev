@@ -8,7 +8,7 @@ Content for the portfolio site (site config, FAQs, legal documents) is authored 
 
 Defined in `apps/studio/schemaTypes/`:
 
-- `siteConfig` — singleton: site title/description, OG/Twitter images, contact info, social links, footer legal links, the downloadable `resumePdf` file, and the footer's `rickrollAudio` easter-egg file (hidden entirely while empty, same pattern as `resumePdf`)
+- `siteConfig` — singleton: site title/description, OG/Twitter images, `logo` (navbar/footer/email branding), `favicon` (browser tab icon + Apple touch icon, see below), contact info, social links, footer legal links, the downloadable `resumePdf` file, and the footer's `rickrollAudio` easter-egg file (hidden entirely while empty, same pattern as `resumePdf`)
 - `faqs` — singleton: FAQ list
 - `legal` — document: legal pages (privacy policy, terms, etc.), rendered via `blockContent`
 - `blockContent` — shared rich-text/portable-text array type used by `legal`
@@ -56,6 +56,7 @@ All written with `next-sanity`'s `defineQuery` for typegen support.
 - `lib/dates.ts` — formats Sanity `date` strings in UTC (`formatDateRange`, `formatDuration`, `spanOf`). Sanity dates are `YYYY-MM-DD`; parsing them as local time renders the previous month in timezones behind UTC.
 - `app/sitemap.ts` — fetches `LEGAL_DOCUMENTS_QUERY` to generate sitemap entries for legal pages, plus static entries for `/resume`, `/skills`, and `/services`.
 - `app/api/revalidate/route.ts` — webhook endpoint; validates the Sanity webhook signature (`SANITY_WEBHOOK_SECRET`) and revalidates Next.js cache tags based on the changed document's `_type`.
+- `app/icon.tsx` / `app/apple-icon.tsx` — Next.js file-convention icon routes. Both fetch `SITE_CONFIG_QUERY` (literal `{ perspective: "published", stega: false }`, same build-time-only constraint as `generateMetadata`/`sitemap.ts`/`opengraph-image.tsx`) and derive their image from the single `siteConfig.favicon` asset via `urlFor(...).width().height().fit("crop")` — `icon.tsx` at 32×32, `apple-icon.tsx` at 180×180. One source image, two sizes; no separate pre-cropped fields in the Studio. Statically optimized at build time like the other icon-route conventions, and picked up by the existing `siteConfig` revalidation webhook when the image changes — no redeploy needed.
 - `components/sanity/portable-text-components.tsx` — renders `blockContent` (portable text) with the site's Tailwind theme classes, including a heading-level shift (schema `h1`→ rendered `h2`, etc.) so CMS content headings never collide with the page's own `h1`.
 
 ## Revalidation model

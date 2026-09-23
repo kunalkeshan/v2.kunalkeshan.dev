@@ -24,6 +24,12 @@ export const SITE_CONFIG_QUERY = defineQuery(`
       crop,
       alt
     },
+    favicon {
+      asset->,
+      hotspot,
+      crop,
+      alt
+    },
     heroName,
     heroRoles,
     heroImage {

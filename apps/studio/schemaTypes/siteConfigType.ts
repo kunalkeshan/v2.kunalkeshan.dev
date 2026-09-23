@@ -124,6 +124,24 @@ export const siteConfigType = defineType({
       validation: (Rule) => Rule.required(),
     },
     {
+      name: "favicon",
+      title: "Favicon",
+      type: "image",
+      group: "basic",
+      options: { hotspot: true },
+      fields: [
+        {
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description: "Short description for accessibility and SEO",
+        },
+      ],
+      description:
+        "Used for the browser tab icon and Apple touch icon. Upload a single high-resolution square image (512x512 or larger recommended) — the site derives both the small favicon and the Apple touch icon size from it automatically.",
+      validation: (Rule) => Rule.required(),
+    },
+    {
       name: "heroName",
       title: "Hero Name",
       type: "string",
