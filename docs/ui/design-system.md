@@ -578,6 +578,51 @@ transition={sectionRevealTransition} viewport={sectionRevealViewport}`. Import f
   until a real cross-route transition is actually requested; don't add
   `AnimatePresence`-around-`{children}` speculatively.
 
+## `InputGroup` — icon-decorated inputs (`@workspace/ui/components/input-group`)
+
+For a text input with a leading/trailing icon (a search icon, a submit button, a clear
+button, …), the icon(s) must be flex children of the same element that carries
+`pressableShadow`/the border/the shadow — never absolutely positioned against a
+separate wrapper that the input itself moves independently of.
+
+**Why this is a dedicated primitive and not a per-usage pattern.** An earlier version of
+the blog/journal post-sidebar search box (`apps/web/components/blog/post-sidebar.tsx`)
+put `pressableShadow` on the `Input` itself (via the base `Input` primitive) while the
+search icon and the arrow-icon submit button were absolutely positioned against a
+separate `<form className="relative">` wrapper. `pressableShadow`'s hover/press
+translate moved the `<input>` element, but the icons — anchored to the stationary form
+— didn't move with it, so the icons visibly lagged behind the input box on hover, press,
+and while typing. `packages/ui/src/components/combobox.tsx`'s `ComboboxInputGroup`
+already had the correct version of this (border/shadow/`pressableShadow`/focus ring on
+the outer wrapper, icon and input as plain flex children inside it), so `InputGroup`
+generalizes that same shape for plain (non-Combobox) text inputs.
+
+- `InputGroup` — the wrapper. Owns `border-2 border-input`, the shadow scale,
+  `pressableShadow`, and `focus-within:` (not `focus-visible:`) ring classes, since
+  focus lands on the inner `InputGroupInput`, not the wrapper itself. Renders a
+  `<div>` by default; pass `asChild` (backed by Radix `Slot`) to render as a `<form>`
+  when the group needs to submit.
+- `InputGroupInput` — a thin `<input>` with no border/shadow/focus classes of its own
+  (`flex-1`, transparent background, `outline-none`) — those live on the wrapper.
+- `InputGroupIcon` — a `shrink-0 text-muted-foreground` flex child for a leading or
+  trailing icon (a `SearchIcon`, a loading spinner swap, …).
+- `InputGroupClear` — a real `<button type="button">` rendering a `lucide-react`
+  `XIcon`, shown conditionally by the consumer once there's a value. Prefer this over
+  a bare `type="search"` input's native browser clear button: the native one can't be
+  restyled or repositioned to match this design language, and doesn't render at all in
+  Firefox. Use `type="text"` on `InputGroupInput`, not `type="search"`, once a custom
+  clear button is present — otherwise both affordances can render at once.
+
+The base `Input` primitive (`packages/ui/src/components/input.tsx`) is unaffected and
+stays correct for any input without sibling icons (form fields, standalone search boxes
+with no icon chrome). `InputGroup` is additive, the same way `ComboboxInputGroup` sits
+alongside the base `Input` rather than replacing it.
+
+Both `apps/web/components/blog/post-sidebar.tsx` (search icon + arrow-icon submit
+button) and `apps/web/components/filters/filter-search-input.tsx` (search icon that
+swaps for a loading spinner) use `InputGroup` — the reference implementations for a
+submit-driven vs. an instant-filter icon input, respectively.
+
 ### Shared filter-bar components (`apps/web/components/filters/`)
 
 `/blog`, `/journal`, `/projects`, and `/skills` each had their own copy-pasted

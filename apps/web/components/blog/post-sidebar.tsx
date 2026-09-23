@@ -6,7 +6,12 @@ import { type FormEvent, useState } from "react"
 import { ArrowRightIcon, SearchIcon } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
-import { Input } from "@workspace/ui/components/input"
+import {
+  InputGroup,
+  InputGroupClear,
+  InputGroupIcon,
+  InputGroupInput,
+} from "@workspace/ui/components/input-group"
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { TocEntry } from "@/lib/toc"
@@ -56,26 +61,26 @@ export function PostSidebar({
           someone types and pauses, since there's nothing on screen inviting a
           next action.
         */}
-        <form onSubmit={handleSearch} className="relative">
-          <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search articles..."
-            aria-label="Search articles"
-            className="h-10 pr-10 pl-8"
-          />
-          <Button
-            type="submit"
-            size="icon-sm"
-            variant="ghost"
-            aria-label="Search"
-            className="absolute top-1/2 right-1 -translate-y-1/2"
-          >
-            <ArrowRightIcon />
-          </Button>
-        </form>
+        <InputGroup asChild>
+          <form onSubmit={handleSearch}>
+            <InputGroupIcon>
+              <SearchIcon className="size-4" />
+            </InputGroupIcon>
+            <InputGroupInput
+              type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search articles..."
+              aria-label="Search articles"
+            />
+            {query.length > 0 && (
+              <InputGroupClear aria-label="Clear search" onClick={() => setQuery("")} />
+            )}
+            <Button type="submit" size="icon-sm" variant="ghost" aria-label="Search">
+              <ArrowRightIcon />
+            </Button>
+          </form>
+        </InputGroup>
       </div>
 
       {toc.length > 0 && (
