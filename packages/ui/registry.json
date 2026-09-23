@@ -80,6 +80,14 @@
       ]
     },
     {
+      "name": "collapsible",
+      "type": "registry:ui",
+      "dependencies": ["@base-ui/react"],
+      "files": [
+        { "path": "src/components/collapsible.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
       "name": "combobox",
       "type": "registry:ui",
       "dependencies": ["@base-ui/react", "lucide-react"],
@@ -127,7 +135,11 @@
     {
       "name": "input-group",
       "type": "registry:ui",
-      "dependencies": ["@base-ui/react", "@radix-ui/react-slot", "lucide-react"],
+      "dependencies": [
+        "@base-ui/react",
+        "@radix-ui/react-slot",
+        "lucide-react"
+      ],
       "registryDependencies": ["utils"],
       "files": [
         { "path": "src/components/input-group.tsx", "type": "registry:ui" }
@@ -154,7 +166,11 @@
     {
       "name": "navigation-menu",
       "type": "registry:ui",
-      "dependencies": ["@base-ui/react", "class-variance-authority", "lucide-react"],
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "lucide-react"
+      ],
       "registryDependencies": ["utils"],
       "files": [
         { "path": "src/components/navigation-menu.tsx", "type": "registry:ui" }
@@ -183,6 +199,28 @@
       "registryDependencies": ["utils"],
       "files": [
         { "path": "src/components/separator.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:ui",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "button",
+        "input",
+        "separator",
+        "sheet",
+        "skeleton",
+        "tooltip"
+      ],
+      "files": [
+        { "path": "src/components/sidebar.tsx", "type": "registry:ui" },
+        { "path": "src/hooks/use-mobile.ts", "type": "registry:hook" }
       ]
     },
     {

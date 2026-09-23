@@ -6,7 +6,9 @@ Two related but separate pieces of infrastructure for `@workspace/ui`.
 
 A public, indexed page (`apps/web/app/(static)/style-guide`) rendering every design
 token and component from `packages/ui` live from the real source, with
-click-to-copy on tokens and component usage snippets. Linked from the footer's
+click-to-copy on tokens and component usage snippets. It includes a sticky grouped
+sidebar on large screens, a bottom navigation sheet on smaller screens, and quick
+instructions for configuring and using the public registry. Linked from the footer's
 "Utility links" column, not the navbar.
 
 ### Tokens (fully dynamic — no manual step)
@@ -29,14 +31,14 @@ manual edit.
 (confirmed by reading the installed `class-variance-authority` source), so a fully
 generic "read every component's variants" renderer isn't possible. Instead:
 
-- **4 of 29 components** (`button`, `badge`, `empty`, `tabs`) extract their `cva()`
+- **4 of 31 components** (`button`, `badge`, `empty`, `tabs`) extract their `cva()`
   config into a named, exported `*VariantsConfig` const (e.g. `buttonVariantsConfig`
   in `packages/ui/src/components/button.tsx`) purely so this page can read the real
   variant list. `apps/web/app/(static)/style-guide/_components/variant-grid.tsx`
   cartesian-products every axis in that config (e.g. Button's `variant` × `size`) and
   renders one cell per combination — this can't drift, since it reads the same object
   the component itself is built from.
-- **The other 25 components** each get a small hand-written file in
+- **The other 27 components** each get a small hand-written file in
   `apps/web/app/(static)/style-guide/_components/demo-specs/`, importing the real
   component and exporting a matching copy-ready JSX snippet string alongside it.
   Several needed real scaffolding to render meaningfully rather than trivial default
@@ -86,8 +88,10 @@ tooling — no npm package publish, no Storybook.
   Next.js's static file handling, no route handler needed. These generated files are
   tracked in git (not gitignored) since there's no build-time hook regenerating them
   yet.
-- A consumer adds `"registries": { "@kunalkeshan": "https://kunalkeshan.dev/r/{name}.json" }`
-  to their own `components.json`, then runs `pnpm dlx shadcn add @kunalkeshan/button`.
+- A consumer configures `@kunalkeshan` as
+  `https://v2-kunalkeshan-dev.vercel.app/r/{name}.json` in `components.json`, then uses
+  `shadcn add @kunalkeshan/button`. The `/style-guide` page includes copyable setup,
+  discovery, and install commands for pnpm, npm, yarn, and bun.
 
 **This is currently a manual step, not wired into `apps/web`'s build.** Re-run
 `pnpm --filter ui registry:build` after changing `registry.json` or any registered

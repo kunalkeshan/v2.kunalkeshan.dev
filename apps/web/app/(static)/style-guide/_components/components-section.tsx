@@ -4,6 +4,7 @@ import { BreadcrumbDemo } from "./demo-specs/breadcrumb-demo"
 import { CardDemo } from "./demo-specs/card-demo"
 import { CarouselDemo } from "./demo-specs/carousel-demo"
 import { CheckboxDemo } from "./demo-specs/checkbox-demo"
+import { CollapsibleDemo } from "./demo-specs/collapsible-demo"
 import { ComboboxDemo } from "./demo-specs/combobox-demo"
 import { ContainerDemo } from "./demo-specs/container-demo"
 import { DialogDemo } from "./demo-specs/dialog-demo"
@@ -18,6 +19,7 @@ import { PaginationDemo } from "./demo-specs/pagination-demo"
 import { SelectDemo } from "./demo-specs/select-demo"
 import { SeparatorDemo } from "./demo-specs/separator-demo"
 import { SheetDemo } from "./demo-specs/sheet-demo"
+import { SidebarDemo } from "./demo-specs/sidebar-demo"
 import { SkeletonDemo } from "./demo-specs/skeleton-demo"
 import { SonnerDemo } from "./demo-specs/sonner-demo"
 import { SpinnerDemo } from "./demo-specs/spinner-demo"
@@ -46,6 +48,7 @@ const DEMOS: Record<string, React.ReactNode> = {
   Card: <CardDemo />,
   Carousel: <CarouselDemo />,
   Checkbox: <CheckboxDemo />,
+  Collapsible: <CollapsibleDemo />,
   Combobox: <ComboboxDemo />,
   Container: <ContainerDemo />,
   Dialog: <DialogDemo />,
@@ -61,6 +64,7 @@ const DEMOS: Record<string, React.ReactNode> = {
   Select: <SelectDemo />,
   Separator: <SeparatorDemo />,
   Sheet: <SheetDemo />,
+  Sidebar: <SidebarDemo />,
   Skeleton: <SkeletonDemo />,
   "Sonner (Toast)": <SonnerDemo />,
   Spinner: <SpinnerDemo />,

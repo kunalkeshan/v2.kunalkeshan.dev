@@ -49,9 +49,9 @@ distinct hue.
 | `--body-foreground`      | `#393939`            | `#C7C7C7`        |
 
 All status colors (`success`/`warning`/`destructive`) and `primary` pair with a
-near-black foreground — never light text on orange/yellow. `chart-*`/`sidebar-*` tokens
-are out of scope for this pass (no chart/sidebar components exist yet) and keep their
-placeholder values.
+near-black foreground — never light text on orange/yellow. `chart-*` tokens remain
+placeholders. The Sidebar component's `sidebar-*` aliases map to card, foreground,
+primary, muted, border, and ring tokens in both themes.
 
 `--body-foreground` was ported from `kunalkeshan.dev` v1's `themes.txt_secondary`
 (`#393939`) during the navbar port. It's distinct from `--muted-foreground`
@@ -80,15 +80,15 @@ numeric scale, no custom key needed). Never use a 1px border anywhere in this la
 Solid, single-color, offset shadows only — no blur, no spread, color always equals
 `--border` (so shadows invert automatically in dark mode).
 
-| Class                               | Value                         | Usage                                             |
-| ----------------------------------- | ----------------------------- | ------------------------------------------------- |
-| `shadow-sm`                         | `2px 2px 0 0 var(--border)`   | badges, tooltips                                  |
-| `shadow`                            | `4px 4px 0 0 var(--border)`   | buttons/inputs at rest                            |
-| `shadow-lg`                         | `6px 6px 0 0 var(--border)`   | open accordions, cards                            |
-| `shadow-xl`                         | `8px 8px 0 0 var(--border)`   | sheets, dialogs, floating nav chrome              |
-| `shadow-2xl`                        | `10px 10px 0 0 var(--border)` | the hover-grow step past `shadow-xl` — see below  |
-| `shadow-reverse`                    | `-4px 4px 0 0 var(--border)`  | rare, directional emphasis only                   |
-| `shadow-reverse-sm`                 | `-2px 2px 0 0 var(--border)`  | reverse-direction hover on small circular avatars |
+| Class               | Value                         | Usage                                             |
+| ------------------- | ----------------------------- | ------------------------------------------------- |
+| `shadow-sm`         | `2px 2px 0 0 var(--border)`   | badges, tooltips                                  |
+| `shadow`            | `4px 4px 0 0 var(--border)`   | buttons/inputs at rest                            |
+| `shadow-lg`         | `6px 6px 0 0 var(--border)`   | open accordions, cards                            |
+| `shadow-xl`         | `8px 8px 0 0 var(--border)`   | sheets, dialogs, floating nav chrome              |
+| `shadow-2xl`        | `10px 10px 0 0 var(--border)` | the hover-grow step past `shadow-xl` — see below  |
+| `shadow-reverse`    | `-4px 4px 0 0 var(--border)`  | rare, directional emphasis only                   |
+| `shadow-reverse-sm` | `-2px 2px 0 0 var(--border)`  | reverse-direction hover on small circular avatars |
 
 The raw CSS var backing `shadow` is `--shadow-base`, not a bare `--shadow` — Tailwind v4
 reserves `--shadow-*` as its own box-shadow theme namespace, so a bare `--shadow` raw var
@@ -112,7 +112,7 @@ keep that boundary when porting more components. The `shadow-reverse-sm` variant
 same idea but for small circular avatar thumbnails, paired with a resting
 `shadow-reverse-sm` (not `shadow-sm`) and `hover:shadow-reverse`.
 
-**Content-card hover — rest flat, lift on hover.** This is a *different* pattern
+**Content-card hover — rest flat, lift on hover.** This is a _different_ pattern
 from the image-wrapper one above, and the two are easy to confuse. A content card
 (service card, project card — a bordered panel holding text) **rests with no
 shadow at all** and gains both the lift and the shadow on hover:
@@ -125,7 +125,7 @@ so layout, colour and border classes stay at the call site:
 import { cardLift, cn } from "@workspace/ui/lib/utils"
 
 const cardShell = cn(
-  "group … rounded-lg border-3 border-border bg-card",
+  "group rounded-lg border-3 border-border bg-card …",
   cardLift
 )
 ```
@@ -133,7 +133,7 @@ const cardShell = cn(
 `cardLift` carries `translate-y-0 transform-gpu will-change-transform` alongside the
 hover classes. The explicit resting `translate-y-0` is load-bearing: without a declared
 start value the transform is absent at rest and the browser has nothing to interpolate
-*back to* on unhover, which reads as jank on the way out. `transform-gpu` promotes the
+_back to_ on unhover, which reads as jank on the way out. `transform-gpu` promotes the
 card to its own layer so the lift composites instead of repainting the bordered box
 every frame.
 
@@ -165,7 +165,7 @@ resting-`shadow-xl` → `hover:shadow-2xl` only for bordered image wrappers.
 
 **Never combine either pattern with `pressableShadow`** — that utility owns
 `hover:translate-x-0.5 hover:translate-y-0.5` on the same axis as the card lift,
-and the two transforms fight. Buttons *inside* a card keep their own
+and the two transforms fight. Buttons _inside_ a card keep their own
 `pressableShadow` independently; the card itself must not have it.
 
 ## `pressableShadow` — the "press into shadow" interaction
@@ -278,7 +278,7 @@ only as a hover accent:
   The shared `navigation-menu.tsx` primitives bake a neutral `bg-muted` chip into
   `hover:`/`focus:`/`data-open:`/`data-active:` states. **Cancelling it requires naming each
   variant** (`hover:bg-transparent focus:bg-transparent data-open:bg-transparent`, …) — a
-  bare `bg-transparent` only overrides the *rest* state and leaves every other one painting
+  bare `bg-transparent` only overrides the _rest_ state and leaves every other one painting
   grey. Do this **on the nav's own usage** (`apps/web/components/layouts/desktop-nav.tsx`
   defines `navLinkClassName`/`navTriggerClassName` for exactly this), not by editing the
   shared primitive's defaults — same reasoning as the `gap-0` override note above.
@@ -286,7 +286,7 @@ only as a hover accent:
   Pair the hover with `focus-visible:text-secondary`, **not** bare `focus:` — with no chip,
   bare `focus:` leaves a link stranded blue after a mouse click.
 
-- **Dropdown panel rows** (the icon+label+description items *inside* a Work/More panel): these
+- **Dropdown panel rows** (the icon+label+description items _inside_ a Work/More panel): these
   **keep** `hover:bg-muted` (`nav-dropdown-item.tsx`). The flat/no-chip rule above is for the
   top-level nav row only — inside a panel, the chip is the row's hit-target affordance.
 - **Solid icon/CTA buttons in chrome** (e.g. the navbar's contact button): add
@@ -357,7 +357,7 @@ as they already are.
 **Nested pale cards**: a light card sitting on an inverted panel needs the page
 text tokens back, or its copy inherits the panel's near-white foreground and
 disappears against its own pale ground. Add `.on-surface` to that card — it
-restores the text tokens *and* puts `--shadow-color` back to the dark border
+restores the text tokens _and_ puts `--shadow-color` back to the dark border
 color, because a light card has to cast a dark shadow onto the panel behind it.
 Inheriting the panel's light cast would paint a white shadow against a white
 card and lose the depth entirely:
@@ -391,11 +391,11 @@ not redefined in `.dark`).
 
 **Anything the user initiates decelerates only — use an `out` curve.** Hover, press,
 a panel opening on click, a card lifting: the motion should begin at full speed and
-ease to a stop. Motion the user did *not* trigger (autoplay, looping, scroll-linked
+ease to a stop. Motion the user did _not_ trigger (autoplay, looping, scroll-linked
 progress) may use an `in-out` curve, where a soft start is honest.
 
 This is why the original `--ease-snap: cubic-bezier(0.4, 0, 0.2, 1)` was replaced. That
-is a *symmetric in-out* curve: it eases in at the start, so a 180ms hover spent its first
+is a _symmetric in-out_ curve: it eases in at the start, so a 180ms hover spent its first
 frames barely moving, then accelerated, then settled — reading as sluggish and abrupt at
 the same time. A hover has no "wind-up" in the physical world; it is a response, and a
 response starts immediately.
@@ -405,15 +405,15 @@ response starts immediately.
 Standard Penner easings, values as published at
 [coss.com/origin/easings](https://coss.com/origin/easings):
 
-| Token                 | Value                              | Use for                                         |
-| --------------------- | ---------------------------------- | ----------------------------------------------- |
-| `--ease-out-expo`     | `cubic-bezier(0.16, 1, 0.3, 1)`    | the default; hover, press, card lift, reveals    |
-| `--ease-out-quint`    | `cubic-bezier(0.22, 1, 0.36, 1)`   | slightly softer alternative to expo              |
-| `--ease-out-quart`    | `cubic-bezier(0.25, 1, 0.5, 1)`    | medium decelerate                                |
-| `--ease-out-cubic`    | `cubic-bezier(0.33, 1, 0.68, 1)`   | gentle, for larger travel distances              |
-| `--ease-out-quad`     | `cubic-bezier(0.5, 1, 0.89, 1)`    | the subtlest; small opacity/color shifts         |
-| `--ease-in-out-quart` | `cubic-bezier(0.76, 0, 0.24, 1)`   | **non-user-initiated** motion only               |
-| `--ease-spring`       | `cubic-bezier(0.34, 1.56, 0.64, 1)`| overshoot; use sparingly, never on hover         |
+| Token                 | Value                               | Use for                                       |
+| --------------------- | ----------------------------------- | --------------------------------------------- |
+| `--ease-out-expo`     | `cubic-bezier(0.16, 1, 0.3, 1)`     | the default; hover, press, card lift, reveals |
+| `--ease-out-quint`    | `cubic-bezier(0.22, 1, 0.36, 1)`    | slightly softer alternative to expo           |
+| `--ease-out-quart`    | `cubic-bezier(0.25, 1, 0.5, 1)`     | medium decelerate                             |
+| `--ease-out-cubic`    | `cubic-bezier(0.33, 1, 0.68, 1)`    | gentle, for larger travel distances           |
+| `--ease-out-quad`     | `cubic-bezier(0.5, 1, 0.89, 1)`     | the subtlest; small opacity/color shifts      |
+| `--ease-in-out-quart` | `cubic-bezier(0.76, 0, 0.24, 1)`    | **non-user-initiated** motion only            |
+| `--ease-spring`       | `cubic-bezier(0.34, 1.56, 0.64, 1)` | overshoot; use sparingly, never on hover      |
 
 `--ease-snap` is aliased to `--ease-out-expo`. Keep writing `ease-snap` in components —
 it is the name every existing component already references, so retuning it reaches all
@@ -452,7 +452,7 @@ from, not utilities to reach for directly. The durations are **not** theme keys 
 are `@utility` rules at the end of `globals.css` (see the second trap below).
 
 > **Trap 1 — a `@theme inline` key must be a literal, in `@theme` itself.**
-> `@theme inline` substitutes a token's value *where it is defined*. A key that names
+> `@theme inline` substitutes a token's value _where it is defined_. A key that names
 > the same custom property it wants to read (`--ease-snap: var(--ease-snap)`) resolves
 > to itself; so does one pointing at a `:root` var that holds another `var()`. Either
 > way the value is unresolvable and the declaration is dropped silently — no error, no
@@ -481,7 +481,7 @@ are `@utility` rules at the end of `globals.css` (see the second trap below).
 > retuning it still reaches every call site at once.
 
 > **Trap 3 — `-translate-y-*` animates the `translate` property, not `transform`.**
-> Tailwind v4 composes translate/rotate/scale as *separate* CSS properties so utilities
+> Tailwind v4 composes translate/rotate/scale as _separate_ CSS properties so utilities
 > don't clobber one another. `hover:-translate-y-2` therefore changes **`translate`**,
 > and a `transition-[transform,box-shadow]` list does not cover it. The result is a card
 > whose shadow eases over 300ms while the 8px lift **jumps instantly** — the classic
@@ -505,8 +505,8 @@ grep -c -- "--ease-snap:var(--ease-snap)" apps/web/.next/static/chunks/*.css  # 
 
 ```js
 // In DevTools, on a card element — Trap 3:
-getComputedStyle($0).transitionProperty  // must include "translate"
-getComputedStyle($0).transitionDuration  // "0.3s", not "0.15s"
+getComputedStyle($0).transitionProperty // must include "translate"
+getComputedStyle($0).transitionDuration // "0.3s", not "0.15s"
 ```
 
 A missing class means the utility never existed, no matter how right the source reads.
@@ -675,7 +675,7 @@ left-to-right across the phrase, once, the first time the heading scrolls into v
 ```
 
 - `variant="primary"` (orange) or `variant="secondary"` (blue) — pick whichever one
-  the *other* nearby highlighted heading on the same page/flow isn't using. v1 alternated
+  the _other_ nearby highlighted heading on the same page/flow isn't using. v1 alternated
   `bg-portfolio-main`/`bg-portfolio-accent` across sections (confirmed via
   `kunalkeshan.dev`'s `tailwind.config.js`: `main: "#ffa500"`, `accent: "#1C92FF"` —
   the same hex pairs as this repo's `--primary`/`--secondary`) rather than making every
@@ -734,7 +734,7 @@ worth keeping, because the same trap applies to any future illustrated card.
   values copy ranges from ~190 to ~385 characters, and it is not editable (v1 values are
   protected by `docs/content/persona-and-tone.md`). CSS grid offers only two bad answers
   to that: stretching to a shared row height pads every short card in the row with
-  trailing dead space, and `items-start` leaves ragged holes *between* rows, which reads
+  trailing dead space, and `items-start` leaves ragged holes _between_ rows, which reads
   as broken rather than as rhythm in a 3-up layout. `columns` removes the dilemma — with
   no rows to align, each card ends at its own copy and the next packs directly beneath
   it, so the variance becomes vertical flow. Pair with `break-inside-avoid` on the items.
@@ -776,7 +776,7 @@ had `priority` set.
 
 `about-story.tsx` (the `/about` page's own portrait) and `not-found-content.tsx`
 already set `priority` correctly. The Carousel section below documents a related but
-distinct case — which *slide* images get eager loading in a component that mostly
+distinct case — which _slide_ images get eager loading in a component that mostly
 renders off-screen content.
 
 ## Marquee (`@workspace/ui/components/marquee`)
@@ -890,7 +890,7 @@ paused is an accessibility problem.
 
 **`align: "center"`, not `"start"`.** With one slide per view and a card whose right
 margin is asymmetric (it reserves room for the portrait's overhang), `start` lets Embla
-settle *between* two snap points — the carousel rests showing ~60% of one slide and ~38%
+settle _between_ two snap points — the carousel rests showing ~60% of one slide and ~38%
 of the next. `center` makes every rest position a whole slide.
 
 ## Sizing logos of mixed aspect ratios
