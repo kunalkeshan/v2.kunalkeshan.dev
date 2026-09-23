@@ -147,6 +147,22 @@ const getServerShortcutModifier = () => "⌘"
 const getClientShortcutModifier = () =>
   /Mac|iPhone|iPad|iPod/.test(navigator.platform) ? "⌘" : "Ctrl"
 
+function rgbStringToHex(rgb: string) {
+  const match = rgb.match(/rgba?\(([^)]+)\)/)
+  const channels = match?.[1]
+  if (!channels) return null
+
+  const [r, g, b] = channels
+    .split(",")
+    .slice(0, 3)
+    .map((part) => Number.parseInt(part.trim(), 10))
+
+  if (r === undefined || g === undefined || b === undefined) return null
+  if ([r, g, b].some((channel) => Number.isNaN(channel))) return null
+
+  return `#${[r, g, b].map((channel) => channel.toString(16).padStart(2, "0")).join("")}`
+}
+
 function filterCommand(value: string, search: string, keywords: string[] = []) {
   const terms = search.trim().toLowerCase().split(/\s+/).filter(Boolean)
   if (terms.length === 0) return 1
@@ -192,11 +208,16 @@ export function PortfolioCommandMenu({
 
   const copyToken = (name: "primary" | "secondary") => async () => {
     try {
-      const value = getComputedStyle(document.documentElement)
-        .getPropertyValue(`--${name}`)
-        .trim()
+      const probe = document.createElement("span")
+      probe.style.display = "none"
+      probe.style.color = `var(--${name})`
+      document.body.appendChild(probe)
+      const rgb = getComputedStyle(probe).color
+      probe.remove()
 
-      await navigator.clipboard.writeText(value)
+      const hex = rgbStringToHex(rgb)
+
+      await navigator.clipboard.writeText(hex ?? rgb)
       toast.success(
         `${name === "primary" ? "Primary" : "Secondary"} color copied`
       )
