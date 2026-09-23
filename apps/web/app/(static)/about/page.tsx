@@ -6,6 +6,7 @@ import { urlFor } from "@workspace/sanity/image"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import {
   ABOUT_PAGE_QUERY,
+  SITE_CONFIG_QUERY,
   VALUES_QUERY,
   FEATURED_SKILLS_QUERY,
 } from "@workspace/sanity/query"
@@ -14,6 +15,12 @@ import { HighlightText } from "@/components/highlight-text"
 import AboutStory from "@/components/sections/about-story"
 import SkillsMarquee from "@/components/sections/skills-marquee"
 import Values from "@/components/sections/values"
+import { JsonLd } from "@/components/shared/json-ld"
+import {
+  buildBreadcrumbListJsonLd,
+  buildPersonJsonLd,
+  buildProfilePageJsonLd,
+} from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -23,6 +30,7 @@ export const metadata: Metadata = {
   title: "About",
   description:
     "How I got into software, what I work on now, and the principles I hold to. Software engineer, freelancer, and long-time builder for the web.",
+  alternates: { canonical: "/about" },
 }
 
 /**
@@ -35,25 +43,32 @@ const BUILDING_SINCE = 2021
 export default async function AboutPage() {
   const dynamicOptions = await getDynamicSanityFetchOptions()
 
-  const [aboutResult, valuesResult, skillsResult] = await Promise.all([
-    sanityFetch({
-      query: ABOUT_PAGE_QUERY,
-      tags: [createCollectionTag("siteConfig")],
-      ...dynamicOptions,
-    }),
-    sanityFetch({
-      query: VALUES_QUERY,
-      tags: [createCollectionTag("value")],
-      ...dynamicOptions,
-    }),
-    sanityFetch({
-      query: FEATURED_SKILLS_QUERY,
-      tags: [createCollectionTag("skill")],
-      ...dynamicOptions,
-    }),
-  ])
+  const [aboutResult, siteConfigResult, valuesResult, skillsResult] =
+    await Promise.all([
+      sanityFetch({
+        query: ABOUT_PAGE_QUERY,
+        tags: [createCollectionTag("siteConfig")],
+        ...dynamicOptions,
+      }),
+      sanityFetch({
+        query: SITE_CONFIG_QUERY,
+        tags: [createCollectionTag("siteConfig")],
+        ...dynamicOptions,
+      }),
+      sanityFetch({
+        query: VALUES_QUERY,
+        tags: [createCollectionTag("value")],
+        ...dynamicOptions,
+      }),
+      sanityFetch({
+        query: FEATURED_SKILLS_QUERY,
+        tags: [createCollectionTag("skill")],
+        ...dynamicOptions,
+      }),
+    ])
 
   const about = cleanSanityData(aboutResult.data)
+  const siteConfig = cleanSanityData(siteConfigResult.data)
   const values = cleanSanityData(valuesResult.data)
   const skills = cleanSanityData(skillsResult.data)
 
@@ -72,6 +87,14 @@ export default async function AboutPage() {
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd data={buildPersonJsonLd(siteConfig)} />
+      <JsonLd data={buildProfilePageJsonLd(siteConfig)} />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "About", path: "/about" },
+        ])}
+      />
       <Container>
         <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
           {about?.aboutPageHeadingLead}{" "}

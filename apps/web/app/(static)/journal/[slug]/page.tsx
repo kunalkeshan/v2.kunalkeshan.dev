@@ -33,8 +33,10 @@ import { PostFooterLicense } from "@/components/blog/post-footer-license"
 import { PostSidebar } from "@/components/blog/post-sidebar"
 import { ReadingProgressBar } from "@/components/blog/reading-progress-bar"
 import { ShareButtons } from "@/components/blog/share-buttons"
+import { JsonLd } from "@/components/shared/json-ld"
 import { readingTime } from "@/lib/reading-time"
 import { extractToc } from "@/lib/toc"
+import { buildArticleJsonLd, buildBreadcrumbListJsonLd } from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -100,7 +102,7 @@ export async function generateMetadata({
 
   if (!entry) return {}
 
-  const title = entry.title ?? "Journal entry"
+  const title = entry.seo?.metaTitle || entry.title || "Journal entry"
   const description = entry.excerpt ?? undefined
 
   // See blog/[slug]/page.tsx's generateMetadata for why `images` is omitted
@@ -112,6 +114,8 @@ export async function generateMetadata({
   return {
     title,
     description,
+    alternates: { canonical: `/journal/${slug}` },
+    ...(entry.seo?.noindex && { robots: { index: false, follow: true } }),
     openGraph: {
       title,
       description,
@@ -174,6 +178,14 @@ export default async function JournalEntryPage({
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd data={buildArticleJsonLd(entry, `/journal/${slug}`)} />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Journal", path: "/journal" },
+          { name: entry.title ?? "Journal entry", path: `/journal/${slug}` },
+        ])}
+      />
       <ReadingProgressBar targetId="entry-article-body" />
       <Container>
         <Breadcrumb>

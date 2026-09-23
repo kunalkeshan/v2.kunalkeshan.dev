@@ -70,6 +70,13 @@ export type JournalEntry = {
   body?: BlockContent
   publishedAt?: string
   featured?: boolean
+  seo?: Seo
+}
+
+export type Seo = {
+  _type: "seo"
+  metaTitle?: string
+  noindex?: boolean
 }
 
 export type BlockContent = Array<
@@ -158,6 +165,7 @@ export type Post = {
   body?: BlockContent
   publishedAt?: string
   featured?: boolean
+  seo?: Seo
 }
 
 export type Tag = {
@@ -298,6 +306,7 @@ export type Project = {
   featured?: boolean
   archived?: boolean
   orderRank?: string
+  seo?: Seo
 }
 
 export type Publication = {
@@ -500,6 +509,7 @@ export type Legal = {
   slug?: Slug
   description?: string
   content?: BlockContent
+  seo?: Seo
 }
 
 export type SanityFileAssetReference = {
@@ -756,6 +766,7 @@ export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | TagReference
   | JournalEntry
+  | Seo
   | BlockContent
   | SanityImageCrop
   | SanityImageHotspot
@@ -1123,7 +1134,7 @@ export type FAQS_QUERY_RESULT = {
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: LEGAL_DOCUMENTS_QUERY
-// Query: *[_type == "legal"] | order(_updatedAt desc) {    _id,    title,    slug,    description,    _createdAt,    _updatedAt  }
+// Query: *[_type == "legal"] | order(_updatedAt desc) {    _id,    title,    slug,    description,    _createdAt,    _updatedAt,    seo {      noindex    }  }
 export type LEGAL_DOCUMENTS_QUERY_RESULT = Array<{
   _id: string
   title: string | null
@@ -1131,11 +1142,14 @@ export type LEGAL_DOCUMENTS_QUERY_RESULT = Array<{
   description: string | null
   _createdAt: string
   _updatedAt: string
+  seo: {
+    noindex: boolean | null
+  } | null
 }>
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: LEGAL_DOCUMENT_BY_SLUG_QUERY
-// Query: *[_type == "legal" && slug.current == $slug][0] {    _id,    title,    slug,    description,    content,    _createdAt,    _updatedAt  }
+// Query: *[_type == "legal" && slug.current == $slug][0] {    _id,    title,    slug,    description,    content,    _createdAt,    _updatedAt,    seo {      metaTitle,      noindex    }  }
 export type LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -1144,6 +1158,10 @@ export type LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT = {
   content: BlockContent | null
   _createdAt: string
   _updatedAt: string
+  seo: {
+    metaTitle: string | null
+    noindex: boolean | null
+  } | null
 } | null
 
 // Source: ../../packages/sanity/src/query.ts
@@ -1840,7 +1858,7 @@ export type PROJECTS_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: PROJECT_BY_SLUG_QUERY
-// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    body,    archived,    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    gallery[] {      asset->,      hotspot,      crop,      alt,      caption    },    organization-> {      _id,      name,      website,      description,      logo {        asset->,        hotspot,        crop,        alt      }    },    relatedExperience-> {      _id,      role,      employmentType,      startDate,      endDate,      isCurrent,      organization-> {        _id,        name      }    },    skills[]-> {      _id,      name,      category    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt,    _updatedAt  }
+// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    body,    archived,    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    gallery[] {      asset->,      hotspot,      crop,      alt,      caption    },    organization-> {      _id,      name,      website,      description,      logo {        asset->,        hotspot,        crop,        alt      }    },    relatedExperience-> {      _id,      role,      employmentType,      startDate,      endDate,      isCurrent,      organization-> {        _id,        name      }    },    skills[]-> {      _id,      name,      category    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt,    _updatedAt,    seo {      metaTitle,      noindex    }  }
 export type PROJECT_BY_SLUG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -2028,11 +2046,15 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
   startDate: string | null
   completedAt: string | null
   _updatedAt: string
+  seo: {
+    metaTitle: string | null
+    noindex: boolean | null
+  } | null
 } | null
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: PROJECT_SLUGS_QUERY
-// Query: *[_type == "project" && defined(slug.current)] | order(orderRank asc) {    _id,    title,    slug,    coverImage {      asset->,      hotspot,      crop,      alt    }  }
+// Query: *[_type == "project" && defined(slug.current)] | order(orderRank asc) {    _id,    title,    slug,    coverImage {      asset->,      hotspot,      crop,      alt    },    _updatedAt,    seo {      noindex    }  }
 export type PROJECT_SLUGS_QUERY_RESULT = Array<{
   _id: string
   title: string | null
@@ -2063,6 +2085,10 @@ export type PROJECT_SLUGS_QUERY_RESULT = Array<{
     hotspot: SanityImageHotspot | null
     crop: SanityImageCrop | null
     alt: string | null
+  } | null
+  _updatedAt: string
+  seo: {
+    noindex: boolean | null
   } | null
 }>
 
@@ -2306,7 +2332,7 @@ export type POST_COUNT_QUERY_RESULT = number
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: POST_BY_SLUG_QUERY
-// Query: *[_type == "post" && slug.current == $slug][0] {      _id,  title,  slug,  excerpt,  publishedAt,  body,  coverImage {    asset->,    hotspot,    crop,    alt  },  ogImage {    asset->,    hotspot,    crop,    alt  },    author-> {    _id,    name,    photo {      asset->,      hotspot,      crop,      alt    },    website,    socials[] {      platform,      url    }  },  tags[]-> {    _id,    name,    slug  },  _updatedAt  }
+// Query: *[_type == "post" && slug.current == $slug][0] {      _id,  title,  slug,  excerpt,  publishedAt,  body,  coverImage {    asset->,    hotspot,    crop,    alt  },  ogImage {    asset->,    hotspot,    crop,    alt  },    author-> {    _id,    name,    photo {      asset->,      hotspot,      crop,      alt    },    website,    socials[] {      platform,      url    }  },  tags[]-> {    _id,    name,    slug  },  _updatedAt,  seo {    metaTitle,    noindex  }  }
 export type POST_BY_SLUG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -2411,16 +2437,24 @@ export type POST_BY_SLUG_QUERY_RESULT = {
     slug: Slug | null
   }> | null
   _updatedAt: string
+  seo: {
+    metaTitle: string | null
+    noindex: boolean | null
+  } | null
 } | null
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: POST_SLUGS_QUERY
-// Query: *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {    _id,    title,    slug,    publishedAt  }
+// Query: *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {    _id,    title,    slug,    publishedAt,    _updatedAt,    seo {      noindex    }  }
 export type POST_SLUGS_QUERY_RESULT = Array<{
   _id: string
   title: string | null
   slug: Slug | null
   publishedAt: string | null
+  _updatedAt: string
+  seo: {
+    noindex: boolean | null
+  } | null
 }>
 
 // Source: ../../packages/sanity/src/query.ts
@@ -2521,7 +2555,7 @@ export type JOURNAL_ENTRY_COUNT_QUERY_RESULT = number
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: JOURNAL_ENTRY_BY_SLUG_QUERY
-// Query: *[_type == "journalEntry" && slug.current == $slug][0] {      _id,  title,  slug,  excerpt,  publishedAt,  body,  coverImage {    asset->,    hotspot,    crop,    alt  },  ogImage {    asset->,    hotspot,    crop,    alt  },    author-> {    _id,    name,    photo {      asset->,      hotspot,      crop,      alt    },    website,    socials[] {      platform,      url    }  },  tags[]-> {    _id,    name,    slug  },  _updatedAt  }
+// Query: *[_type == "journalEntry" && slug.current == $slug][0] {      _id,  title,  slug,  excerpt,  publishedAt,  body,  coverImage {    asset->,    hotspot,    crop,    alt  },  ogImage {    asset->,    hotspot,    crop,    alt  },    author-> {    _id,    name,    photo {      asset->,      hotspot,      crop,      alt    },    website,    socials[] {      platform,      url    }  },  tags[]-> {    _id,    name,    slug  },  _updatedAt,  seo {    metaTitle,    noindex  }  }
 export type JOURNAL_ENTRY_BY_SLUG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -2626,16 +2660,24 @@ export type JOURNAL_ENTRY_BY_SLUG_QUERY_RESULT = {
     slug: Slug | null
   }> | null
   _updatedAt: string
+  seo: {
+    metaTitle: string | null
+    noindex: boolean | null
+  } | null
 } | null
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: JOURNAL_ENTRY_SLUGS_QUERY
-// Query: *[_type == "journalEntry" && defined(slug.current)] | order(publishedAt desc) {    _id,    title,    slug,    publishedAt  }
+// Query: *[_type == "journalEntry" && defined(slug.current)] | order(publishedAt desc) {    _id,    title,    slug,    publishedAt,    _updatedAt,    seo {      noindex    }  }
 export type JOURNAL_ENTRY_SLUGS_QUERY_RESULT = Array<{
   _id: string
   title: string | null
   slug: Slug | null
   publishedAt: string | null
+  _updatedAt: string
+  seo: {
+    noindex: boolean | null
+  } | null
 }>
 
 // Source: ../../packages/sanity/src/query.ts
@@ -2650,12 +2692,13 @@ export type LATEST_JOURNAL_ENTRIES_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: TAGS_QUERY
-// Query: *[_type == "tag"] | order(name asc) {    _id,    name,    slug,    description  }
+// Query: *[_type == "tag"] | order(name asc) {    _id,    name,    slug,    description,    _updatedAt  }
 export type TAGS_QUERY_RESULT = Array<{
   _id: string
   name: string | null
   slug: Slug | null
   description: string | null
+  _updatedAt: string
 }>
 
 // Source: ../../packages/sanity/src/query.ts
@@ -2842,8 +2885,8 @@ declare global {
     '\n  *[_type == "siteConfig"][0] {\n    aboutPageHeadingLead,\n    aboutPageHeadingHighlight,\n    aboutPageIntro,\n    aboutPageStoryHeadingLead,\n    aboutPageStoryHeadingHighlight,\n    aboutPageStoryHeadingTrail,\n    aboutPageStory,\n    aboutPageValuesHeading,\n    aboutPageValuesIntro,\n    aboutPagePortrait {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': ABOUT_PAGE_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0].footerLegalLinks[]-> {\n    _id,\n    title,\n    slug,\n    description,\n    _updatedAt\n  }\n': FOOTER_LEGAL_LINKS_QUERY_RESULT
     '\n  *[_type == "faqs"][0] {\n    ...,\n    faqItems[]{ ... }\n  }\n': FAQS_QUERY_RESULT
-    '\n  *[_type == "legal"] | order(_updatedAt desc) {\n    _id,\n    title,\n    slug,\n    description,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENTS_QUERY_RESULT
-    '\n  *[_type == "legal" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    description,\n    content,\n    _createdAt,\n    _updatedAt\n  }\n': LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT
+    '\n  *[_type == "legal"] | order(_updatedAt desc) {\n    _id,\n    title,\n    slug,\n    description,\n    _createdAt,\n    _updatedAt,\n    seo {\n      noindex\n    }\n  }\n': LEGAL_DOCUMENTS_QUERY_RESULT
+    '\n  *[_type == "legal" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    description,\n    content,\n    _createdAt,\n    _updatedAt,\n    seo {\n      metaTitle,\n      noindex\n    }\n  }\n': LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT
     '\n  *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    category\n  }\n': FEATURED_SKILLS_QUERY_RESULT
     '\n  *[_type == "skill"] | order(category asc, orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    category\n  }\n': SKILLS_QUERY_RESULT
     '\n  *[_type == "service"] | order(orderRank asc) {\n    _id,\n    name,\n    description,\n    icon,\n    illustration {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': SERVICES_QUERY_RESULT
@@ -2857,21 +2900,21 @@ declare global {
     '\n  *[_type == "publication"] | order(orderRank asc) {\n    _id,\n    title,\n    venue,\n    publishedAt,\n    authors,\n    doi,\n    url,\n    abstract\n  }\n': PUBLICATIONS_QUERY_RESULT
     '\n  *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': FEATURED_PROJECTS_QUERY_RESULT
     '\n  *[_type == "project"] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    archived,\n    featured,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': PROJECTS_QUERY_RESULT
-    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    body,\n    archived,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    gallery[] {\n      asset->,\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType,\n      startDate,\n      endDate,\n      isCurrent,\n      organization-> {\n        _id,\n        name\n      }\n    },\n    skills[]-> {\n      _id,\n      name,\n      category\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt,\n    _updatedAt\n  }\n': PROJECT_BY_SLUG_QUERY_RESULT
-    '\n  *[_type == "project" && defined(slug.current)] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': PROJECT_SLUGS_QUERY_RESULT
+    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    body,\n    archived,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    gallery[] {\n      asset->,\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType,\n      startDate,\n      endDate,\n      isCurrent,\n      organization-> {\n        _id,\n        name\n      }\n    },\n    skills[]-> {\n      _id,\n      name,\n      category\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt,\n    _updatedAt,\n    seo {\n      metaTitle,\n      noindex\n    }\n  }\n': PROJECT_BY_SLUG_QUERY_RESULT
+    '\n  *[_type == "project" && defined(slug.current)] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    _updatedAt,\n    seo {\n      noindex\n    }\n  }\n': PROJECT_SLUGS_QUERY_RESULT
     '\n  *[_type == "testimonial"] | order(orderRank asc) {\n    \n  _id,\n  quote,\n  context,\n  givenAt,\n  author-> {\n    _id,\n    name,\n    position,\n    website,\n    organizationName,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    }\n  }\n\n  }\n': TESTIMONIALS_QUERY_RESULT
     '\n  *[_type == "testimonial" && featured == true] | order(orderRank asc) {\n    \n  _id,\n  quote,\n  context,\n  givenAt,\n  author-> {\n    _id,\n    name,\n    position,\n    website,\n    organizationName,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    }\n  }\n\n  }\n': FEATURED_TESTIMONIALS_QUERY_RESULT
     '\n  *[_type == "post" && \n  (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&\n  (!defined($search) || title match $search + "*" || excerpt match $search + "*")\n] | order(publishedAt desc) [$start...$end] {\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  "hasBody": defined(body),\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  }\n\n  }\n': POSTS_QUERY_RESULT
     '\n  count(*[_type == "post" && \n  (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&\n  (!defined($search) || title match $search + "*" || excerpt match $search + "*")\n])\n': POST_COUNT_QUERY_RESULT
-    '\n  *[_type == "post" && slug.current == $slug][0] {\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  body,\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  ogImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  },\n  _updatedAt\n\n  }\n': POST_BY_SLUG_QUERY_RESULT
-    '\n  *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {\n    _id,\n    title,\n    slug,\n    publishedAt\n  }\n': POST_SLUGS_QUERY_RESULT
+    '\n  *[_type == "post" && slug.current == $slug][0] {\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  body,\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  ogImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  },\n  _updatedAt,\n  seo {\n    metaTitle,\n    noindex\n  }\n\n  }\n': POST_BY_SLUG_QUERY_RESULT
+    '\n  *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {\n    _id,\n    title,\n    slug,\n    publishedAt,\n    _updatedAt,\n    seo {\n      noindex\n    }\n  }\n': POST_SLUGS_QUERY_RESULT
     '\n  *[_type == "post"] | order(publishedAt desc) [0...5] {\n    _id,\n    title,\n    slug,\n    publishedAt\n  }\n': LATEST_POSTS_QUERY_RESULT
     '\n  *[_type == "journalEntry" && \n  (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&\n  (!defined($search) || title match $search + "*" || excerpt match $search + "*")\n] | order(publishedAt desc) [$start...$end] {\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  "hasBody": defined(body),\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  }\n\n  }\n': JOURNAL_ENTRIES_QUERY_RESULT
     '\n  count(*[_type == "journalEntry" && \n  (!defined($tagSlug) || $tagSlug in tags[]->slug.current) &&\n  (!defined($search) || title match $search + "*" || excerpt match $search + "*")\n])\n': JOURNAL_ENTRY_COUNT_QUERY_RESULT
-    '\n  *[_type == "journalEntry" && slug.current == $slug][0] {\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  body,\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  ogImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  },\n  _updatedAt\n\n  }\n': JOURNAL_ENTRY_BY_SLUG_QUERY_RESULT
-    '\n  *[_type == "journalEntry" && defined(slug.current)] | order(publishedAt desc) {\n    _id,\n    title,\n    slug,\n    publishedAt\n  }\n': JOURNAL_ENTRY_SLUGS_QUERY_RESULT
+    '\n  *[_type == "journalEntry" && slug.current == $slug][0] {\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  body,\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  ogImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  },\n  _updatedAt,\n  seo {\n    metaTitle,\n    noindex\n  }\n\n  }\n': JOURNAL_ENTRY_BY_SLUG_QUERY_RESULT
+    '\n  *[_type == "journalEntry" && defined(slug.current)] | order(publishedAt desc) {\n    _id,\n    title,\n    slug,\n    publishedAt,\n    _updatedAt,\n    seo {\n      noindex\n    }\n  }\n': JOURNAL_ENTRY_SLUGS_QUERY_RESULT
     '\n  *[_type == "journalEntry"] | order(publishedAt desc) [0...5] {\n    _id,\n    title,\n    slug,\n    publishedAt\n  }\n': LATEST_JOURNAL_ENTRIES_QUERY_RESULT
-    '\n  *[_type == "tag"] | order(name asc) {\n    _id,\n    name,\n    slug,\n    description\n  }\n': TAGS_QUERY_RESULT
+    '\n  *[_type == "tag"] | order(name asc) {\n    _id,\n    name,\n    slug,\n    description,\n    _updatedAt\n  }\n': TAGS_QUERY_RESULT
     '\n  *[_type == "tag" && slug.current == $slug][0] {\n    _id,\n    name,\n    slug,\n    description\n  }\n': TAG_BY_SLUG_QUERY_RESULT
     '\n  *[(_type == "post" || _type == "journalEntry") && $tagSlug in tags[]->slug.current] | order(publishedAt desc) [$start...$end] {\n    "kind": _type,\n    \n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n  "hasBody": defined(body),\n  coverImage {\n    asset->,\n    hotspot,\n    crop,\n    alt\n  },\n  \n  author-> {\n    _id,\n    name,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    website,\n    socials[] {\n      platform,\n      url\n    }\n  }\n,\n  tags[]-> {\n    _id,\n    name,\n    slug\n  }\n\n  }\n': WRITING_BY_TAG_QUERY_RESULT
     '\n  count(*[(_type == "post" || _type == "journalEntry") && $tagSlug in tags[]->slug.current])\n': WRITING_COUNT_BY_TAG_QUERY_RESULT

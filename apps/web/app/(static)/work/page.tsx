@@ -18,6 +18,11 @@ import {
   SectionNav,
   type SectionNavItem,
 } from "@/components/sections/section-nav"
+import { JsonLd } from "@/components/shared/json-ld"
+import {
+  buildBreadcrumbListJsonLd,
+  buildCollectionPageJsonLd,
+} from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -27,6 +32,7 @@ export const metadata: Metadata = {
   title: "Experience",
   description:
     "Every role so far: full-time and contract engineering work, the community teams that came before it, and the education behind both.",
+  alternates: { canonical: "/work" },
 }
 
 export default async function ExperiencePage() {
@@ -73,6 +79,20 @@ export default async function ExperiencePage() {
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd
+        data={buildCollectionPageJsonLd({
+          name: "Experience",
+          description:
+            "Full-time and contract engineering work, community teams, and education.",
+          path: "/work",
+        })}
+      />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Experience", path: "/work" },
+        ])}
+      />
       <Container>
         <h1 className="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl">
           It&apos;s dangerous to go alone,{" "}

@@ -31,6 +31,7 @@ import {
 
 import { portableTextComponents } from "@/components/sanity/portable-text-components"
 import { ProjectGallery } from "@/components/sections/project-gallery"
+import { JsonLd } from "@/components/shared/json-ld"
 import { formatDateRange } from "@/lib/dates"
 import { fetchStars } from "@/lib/github"
 import {
@@ -38,6 +39,7 @@ import {
   PROJECT_STATUS_LABELS,
   attributionLine,
 } from "@/lib/projects"
+import { buildBreadcrumbListJsonLd, buildCreativeWorkJsonLd } from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -103,12 +105,14 @@ export async function generateMetadata({
     ? urlFor(project.coverImage).width(1200).height(630).fit("crop").url()
     : undefined
 
-  const title = project.title ?? "Project"
+  const title = project.seo?.metaTitle || project.title || "Project"
   const description = project.summary ?? project.tagline ?? undefined
 
   return {
     title,
     description,
+    alternates: { canonical: `/projects/${slug}` },
+    ...(project.seo?.noindex && { robots: { index: false, follow: true } }),
     openGraph: {
       title,
       description,
@@ -211,6 +215,14 @@ export default async function ProjectPage({
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd data={buildCreativeWorkJsonLd(project, `/projects/${slug}`)} />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Projects", path: "/projects" },
+          { name: project.title ?? "Project", path: `/projects/${slug}` },
+        ])}
+      />
       <Container>
         <Link
           href="/projects"

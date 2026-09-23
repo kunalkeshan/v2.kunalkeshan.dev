@@ -8,6 +8,11 @@ import { SKILLS_QUERY } from "@workspace/sanity/query"
 
 import { HighlightText } from "@/components/highlight-text"
 import { SkillsFiltered } from "@/components/sections/skills-filtered"
+import { JsonLd } from "@/components/shared/json-ld"
+import {
+  buildBreadcrumbListJsonLd,
+  buildCollectionPageJsonLd,
+} from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -17,6 +22,7 @@ export const metadata: Metadata = {
   title: "Skills",
   description:
     "The full list of tools, languages, and technologies I work with.",
+  alternates: { canonical: "/skills" },
 }
 
 export default async function SkillsPage() {
@@ -32,6 +38,20 @@ export default async function SkillsPage() {
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd
+        data={buildCollectionPageJsonLd({
+          name: "Skills",
+          description:
+            "The full list of tools, languages, and technologies I work with.",
+          path: "/skills",
+        })}
+      />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Skills", path: "/skills" },
+        ])}
+      />
       <Container>
         <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
           A good workman never blames his tools

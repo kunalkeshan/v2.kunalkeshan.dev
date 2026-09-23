@@ -8,7 +8,12 @@ import { PROJECTS_QUERY } from "@workspace/sanity/query"
 
 import { HighlightText } from "@/components/highlight-text"
 import { ProjectsFiltered } from "@/components/sections/projects-filtered"
+import { JsonLd } from "@/components/shared/json-ld"
 import { fetchStars } from "@/lib/github"
+import {
+  buildBreadcrumbListJsonLd,
+  buildCollectionPageJsonLd,
+} from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -18,6 +23,7 @@ export const metadata: Metadata = {
   title: "Projects",
   description:
     "Products, client work, and side projects I've designed, built, and shipped — with the stack and the story behind each one.",
+  alternates: { canonical: "/projects" },
 }
 
 export default async function ProjectsPage() {
@@ -41,6 +47,26 @@ export default async function ProjectsPage() {
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd
+        data={buildCollectionPageJsonLd({
+          name: "Projects",
+          description:
+            "Products, client work, and side projects I've designed, built, and shipped.",
+          path: "/projects",
+          items: (projects ?? [])
+            .filter((project) => project.slug?.current)
+            .map((project) => ({
+              name: project.title ?? "Project",
+              path: `/projects/${project.slug?.current}`,
+            })),
+        })}
+      />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Projects", path: "/projects" },
+        ])}
+      />
       <Container>
         <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
           Things I&apos;ve <HighlightText variant="primary">built</HighlightText>

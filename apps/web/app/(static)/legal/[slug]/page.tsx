@@ -23,6 +23,8 @@ import {
 } from "@workspace/sanity/query"
 
 import { portableTextComponents } from "@/components/sanity/portable-text-components"
+import { JsonLd } from "@/components/shared/json-ld"
+import { buildBreadcrumbListJsonLd, buildWebPageJsonLd } from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -73,8 +75,10 @@ export async function generateMetadata({
   if (!doc) return {}
 
   return {
-    title: doc.title ?? "Legal",
+    title: doc.seo?.metaTitle || doc.title || "Legal",
     description: doc.description ?? undefined,
+    alternates: { canonical: `/legal/${slug}` },
+    ...(doc.seo?.noindex && { robots: { index: false, follow: true } }),
   }
 }
 
@@ -90,6 +94,20 @@ export default async function LegalDocumentPage({
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd
+        data={buildWebPageJsonLd({
+          name: doc.title,
+          description: doc.description,
+          path: `/legal/${slug}`,
+        })}
+      />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Legal", path: "/legal" },
+          { name: doc.title ?? "Legal", path: `/legal/${slug}` },
+        ])}
+      />
       <Container className="max-w-3xl">
         <Breadcrumb>
           <BreadcrumbList>

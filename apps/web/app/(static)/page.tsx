@@ -1,3 +1,5 @@
+import type { Metadata } from "next"
+
 import { sanityFetch } from "@workspace/sanity/live"
 import { urlFor } from "@workspace/sanity/image"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
@@ -17,11 +19,17 @@ import About from "@/components/sections/about"
 import Experience from "@/components/sections/experience"
 import Projects from "@/components/sections/projects"
 import Testimonials from "@/components/sections/testimonials"
+import { JsonLd } from "@/components/shared/json-ld"
 import { fetchStars } from "@/lib/github"
+import { buildPersonJsonLd, buildWebSiteJsonLd } from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
 } from "@/lib/sanity-fetch-options"
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+}
 
 /**
  * Kunal has been building for the web since 2021, and working as a software
@@ -109,6 +117,8 @@ export default async function Home() {
 
   return (
     <main>
+      <JsonLd data={buildWebSiteJsonLd(siteConfig)} />
+      <JsonLd data={buildPersonJsonLd(siteConfig)} />
       <Hero
         name={siteConfig?.heroName ?? "Kunal Keshan"}
         roles={

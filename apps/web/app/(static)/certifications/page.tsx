@@ -17,6 +17,11 @@ import {
   SectionNav,
   type SectionNavItem,
 } from "@/components/sections/section-nav"
+import { JsonLd } from "@/components/shared/json-ld"
+import {
+  buildBreadcrumbListJsonLd,
+  buildCollectionPageJsonLd,
+} from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -26,6 +31,7 @@ export const metadata: Metadata = {
   title: "Certifications",
   description:
     "Courses and certifications completed over the years, from SQL fundamentals to the latest AI tooling.",
+  alternates: { canonical: "/certifications" },
 }
 
 export default async function CertificationsPage() {
@@ -59,6 +65,20 @@ export default async function CertificationsPage() {
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd
+        data={buildCollectionPageJsonLd({
+          name: "Certifications",
+          description:
+            "Courses and certifications completed over the years.",
+          path: "/certifications",
+        })}
+      />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Certifications", path: "/certifications" },
+        ])}
+      />
       <Container>
         <h1 className="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl">
           Achievement unlocked:{" "}

@@ -16,6 +16,7 @@ import { Toaster } from "@workspace/ui/components/sonner";
 export const metadata: Metadata = {
   title: "Page Not Found | Kunal Keshan",
   description: "The page you are looking for does not exist.",
+  robots: { index: false, follow: true },
 };
 
 export default async function NotFound() {

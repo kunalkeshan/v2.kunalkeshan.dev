@@ -9,6 +9,8 @@ import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import { LEGAL_DOCUMENTS_QUERY } from "@workspace/sanity/query"
 
 import { HighlightText } from "@/components/highlight-text"
+import { JsonLd } from "@/components/shared/json-ld"
+import { buildBreadcrumbListJsonLd, buildWebPageJsonLd } from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -17,6 +19,7 @@ import {
 export const metadata: Metadata = {
   title: "Legal",
   description: "Privacy policy, terms, and other legal documents for this site.",
+  alternates: { canonical: "/legal" },
 }
 
 export default async function LegalPage() {
@@ -32,6 +35,20 @@ export default async function LegalPage() {
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd
+        data={buildWebPageJsonLd({
+          name: "Legal",
+          description:
+            "Privacy policy, terms, and other legal documents for this site.",
+          path: "/legal",
+        })}
+      />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Legal", path: "/legal" },
+        ])}
+      />
       <Container>
         <h1 className="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl">
           The fine print,{" "}

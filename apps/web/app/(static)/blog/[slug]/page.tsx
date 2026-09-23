@@ -33,8 +33,10 @@ import { PostFooterLicense } from "@/components/blog/post-footer-license"
 import { PostSidebar } from "@/components/blog/post-sidebar"
 import { ReadingProgressBar } from "@/components/blog/reading-progress-bar"
 import { ShareButtons } from "@/components/blog/share-buttons"
+import { JsonLd } from "@/components/shared/json-ld"
 import { readingTime } from "@/lib/reading-time"
 import { extractToc } from "@/lib/toc"
+import { buildArticleJsonLd, buildBreadcrumbListJsonLd } from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -97,7 +99,7 @@ export async function generateMetadata({
 
   if (!post) return {}
 
-  const title = post.title ?? "Post"
+  const title = post.seo?.metaTitle || post.title || "Post"
   const description = post.excerpt ?? undefined
 
   // Only overrides next/og's file-convention opengraph-image.tsx when a
@@ -112,6 +114,8 @@ export async function generateMetadata({
   return {
     title,
     description,
+    alternates: { canonical: `/blog/${slug}` },
+    ...(post.seo?.noindex && { robots: { index: false, follow: true } }),
     openGraph: {
       title,
       description,
@@ -175,6 +179,14 @@ export default async function BlogPostPage({
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd data={buildArticleJsonLd(post, `/blog/${slug}`)} />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Blog", path: "/blog" },
+          { name: post.title ?? "Post", path: `/blog/${slug}` },
+        ])}
+      />
       <ReadingProgressBar targetId="post-article-body" />
       <Container>
         <Breadcrumb>

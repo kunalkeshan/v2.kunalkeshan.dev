@@ -5,6 +5,7 @@ This is the documentation root for `v2.kunalkeshan.dev`. See `CLAUDE.md`/`AGENTS
 ## Guides
 
 - [`architecture.md`](./architecture.md) — monorepo layout, apps/packages, how they relate
+- [`seo.md`](./seo.md) — JSON-LD structured data, canonical URLs, the sitemap/robots/llms.txt setup, and per-document `noindex`
 
 ## Feature docs (`docs/feature/`)
 

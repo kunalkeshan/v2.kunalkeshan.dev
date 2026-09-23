@@ -137,7 +137,10 @@ export const LEGAL_DOCUMENTS_QUERY = defineQuery(`
     slug,
     description,
     _createdAt,
-    _updatedAt
+    _updatedAt,
+    seo {
+      noindex
+    }
   }
 `);
 
@@ -149,7 +152,11 @@ export const LEGAL_DOCUMENT_BY_SLUG_QUERY = defineQuery(`
     description,
     content,
     _createdAt,
-    _updatedAt
+    _updatedAt,
+    seo {
+      metaTitle,
+      noindex
+    }
   }
 `);
 
@@ -569,13 +576,20 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(`
     githubRepo,
     startDate,
     completedAt,
-    _updatedAt
+    _updatedAt,
+    seo {
+      metaTitle,
+      noindex
+    }
   }
 `);
 
 /**
  * Slugs for `generateStaticParams`, and the ordered list the project page uses
- * to resolve its previous/next neighbours.
+ * to resolve its previous/next neighbours. Also the source for the sitemap's
+ * project entries — `_updatedAt` and `seo.noindex` are projected here so
+ * `sitemap.ts` can use a real lastmod and skip noindexed projects without a
+ * second query.
  */
 export const PROJECT_SLUGS_QUERY = defineQuery(`
   *[_type == "project" && defined(slug.current)] | order(orderRank asc) {
@@ -587,6 +601,10 @@ export const PROJECT_SLUGS_QUERY = defineQuery(`
       hotspot,
       crop,
       alt
+    },
+    _updatedAt,
+    seo {
+      noindex
     }
   }
 `);
@@ -746,7 +764,11 @@ const WRITING_DETAIL_FIELDS = `
     name,
     slug
   },
-  _updatedAt
+  _updatedAt,
+  seo {
+    metaTitle,
+    noindex
+  }
 `;
 
 /**
@@ -794,6 +816,8 @@ export const POST_BY_SLUG_QUERY = defineQuery(`
 /**
  * Slugs (+ publishedAt, for prev/next ordering) for \`generateStaticParams\`
  * and the detail page's previous/next neighbour resolution — mirrors
+ * PROJECT_SLUGS_QUERY. Also the source for the sitemap's post entries —
+ * \`_updatedAt\` and \`seo.noindex\` are projected here for the same reason as
  * PROJECT_SLUGS_QUERY.
  */
 export const POST_SLUGS_QUERY = defineQuery(`
@@ -801,7 +825,11 @@ export const POST_SLUGS_QUERY = defineQuery(`
     _id,
     title,
     slug,
-    publishedAt
+    publishedAt,
+    _updatedAt,
+    seo {
+      noindex
+    }
   }
 `);
 
@@ -846,7 +874,11 @@ export const JOURNAL_ENTRY_SLUGS_QUERY = defineQuery(`
     _id,
     title,
     slug,
-    publishedAt
+    publishedAt,
+    _updatedAt,
+    seo {
+      noindex
+    }
   }
 `);
 
@@ -868,7 +900,8 @@ export const TAGS_QUERY = defineQuery(`
     _id,
     name,
     slug,
-    description
+    description,
+    _updatedAt
   }
 `);
 

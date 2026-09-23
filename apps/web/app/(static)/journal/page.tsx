@@ -15,7 +15,12 @@ import { PostsGrid } from "@/components/blog/post-card"
 import { PostListingControls } from "@/components/blog/post-listing-controls"
 import { PostPagination } from "@/components/blog/post-pagination"
 import { FilterResultsTransition } from "@/components/filters/filter-results-transition"
+import { JsonLd } from "@/components/shared/json-ld"
 import { pageCount, pageSlice, parsePage } from "@/lib/posts"
+import {
+  buildBreadcrumbListJsonLd,
+  buildCollectionPageJsonLd,
+} from "@/lib/structured-data"
 import {
   cleanSanityData,
   getDynamicSanityFetchOptions,
@@ -25,6 +30,9 @@ export const metadata: Metadata = {
   title: "Journal",
   description:
     "A running, more personal log — shorter and less polished than the blog, written as things happen.",
+  // Always the clean, unfiltered URL — ?q=/?tag=/?page= variants are
+  // duplicate content and must never self-canonicalize.
+  alternates: { canonical: "/journal" },
 }
 
 interface JournalPageProps {
@@ -77,6 +85,20 @@ export default async function JournalPage({ searchParams }: JournalPageProps) {
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd
+        data={buildCollectionPageJsonLd({
+          name: "Journal",
+          description:
+            "A running, more personal log — shorter and less polished than the blog.",
+          path: "/journal",
+        })}
+      />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Journal", path: "/journal" },
+        ])}
+      />
       <Container>
         <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
           The <HighlightText variant="secondary">journal</HighlightText>

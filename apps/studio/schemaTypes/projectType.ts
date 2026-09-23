@@ -70,6 +70,7 @@ export const projectType = defineType({
     { name: "references", title: "Connections" },
     { name: "meta", title: "Links & Dates" },
     { name: "display", title: "Display" },
+    { name: "seo", title: "SEO" },
   ],
   fields: [
     defineField({
@@ -350,6 +351,12 @@ export const projectType = defineType({
       initialValue: false,
     }),
     orderRankField({ type: "project" }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      group: "seo",
+    }),
   ],
   preview: {
     select: {

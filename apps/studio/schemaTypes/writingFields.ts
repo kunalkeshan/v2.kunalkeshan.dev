@@ -112,5 +112,10 @@ export function writingFields(urlPrefix: "/blog" | "/journal") {
       description:
         "Reserved for a future curated section (e.g. a home page strip). Everything appears on the listing page regardless of this flag.",
     }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+    }),
   ];
 }

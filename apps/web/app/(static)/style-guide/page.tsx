@@ -3,7 +3,9 @@ import type { Metadata } from "next"
 import { Container } from "@workspace/ui/components/container"
 
 import { HighlightText } from "@/components/highlight-text"
+import { JsonLd } from "@/components/shared/json-ld"
 import { getTokenGroups, BORDER_WIDTHS } from "@/lib/style-guide/tokens"
+import { buildBreadcrumbListJsonLd, buildWebPageJsonLd } from "@/lib/structured-data"
 import { ComponentsSection } from "./_components/components-section"
 import { RegistryGuide } from "./_components/registry-guide"
 import { StyleGuideLayout } from "./_components/style-guide-navigation"
@@ -14,6 +16,7 @@ export const metadata: Metadata = {
   title: "Style Guide",
   description:
     "Colors, typography, shadows, and every component in this site's design system — rendered live from the real source.",
+  alternates: { canonical: "/style-guide" },
 }
 
 export default function StyleGuidePage() {
@@ -21,6 +24,20 @@ export default function StyleGuidePage() {
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">
+      <JsonLd
+        data={buildWebPageJsonLd({
+          name: "Style Guide",
+          description:
+            "Colors, typography, shadows, and every component in this site's design system.",
+          path: "/style-guide",
+        })}
+      />
+      <JsonLd
+        data={buildBreadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Style Guide", path: "/style-guide" },
+        ])}
+      />
       <Container>
         <StyleGuideLayout>
           <div className="space-y-16">

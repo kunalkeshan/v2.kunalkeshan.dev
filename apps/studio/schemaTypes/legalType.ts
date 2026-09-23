@@ -43,6 +43,11 @@ export const legalType = defineType({
         "The full document body. Headings, lists, and links are all supported — note that a Heading 1 here renders as an h2 on the page, so it never competes with the page title.",
       validation: (Rule) => Rule.required(),
     }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+    }),
   ],
   preview: {
     select: {
