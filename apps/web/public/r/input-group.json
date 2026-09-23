@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input-group",
+  "dependencies": [
+    "@base-ui/react",
+    "@radix-ui/react-slot",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "src/components/input-group.tsx",
+      "content": "import * as React from \"react\"\nimport { Slot } from \"@radix-ui/react-slot\"\nimport { Input as InputPrimitive } from \"@base-ui/react/input\"\nimport { XIcon } from \"lucide-react\"\n\nimport { cn, pressableShadow } from \"@workspace/ui/lib/utils\"\n\n/**\n * Wrapper for a text input with leading/trailing icons (search icon, submit\n * button, clear button, …). The wrapper — not the inner `<input>` — owns the\n * border, shadow, `pressableShadow` press animation, and focus ring, so a\n * hover/press translate moves the icons along with the input box as one\n * rigid unit. Icons positioned `absolute` against a separate, stationary\n * ancestor instead of being flex children here is what causes icons to lag\n * behind the input's own hover/press motion — see\n * `packages/ui/src/components/combobox.tsx`'s `ComboboxInputGroup`, the\n * reference this mirrors.\n *\n * `asChild` renders as the passed child (e.g. a `<form>`) instead of a\n * `<div>`, for callers that need the group to submit.\n */\nfunction InputGroup({\n  className,\n  asChild,\n  ...props\n}: React.ComponentProps<\"div\"> & { asChild?: boolean }) {\n  const Comp = asChild ? Slot : \"div\"\n  return (\n    <Comp\n      data-slot=\"input-group\"\n      className={cn(\n        \"flex h-10 w-full items-center gap-1.5 rounded-lg border-2 border-input bg-transparent px-2.5 focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 focus-within:ring-offset-2 focus-within:ring-offset-background has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:bg-input/50 has-disabled:opacity-50 has-aria-invalid:border-destructive has-aria-invalid:ring-3 has-aria-invalid:ring-destructive/20 dark:bg-input/30 dark:has-disabled:bg-input/80\",\n        pressableShadow,\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nfunction InputGroupInput({ className, type, ...props }: React.ComponentProps<\"input\">) {\n  return (\n    <InputPrimitive\n      type={type}\n      data-slot=\"input-group-input\"\n      className={cn(\n        \"h-6 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground disabled:pointer-events-none md:text-sm\",\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nfunction InputGroupIcon({ className, ...props }: React.ComponentProps<\"span\">) {\n  return (\n    <span\n      data-slot=\"input-group-icon\"\n      className={cn(\"flex shrink-0 items-center justify-center text-muted-foreground\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction InputGroupClear({\n  className,\n  ...props\n}: Omit<React.ComponentProps<\"button\">, \"type\" | \"children\">) {\n  return (\n    <button\n      type=\"button\"\n      data-slot=\"input-group-clear\"\n      className={cn(\n        \"flex size-5 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground\",\n        className\n      )}\n      {...props}\n    >\n      <XIcon className=\"size-3.5\" />\n    </button>\n  )\n}\n\nexport { InputGroup, InputGroupInput, InputGroupIcon, InputGroupClear }\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

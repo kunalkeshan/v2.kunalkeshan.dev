@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "marquee",
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "src/components/marquee.tsx",
+      "content": "import * as React from \"react\"\n\nimport { cn } from \"@workspace/ui/lib/utils\"\n\ninterface MarqueeProps extends React.ComponentProps<\"div\"> {\n  /** Seconds for one full loop. Higher is slower. */\n  durationSeconds?: number\n  /** Direction of travel. */\n  direction?: \"left\" | \"right\"\n  /** Pause while the pointer is over the band. */\n  pauseOnHover?: boolean\n}\n\n/**\n * A continuously scrolling band of content.\n *\n * Deliberately CSS-only — no `\"use client\"`, no hooks, no event handlers — so it\n * stays a Server Component and adds nothing to the client bundle. `pauseOnHover`\n * is a CSS `:hover` rule rather than `onMouseEnter` for the same reason.\n * `packages/ui` also has no motion-package dependency (see\n * docs/ui/design-system.md), so a `motion/react` implementation would have\n * broken the package boundary.\n *\n * `children` are rendered TWICE. The keyframe translates the track by -50% of\n * its own width, so at the end of a cycle the second copy sits exactly where the\n * first began and the restart is invisible. Ported from kunalkeshan.dev v1's\n * `SkillsInText`, which rendered the content once and ran 0% -> -100% — the band\n * scrolled to empty and snapped back every cycle. The duplicate copy and the\n * -50% in globals.css are one mechanism; changing either alone reintroduces that\n * gap.\n *\n * `min-w-full` on each copy keeps the band full even when there are few items.\n *\n * Reduced motion is handled in `globals.css` rather than here, so every consumer\n * inherits it automatically.\n *\n * Accessibility: the second copy is `aria-hidden`, so assistive tech reads the\n * content once. Give the wrapping landmark an `aria-label` at the call site.\n */\nfunction Marquee({\n  children,\n  durationSeconds = 30,\n  direction = \"left\",\n  pauseOnHover = true,\n  className,\n  style,\n  ...props\n}: MarqueeProps) {\n  const track = cn(\n    \"flex min-w-full shrink-0 items-center justify-around\",\n    \"gap-[var(--marquee-gap,3rem)]\",\n    direction === \"left\" ? \"animate-marquee-left\" : \"animate-marquee-right\",\n    pauseOnHover &&\n      \"group-hover/marquee:[animation-play-state:paused]\"\n  )\n\n  return (\n    <div\n      data-slot=\"marquee\"\n      className={cn(\"group/marquee flex w-full overflow-hidden\", className)}\n      style={\n        {\n          \"--marquee-duration\": `${durationSeconds}s`,\n          ...style,\n        } as React.CSSProperties\n      }\n      {...props}\n    >\n      <div className={track}>{children}</div>\n      <div className={track} aria-hidden=\"true\">\n        {children}\n      </div>\n    </div>\n  )\n}\n\nexport { Marquee }\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

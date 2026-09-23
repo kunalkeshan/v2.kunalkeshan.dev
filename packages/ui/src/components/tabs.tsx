@@ -23,19 +23,24 @@ function Tabs({
   )
 }
 
+// Extracted to a named const (see button.tsx for the full rationale) so the
+// style-guide page can import the real variant list instead of hand-copying
+// it — `cva()`'s returned function does not expose its own config.
+const tabsListVariantsConfig = {
+  variants: {
+    variant: {
+      default: "border-2 border-border bg-muted",
+      line: "gap-1 bg-transparent",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+} as const
+
 const tabsListVariants = cva(
   "group/tabs-list inline-flex w-fit items-center justify-center rounded-md p-[3px] text-muted-foreground group-data-horizontal/tabs:h-9 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none",
-  {
-    variants: {
-      variant: {
-        default: "border-2 border-border bg-muted",
-        line: "gap-1 bg-transparent",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
+  tabsListVariantsConfig
 )
 
 function TabsList({
@@ -79,4 +84,11 @@ function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
   )
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants }
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  tabsListVariants,
+  tabsListVariantsConfig,
+}

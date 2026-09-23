@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "badge",
+  "dependencies": [
+    "@base-ui/react",
+    "class-variance-authority"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "src/components/badge.tsx",
+      "content": "import { mergeProps } from \"@base-ui/react/merge-props\"\nimport { useRender } from \"@base-ui/react/use-render\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@workspace/ui/lib/utils\"\n\n// Extracted to a named const (see button.tsx for the full rationale) so the\n// style-guide page can import the real variant list instead of hand-copying\n// it — `cva()`'s returned function does not expose its own config.\nconst badgeVariantsConfig = {\n  variants: {\n    variant: {\n      default:\n        \"border-2 border-border bg-primary text-primary-foreground shadow-sm [a]:hover:bg-primary/80\",\n      secondary:\n        \"border-2 border-border bg-secondary text-secondary-foreground shadow-sm [a]:hover:bg-secondary/80\",\n      success:\n        \"border-2 border-border bg-success text-success-foreground shadow-sm [a]:hover:bg-success/80\",\n      warning:\n        \"border-2 border-border bg-warning text-warning-foreground shadow-sm [a]:hover:bg-warning/80\",\n      destructive:\n        \"border-2 border-border bg-destructive text-destructive-foreground shadow-sm focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/80\",\n      outline:\n        \"border-2 border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground\",\n      ghost:\n        \"hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50\",\n      link: \"text-primary underline-offset-4 hover:underline\",\n    },\n  },\n  defaultVariants: {\n    variant: \"default\",\n  },\n} as const\n\nconst badgeVariants = cva(\n  \"group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border-transparent px-3 py-0.5 font-heading text-[11px] font-black tracking-wide uppercase whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!\",\n  badgeVariantsConfig\n)\n\nfunction Badge({\n  className,\n  variant = \"default\",\n  render,\n  ...props\n}: useRender.ComponentProps<\"span\"> & VariantProps<typeof badgeVariants>) {\n  return useRender({\n    defaultTagName: \"span\",\n    props: mergeProps<\"span\">(\n      {\n        className: cn(badgeVariants({ variant }), className),\n      },\n      props\n    ),\n    render,\n    state: {\n      slot: \"badge\",\n      variant,\n    },\n  })\n}\n\nexport { Badge, badgeVariants, badgeVariantsConfig }\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

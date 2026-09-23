@@ -73,6 +73,14 @@ const About = ({
                 alt={imageAlt}
                 width={1433}
                 height={1956}
+                // On common laptop/desktop viewport heights this section sits
+                // within the initial viewport alongside Hero, so Next has
+                // measured it as the actual Largest Contentful Paint element
+                // (not Hero's image) and flagged it for lacking an eager/
+                // priority load hint. `priority` sets loading="eager" and
+                // fetchPriority="high" so it's requested immediately instead
+                // of only once it scrolls into view.
+                priority
                 className="h-full w-full object-cover"
               />
             </div>

@@ -148,6 +148,11 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
                   Sanity Studio
                 </a>
               </li>
+              <li>
+                <Link href="/style-guide" className="hover:text-foreground">
+                  Style Guide
+                </Link>
+              </li>
               {rickrollUrl && (
                 <li suppressHydrationWarning>
                   <button

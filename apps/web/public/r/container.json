@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "container",
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "src/components/container.tsx",
+      "content": "import * as React from \"react\"\n\nimport { cn } from \"@workspace/ui/lib/utils\"\n\nfunction Container({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"container\"\n      className={cn(\"mx-auto w-full max-w-7xl px-5\", className)}\n      {...props}\n    />\n  )\n}\n\nexport { Container }\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

@@ -748,6 +748,37 @@ worth keeping, because the same trap applies to any future illustrated card.
   `group-hover:scale-110` on the art, plus a `motion-reduce:` reset. `origin-left` on the
   image keeps that zoom anchored to the text column.
 
+## Image loading priority (`next/image`, above-the-fold sections)
+
+**Every `next/image` that can render within the initial viewport on common
+desktop/laptop heights needs `priority`.** This is not limited to the very first
+section on a page — Next's own LCP detection measures the actual rendered viewport at
+build/runtime, not "is this the first `<Image>` in the JSX." On the home page, both
+`Hero` and `About` render at the same identical size (`width={1433} height={1956}`)
+and `About` sits close enough beneath `Hero` that it lands inside the fold on a typical
+laptop screen — `next dev`'s console warned that `About`'s image (not `Hero`'s) was the
+one actually measured as the Largest Contentful Paint element, because only `Hero`'s
+had `priority` set.
+
+**When adding or editing a section that renders near the top of a page:**
+
+- Check what actually sits above the fold at a real desktop viewport height (not just
+  "is my section first"), not only the hero/first section.
+- Set `priority` on that `<Image>` — it maps to `loading="eager"` +
+  `fetchPriority="high"`, so the browser requests it immediately instead of waiting for
+  it to scroll into view.
+- Leave every image genuinely below the fold on `loading="lazy"` (the `next/image`
+  default) — marking everything `priority` defeats the hint and delays real LCP
+  candidates behind unnecessary eager requests.
+- If in doubt, run the page once with `next dev` and check the browser console: Next
+  logs exactly which `<Image>` it measured as LCP and whether it's missing the eager
+  hint — don't guess from the JSX order alone.
+
+`about-story.tsx` (the `/about` page's own portrait) and `not-found-content.tsx`
+already set `priority` correctly. The Carousel section below documents a related but
+distinct case — which *slide* images get eager loading in a component that mostly
+renders off-screen content.
+
 ## Marquee (`@workspace/ui/components/marquee`)
 
 The continuously scrolling band, used on `/about` for the featured-skills ticker.

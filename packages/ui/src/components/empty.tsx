@@ -25,19 +25,24 @@ function EmptyHeader({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+// Extracted to a named const (see button.tsx for the full rationale) so the
+// style-guide page can import the real variant list instead of hand-copying
+// it — `cva()`'s returned function does not expose its own config.
+const emptyMediaVariantsConfig = {
+  variants: {
+    variant: {
+      default: "bg-transparent",
+      icon: "flex size-8 shrink-0 items-center justify-center rounded-lg border-2 border-border bg-muted text-foreground [&_svg:not([class*='size-'])]:size-4",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+} as const
+
 const emptyMediaVariants = cva(
   "mb-2 flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0",
-  {
-    variants: {
-      variant: {
-        default: "bg-transparent",
-        icon: "flex size-8 shrink-0 items-center justify-center rounded-lg border-2 border-border bg-muted text-foreground [&_svg:not([class*='size-'])]:size-4",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
+  emptyMediaVariantsConfig
 )
 
 function EmptyMedia({
@@ -101,4 +106,5 @@ export {
   EmptyDescription,
   EmptyContent,
   EmptyMedia,
+  emptyMediaVariantsConfig,
 }

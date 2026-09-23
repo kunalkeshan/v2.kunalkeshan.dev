@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "logo",
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "src/components/logo.tsx",
+      "content": "import Image from \"next/image\"\nimport Link from \"next/link\"\n\nimport { cn } from \"@workspace/ui/lib/utils\"\n\nconst sizeClasses = {\n  sm: \"size-10\",\n  md: \"size-12\",\n  lg: \"size-14\",\n} as const\n\nexport interface LogoProps {\n  size?: keyof typeof sizeClasses\n  href?: string\n  className?: string\n  preload?: boolean\n  /** Path to the logo image, resolved from the consuming app's /public. */\n  src?: string\n}\n\nexport function Logo({\n  size = \"md\",\n  href = \"/\",\n  className,\n  preload = false,\n  src = \"/logo.jpg\",\n}: LogoProps) {\n  return (\n    <Link\n      href={href}\n      aria-label=\"Home\"\n      className={cn(\n        \"block shrink-0 overflow-hidden rounded-full border-2 border-border bg-card\",\n        \"transition-transform duration-press ease-snap hover:scale-95\",\n        sizeClasses[size],\n        className\n      )}\n    >\n      <Image\n        src={src}\n        alt=\"\"\n        width={112}\n        height={112}\n        preload={preload}\n        className=\"size-full object-cover\"\n      />\n    </Link>\n  )\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

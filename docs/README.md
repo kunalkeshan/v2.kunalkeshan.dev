@@ -26,6 +26,7 @@ Deployment, hosting, and operational topology.
 
 - [`font-stack.md`](./ui/font-stack.md) — shared font package convention
 - [`design-system.md`](./ui/design-system.md) — token model, shadow/radius/motion scales, and the neobrutalism visual language
+- [`style-guide.md`](./ui/style-guide.md) — the `/style-guide` page and the shadcn registry (`packages/ui/registry.json`)
 
 ## Runbooks (`docs/runbooks/`)
 
