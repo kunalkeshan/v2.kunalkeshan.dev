@@ -192,12 +192,16 @@ export function PortfolioCommandMenu({
 
   const copyToken = (name: "primary" | "secondary") => async () => {
     try {
-      await navigator.clipboard.writeText(`var(--${name})`)
+      const value = getComputedStyle(document.documentElement)
+        .getPropertyValue(`--${name}`)
+        .trim()
+
+      await navigator.clipboard.writeText(value)
       toast.success(
-        `${name === "primary" ? "Primary" : "Secondary"} color variable copied`
+        `${name === "primary" ? "Primary" : "Secondary"} color copied`
       )
     } catch {
-      toast.error("Unable to copy color variable")
+      toast.error("Unable to copy color")
     }
   }
 
