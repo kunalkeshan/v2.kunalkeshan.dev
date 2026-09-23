@@ -191,6 +191,19 @@ export const SERVICES_QUERY = defineQuery(`
 `);
 
 /**
+ * Resolves service document IDs to their display names — used by the contact
+ * form's notification email to render human-readable service names instead
+ * of the raw `_id`s the client submits (see service-multi-select.tsx, which
+ * only keeps IDs in committed form state).
+ */
+export const SERVICES_BY_IDS_QUERY = defineQuery(`
+  *[_type == "service" && _id in $ids] {
+    _id,
+    name
+  }
+`);
+
+/**
  * The six core values on /about.
  *
  * `asset->` is dereferenced in full, not just for the URL: every illustration is

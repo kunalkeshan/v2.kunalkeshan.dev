@@ -54,7 +54,7 @@ Email templates live in `packages/emails/src/`, structured like:
 
 ```
 packages/emails/src/
-  _components/   shared header/footer/Tailwind-root wrapper
+  _components/   shared header/footer/Tailwind-root wrapper + EmailLayout
   _theme/        brand constants + a hex color palette mirrored from
                  packages/ui's design tokens (see note below)
   contact/       contact-notification.tsx — the one template that exists
@@ -75,6 +75,16 @@ Adding a second template: create the `.tsx` file next to
 { PreviewProps })`), then add one entry to `registry.ts`. No other file needs
 to change.
 
+Every template's top-level JSX should be
+`<EmailLayout preview={...} logoUrl={...} logoAlt={...} siteName={...}>` from
+`_components/email-layout.tsx`, wrapping just that template's own body
+content — `EmailLayout` handles `EmailTailwindRoot`, `<Preview>`/`<Body>`/
+`<Container>`, and bracketing the body with `EmailHeader`/`EmailFooter`, so a
+new template only writes its content and passes branding props once (see
+`contact-notification.tsx` for the pattern). `preview` must be a plain
+`string`, not JSX — react-email's `<Preview>` only accepts
+`string | string[]` children.
+
 ### Color token drift
 
 `packages/emails/src/_theme/colors.ts` is a **hand-maintained** hex mirror of
@@ -83,6 +93,29 @@ clients can't read CSS custom properties, so this can't be automated — see
 the note at the top of `colors.ts`, and the cross-reference in
 `docs/ui/design-system.md`. If the design system's palette changes, check
 whether `colors.ts` needs updating too.
+
+## Services: resolving IDs to names
+
+The client form (`apps/web/components/contact/service-multi-select.tsx`)
+only keeps Sanity `service` document `_id`s in its committed form state —
+the human-readable `name` shown in the combobox is discarded on submit
+(`onValueChange` maps selections down to `.id` only). Trusting client state
+for display text also means trusting whatever a raw API request claims, so
+`route.ts` re-resolves the submitted IDs against Sanity itself via
+`SERVICES_BY_IDS_QUERY` (`packages/sanity/src/query.ts`) before building the
+email — the notification email always shows service names as Sanity
+currently has them, never raw IDs and never client-supplied labels.
+`otherService` bypasses this lookup entirely since it's already free text.
+
+## Subject line and sender name
+
+The outgoing email's subject is a fixed `New contact form submission:
+{subject}` — the submitter's name is not in the subject (it's already the
+first field in the body). The nodemailer `from` uses `siteConfig.title` as
+the display name (falling back to `"Kunal Keshan — Software Engineer"`, the
+same fallback `apps/web/app/(static)/layout.tsx` uses for `<title>`) paired
+with `env.NODEMAILER_EMAIL` as the address — so the inbox shows a proper
+sender name instead of a bare email address.
 
 ## The notification email's logo
 

@@ -4,8 +4,11 @@ import nodemailer from "nodemailer"
 import { env } from "@workspace/env/server"
 import { sanityFetch } from "@workspace/sanity/fetch"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
-import { SITE_CONFIG_QUERY } from "@workspace/sanity/query"
-import type { SITE_CONFIG_QUERY_RESULT } from "@workspace/sanity/types"
+import { SERVICES_BY_IDS_QUERY, SITE_CONFIG_QUERY } from "@workspace/sanity/query"
+import type {
+  SERVICES_BY_IDS_QUERY_RESULT,
+  SITE_CONFIG_QUERY_RESULT,
+} from "@workspace/sanity/types"
 import { logoUrlFor } from "@workspace/sanity/image"
 import {
   renderEmailTemplateHtml,
@@ -77,17 +80,30 @@ export async function POST(req: NextRequest) {
       ? logoUrlFor(siteConfig.logo, { width: 160 })
       : undefined
 
+    const resolvedServices = services.length
+      ? await sanityFetch<SERVICES_BY_IDS_QUERY_RESULT>({
+          query: SERVICES_BY_IDS_QUERY,
+          params: { ids: services },
+          tags: [createCollectionTag("service")],
+        })
+      : []
+    const serviceNames = resolvedServices
+      .map((service) => service.name)
+      .filter((name): name is string => Boolean(name))
+
+    const siteName = siteConfig?.title || "Kunal Keshan — Software Engineer"
+
     const emailProps = {
       name,
       email,
       phone: phone || undefined,
-      services,
+      services: serviceNames,
       otherService: otherService || undefined,
       subject,
       message: body,
       logoUrl,
       logoAlt: siteConfig?.logo?.alt ?? undefined,
-      siteName: siteConfig?.title ?? undefined,
+      siteName,
     } as const
 
     const [html, text] = await Promise.all([
@@ -96,10 +112,10 @@ export async function POST(req: NextRequest) {
     ])
 
     await getTransporter().sendMail({
-      from: env.NODEMAILER_EMAIL,
+      from: { name: siteName, address: env.NODEMAILER_EMAIL },
       to: notificationEmail,
       replyTo: email,
-      subject: `${subject} — Portfolio contact from ${name}`,
+      subject: `New contact form submission: ${subject}`,
       html,
       text,
     })

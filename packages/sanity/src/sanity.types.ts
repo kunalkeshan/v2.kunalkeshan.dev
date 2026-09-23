@@ -1264,6 +1264,14 @@ export type SERVICES_QUERY_RESULT = Array<{
 }>
 
 // Source: ../../packages/sanity/src/query.ts
+// Variable: SERVICES_BY_IDS_QUERY
+// Query: *[_type == "service" && _id in $ids] {    _id,    name  }
+export type SERVICES_BY_IDS_QUERY_RESULT = Array<{
+  _id: string
+  name: string | null
+}>
+
+// Source: ../../packages/sanity/src/query.ts
 // Variable: VALUES_QUERY
 // Query: *[_type == "value"] | order(orderRank asc) {    _id,    title,    description,    illustration {      asset->,      hotspot,      crop,      alt    }  }
 export type VALUES_QUERY_RESULT = Array<{
@@ -2804,6 +2812,7 @@ declare global {
     '\n  *[_type == "skill" && featured == true] | order(orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    category\n  }\n': FEATURED_SKILLS_QUERY_RESULT
     '\n  *[_type == "skill"] | order(category asc, orderRank asc, name asc) {\n    _id,\n    name,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    category\n  }\n': SKILLS_QUERY_RESULT
     '\n  *[_type == "service"] | order(orderRank asc) {\n    _id,\n    name,\n    description,\n    icon,\n    illustration {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': SERVICES_QUERY_RESULT
+    '\n  *[_type == "service" && _id in $ids] {\n    _id,\n    name\n  }\n': SERVICES_BY_IDS_QUERY_RESULT
     '\n  *[_type == "value"] | order(orderRank asc) {\n    _id,\n    title,\n    description,\n    illustration {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': VALUES_QUERY_RESULT
     '\n  *[_type == "experience" && kind == "work" && featured == true] | order(orderRank asc) {\n    _id,\n    role,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    employmentType,\n    startDate,\n    endDate,\n    isCurrent,\n    summary\n  }\n': FEATURED_EXPERIENCES_QUERY_RESULT
     '\n  *[_type == "experience" && kind in ["work", "community"]] | order(orderRank asc) {\n    _id,\n    role,\n    kind,\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    employmentType,\n    workMode,\n    location,\n    startDate,\n    endDate,\n    isCurrent,\n    summary,\n    highlights,\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    }\n  }\n': EXPERIENCES_QUERY_RESULT
