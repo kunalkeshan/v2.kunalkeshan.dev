@@ -501,7 +501,7 @@ const Experience = ({ experiences, yearsBuilding }: ExperienceProps) => {
                 size="lg"
                 variant="secondary"
                 className="mt-8 w-full md:w-fit"
-                render={<Link href="/experience" />}
+                render={<Link href="/work" />}
                 nativeButton={false}
               >
                 <FileTextIcon data-icon="inline-start" />

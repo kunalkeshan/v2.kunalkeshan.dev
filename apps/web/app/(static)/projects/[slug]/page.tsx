@@ -336,7 +336,7 @@ export default async function ProjectPage({
                 {project.relatedExperience?.role && (
                   <InfoRow label="Role">
                     <Link
-                      href="/experience"
+                      href="/work"
                       className="underline-offset-4 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                     >
                       {project.relatedExperience.role}

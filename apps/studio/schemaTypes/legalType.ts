@@ -24,7 +24,7 @@ export const legalType = defineType({
         maxLength: 96,
       },
       description:
-        "Drives the /legals/<slug> URL. Click Generate to derive it from the title. Changing this after publishing breaks any existing links.",
+        "Drives the /legal/<slug> URL. Click Generate to derive it from the title. Changing this after publishing breaks any existing links.",
       validation: (Rule) => Rule.required(),
     }),
     defineField({

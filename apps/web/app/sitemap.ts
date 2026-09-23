@@ -48,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const legalEntries: MetadataRoute.Sitemap = legalDocs
     .filter((doc) => doc.slug?.current)
     .map((doc) => ({
-      url: `${SITE_CONFIG.URL}/legals/${doc.slug?.current}`,
+      url: `${SITE_CONFIG.URL}/legal/${doc.slug?.current}`,
       lastModified: doc._updatedAt ? new Date(doc._updatedAt) : new Date(),
       changeFrequency: "yearly" as const,
       priority: 0.3,
@@ -125,7 +125,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      url: `${SITE_CONFIG.URL}/experience`,
+      url: `${SITE_CONFIG.URL}/work`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.8,
@@ -143,7 +143,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     },
     {
-      url: `${SITE_CONFIG.URL}/legals`,
+      url: `${SITE_CONFIG.URL}/legal`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.5,

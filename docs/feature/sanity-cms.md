@@ -8,7 +8,7 @@ Content for the portfolio site (site config, FAQs, legal documents) is authored 
 
 Defined in `apps/studio/schemaTypes/`:
 
-- `siteConfig` — singleton: site title/description, OG/Twitter images, contact info, social links, footer legal links, and the downloadable `resumePdf` file
+- `siteConfig` — singleton: site title/description, OG/Twitter images, contact info, social links, footer legal links, the downloadable `resumePdf` file, and the footer's `rickrollAudio` easter-egg file (hidden entirely while empty, same pattern as `resumePdf`)
 - `faqs` — singleton: FAQ list
 - `legal` — document: legal pages (privacy policy, terms, etc.), rendered via `blockContent`
 - `blockContent` — shared rich-text/portable-text array type used by `legal`
@@ -48,6 +48,7 @@ All written with `next-sanity`'s `defineQuery` for typegen support.
 ## Consumption in `apps/web`
 
 - `app/(static)/layout.tsx` — fetches `SITE_CONFIG_QUERY` for metadata (title/description/OG images) and passes site config + footer legal links down to `Footer`.
+- `app/(static)/legal/page.tsx` and `app/(static)/legal/[slug]/page.tsx` — fetch `LEGAL_DOCUMENTS_QUERY` (index) and `LEGAL_DOCUMENT_BY_SLUG_QUERY` (detail), rendering `content` through the shared `portable-text-components.tsx`. Canonical path is singular `/legal` (`sitemap.ts` and `legalType.ts`'s own field description both say so) — `footer.tsx` already linked here; it was `sitemap.ts` that briefly drifted to a plural `/legals` before both were reconciled.
 - `app/(static)/page.tsx` — fetches site config, featured skills, services, `FEATURED_EXPERIENCES_QUERY`, and `FEATURED_TESTIMONIALS_QUERY` in one `Promise.all`, rendering the condensed Experience section after About and the testimonials carousel last.
 - `components/sections/testimonials.tsx` — default-exports the home section; named-exports `TestimonialsCarousel` unwrapped, the same split as `ServicesGrid`. Heading/intro copy comes from `siteConfig`'s `testimonials*` fields, not hardcoded.
 - `app/(static)/resume/page.tsx` — fetches site config (for `resumePdf`), `EXPERIENCES_QUERY`, `EDUCATION_QUERY`, and `PUBLICATIONS_QUERY`. Renders `ExperienceTimeline` (grouped by organization, education in its own block), `Publications`, and `ResumeCta`. The download banner renders nothing while `resumePdf` is empty, so the page can never ship a dead link.

@@ -543,6 +543,15 @@ export const siteConfigType = defineType({
       description:
         "Select and order legal documents to be displayed in the footer links. Only legal documents added in this list will appear in the footer.",
     },
+    {
+      name: "rickrollAudio",
+      title: "Footer Easter Egg — Rickroll Audio",
+      type: "file",
+      group: "content",
+      options: { accept: "audio/mpeg" },
+      description:
+        "The audio track played by the footer's hidden toggle button. The footer hides the toggle entirely while this is empty, so it never ships a dead button.",
+    },
   ],
   preview: {
     select: {

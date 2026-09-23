@@ -70,6 +70,9 @@ export const SITE_CONFIG_QUERY = defineQuery(`
     },
     resumePdf {
       asset->
+    },
+    rickrollAudio {
+      asset->
     }
   }
 `);

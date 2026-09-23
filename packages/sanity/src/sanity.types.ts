@@ -638,6 +638,11 @@ export type SiteConfig = {
       _key: string
     } & LegalReference
   >
+  rickrollAudio?: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: "file"
+  }
 }
 
 export type SanityImagePaletteSwatch = {
@@ -777,7 +782,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: SITE_CONFIG_QUERY
-// Query: *[_type == "siteConfig"][0] {    _id,    title,    description,    ogImage {      asset->,      hotspot,      crop,      alt    },    twitterImage {      asset->,      hotspot,      crop,      alt    },    logo {      asset->,      hotspot,      crop,      alt    },    heroName,    heroRoles,    heroImage {      asset->,      hotspot,      crop,      alt    },    aboutHeadingLead,    aboutHeadingHighlight,    aboutBody,    aboutHighlights[] {      title,      description    },    aboutImage {      asset->,      hotspot,      crop,      alt    },    testimonialsHeadingLead,    testimonialsHeadingHighlight,    testimonialsIntro,    phoneNumbers[] {      number,      label    },    emails[] {      email,      label    },    contactNotificationEmail,    address {      street,      city,      state,      postalCode,      country    },    socialMedia[] {      platform,      url,      label    },    resumePdf {      asset->    }  }
+// Query: *[_type == "siteConfig"][0] {    _id,    title,    description,    ogImage {      asset->,      hotspot,      crop,      alt    },    twitterImage {      asset->,      hotspot,      crop,      alt    },    logo {      asset->,      hotspot,      crop,      alt    },    heroName,    heroRoles,    heroImage {      asset->,      hotspot,      crop,      alt    },    aboutHeadingLead,    aboutHeadingHighlight,    aboutBody,    aboutHighlights[] {      title,      description    },    aboutImage {      asset->,      hotspot,      crop,      alt    },    testimonialsHeadingLead,    testimonialsHeadingHighlight,    testimonialsIntro,    phoneNumbers[] {      number,      label    },    emails[] {      email,      label    },    contactNotificationEmail,    address {      street,      city,      state,      postalCode,      country    },    socialMedia[] {      platform,      url,      label    },    resumePdf {      asset->    },    rickrollAudio {      asset->    }  }
 export type SITE_CONFIG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -962,6 +967,29 @@ export type SITE_CONFIG_QUERY_RESULT = {
     label: string | null
   }> | null
   resumePdf: {
+    asset: {
+      _id: string
+      _type: "sanity.fileAsset"
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      originalFilename?: string
+      label?: string
+      title?: string
+      description?: string
+      altText?: string
+      sha1hash?: string
+      extension?: string
+      mimeType?: string
+      size?: number
+      assetId?: string
+      uploadId?: string
+      path?: string
+      url?: string
+      source?: SanityAssetSourceData
+    } | null
+  } | null
+  rickrollAudio: {
     asset: {
       _id: string
       _type: "sanity.fileAsset"
@@ -2765,7 +2793,7 @@ export type WRITING_COUNT_BY_TAG_QUERY_RESULT = number
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    twitterImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    logo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    testimonialsHeadingLead,\n    testimonialsHeadingHighlight,\n    testimonialsIntro,\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    contactNotificationEmail,\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    },\n    resumePdf {\n      asset->\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
+    '\n  *[_type == "siteConfig"][0] {\n    _id,\n    title,\n    description,\n    ogImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    twitterImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    logo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    heroName,\n    heroRoles,\n    heroImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    aboutHeadingLead,\n    aboutHeadingHighlight,\n    aboutBody,\n    aboutHighlights[] {\n      title,\n      description\n    },\n    aboutImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    testimonialsHeadingLead,\n    testimonialsHeadingHighlight,\n    testimonialsIntro,\n    phoneNumbers[] {\n      number,\n      label\n    },\n    emails[] {\n      email,\n      label\n    },\n    contactNotificationEmail,\n    address {\n      street,\n      city,\n      state,\n      postalCode,\n      country\n    },\n    socialMedia[] {\n      platform,\n      url,\n      label\n    },\n    resumePdf {\n      asset->\n    },\n    rickrollAudio {\n      asset->\n    }\n  }\n': SITE_CONFIG_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0] {\n    aboutPageHeadingLead,\n    aboutPageHeadingHighlight,\n    aboutPageIntro,\n    aboutPageStoryHeadingLead,\n    aboutPageStoryHeadingHighlight,\n    aboutPageStoryHeadingTrail,\n    aboutPageStory,\n    aboutPageValuesHeading,\n    aboutPageValuesIntro,\n    aboutPagePortrait {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    }\n  }\n': ABOUT_PAGE_QUERY_RESULT
     '\n  *[_type == "siteConfig"][0].footerLegalLinks[]-> {\n    _id,\n    title,\n    slug,\n    description,\n    _updatedAt\n  }\n': FOOTER_LEGAL_LINKS_QUERY_RESULT
     '\n  *[_type == "faqs"][0] {\n    ...,\n    faqItems[]{ ... }\n  }\n': FAQS_QUERY_RESULT

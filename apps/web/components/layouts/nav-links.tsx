@@ -18,7 +18,7 @@ export type LinkItemType = {
 export const primaryLinks: LinkItemType[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Experience", href: "/experience" },
+  { label: "Experience", href: "/work" },
 ]
 
 export const workLinks: LinkItemType[] = [
