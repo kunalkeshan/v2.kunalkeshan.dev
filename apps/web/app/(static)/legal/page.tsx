@@ -4,12 +4,15 @@ import { ArrowRightIcon } from "lucide-react"
 
 import { Container } from "@workspace/ui/components/container"
 import { cardLift, cn } from "@workspace/ui/lib/utils"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import { LEGAL_DOCUMENTS_QUERY } from "@workspace/sanity/query"
-import type { LEGAL_DOCUMENTS_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 export const metadata: Metadata = {
   title: "Legal",
@@ -17,10 +20,15 @@ export const metadata: Metadata = {
 }
 
 export default async function LegalPage() {
-  const legalDocs = await sanityFetch<LEGAL_DOCUMENTS_QUERY_RESULT>({
-    query: LEGAL_DOCUMENTS_QUERY,
-    tags: [createCollectionTag("legal")],
-  })
+  const legalDocs = cleanSanityData(
+    (
+      await sanityFetch({
+        query: LEGAL_DOCUMENTS_QUERY,
+        tags: [createCollectionTag("legal")],
+        ...(await getDynamicSanityFetchOptions()),
+      })
+    ).data
+  )
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">

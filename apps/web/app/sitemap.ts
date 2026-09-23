@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { sanityFetch } from "@workspace/sanity/fetch";
+import { sanityFetch } from "@workspace/sanity/live";
 import { createCollectionTag } from "@workspace/sanity/cache-tags";
 import {
   JOURNAL_ENTRY_SLUGS_QUERY,
@@ -9,38 +9,47 @@ import {
   PROJECT_SLUGS_QUERY,
   TAGS_QUERY,
 } from "@workspace/sanity/query";
-import type {
-  JOURNAL_ENTRY_SLUGS_QUERY_RESULT,
-  LEGAL_DOCUMENTS_QUERY_RESULT,
-  POST_SLUGS_QUERY_RESULT,
-  PROJECT_SLUGS_QUERY_RESULT,
-  TAGS_QUERY_RESULT,
-} from "@workspace/sanity/types";
 
 import { SITE_CONFIG } from "@/config/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Fetch all dynamic content
-  const [legalDocs, projects, posts, journalEntries, tags] = await Promise.all([
-    sanityFetch<LEGAL_DOCUMENTS_QUERY_RESULT>({
+  // Public sitemap: always published, never stega — no draft-mode concept here.
+  const [
+    { data: legalDocs },
+    { data: projects },
+    { data: posts },
+    { data: journalEntries },
+    { data: tags },
+  ] = await Promise.all([
+    sanityFetch({
       query: LEGAL_DOCUMENTS_QUERY,
       tags: [createCollectionTag("legal")],
+      perspective: "published",
+      stega: false,
     }),
-    sanityFetch<PROJECT_SLUGS_QUERY_RESULT>({
+    sanityFetch({
       query: PROJECT_SLUGS_QUERY,
       tags: [createCollectionTag("project")],
+      perspective: "published",
+      stega: false,
     }),
-    sanityFetch<POST_SLUGS_QUERY_RESULT>({
+    sanityFetch({
       query: POST_SLUGS_QUERY,
       tags: [createCollectionTag("post")],
+      perspective: "published",
+      stega: false,
     }),
-    sanityFetch<JOURNAL_ENTRY_SLUGS_QUERY_RESULT>({
+    sanityFetch({
       query: JOURNAL_ENTRY_SLUGS_QUERY,
       tags: [createCollectionTag("journalEntry")],
+      perspective: "published",
+      stega: false,
     }),
-    sanityFetch<TAGS_QUERY_RESULT>({
+    sanityFetch({
       query: TAGS_QUERY,
       tags: [createCollectionTag("tag")],
+      perspective: "published",
+      stega: false,
     }),
   ]);
 

@@ -15,7 +15,7 @@ import {
   BreadcrumbSeparator,
 } from "@workspace/ui/components/breadcrumb"
 import { cardLift, cn } from "@workspace/ui/lib/utils"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import {
   createCollectionTag,
   createDocumentTag,
@@ -26,11 +26,6 @@ import {
   POST_BY_SLUG_QUERY,
   POST_SLUGS_QUERY,
 } from "@workspace/sanity/query"
-import type {
-  LATEST_POSTS_QUERY_RESULT,
-  POST_BY_SLUG_QUERY_RESULT,
-  POST_SLUGS_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { SITE_CONFIG } from "@/config/site"
 import { postPortableTextComponents } from "@/components/blog/post-portable-text-components"
@@ -40,31 +35,43 @@ import { ReadingProgressBar } from "@/components/blog/reading-progress-bar"
 import { ShareButtons } from "@/components/blog/share-buttons"
 import { readingTime } from "@/lib/reading-time"
 import { extractToc } from "@/lib/toc"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+  type SanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
-async function getPost(slug: string) {
-  return sanityFetch<POST_BY_SLUG_QUERY_RESULT>({
+async function getPost(slug: string, options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: POST_BY_SLUG_QUERY,
     params: { slug },
     tags: [createCollectionTag("post"), createDocumentTag("post", slug)],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
-async function getSlugs() {
-  return sanityFetch<POST_SLUGS_QUERY_RESULT>({
+async function getSlugs(options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: POST_SLUGS_QUERY,
     tags: [createCollectionTag("post")],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
-async function getLatest() {
-  return sanityFetch<LATEST_POSTS_QUERY_RESULT>({
+async function getLatest(options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: LATEST_POSTS_QUERY,
     tags: [createCollectionTag("post")],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
 export async function generateStaticParams() {
-  const posts = await getSlugs()
+  // Build time — draftMode() can't be called here, so always published.
+  const posts = await getSlugs({ perspective: "published", stega: false })
 
   return (posts ?? [])
     .map((post) => post.slug?.current)
@@ -85,7 +92,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const post = await getPost(slug)
+  // Never let stega leak into <title>/<meta>/OG tags — always published, clean.
+  const post = await getPost(slug, { perspective: "published", stega: false })
 
   if (!post) return {}
 
@@ -129,10 +137,11 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  const dynamicOptions = await getDynamicSanityFetchOptions()
   const [post, allSlugs, latest] = await Promise.all([
-    getPost(slug),
-    getSlugs(),
-    getLatest(),
+    getPost(slug, dynamicOptions),
+    getSlugs(dynamicOptions),
+    getLatest(dynamicOptions),
   ])
 
   if (!post) notFound()

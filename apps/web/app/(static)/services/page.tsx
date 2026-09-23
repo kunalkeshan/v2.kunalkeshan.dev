@@ -1,13 +1,16 @@
 import type { Metadata } from "next"
 
 import { Container } from "@workspace/ui/components/container"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import { SERVICES_QUERY } from "@workspace/sanity/query"
-import type { SERVICES_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
 import { ServicesGrid } from "@/components/sections/services"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 export const metadata: Metadata = {
   title: "Services",
@@ -15,10 +18,15 @@ export const metadata: Metadata = {
 }
 
 export default async function ServicesPage() {
-  const services = await sanityFetch<SERVICES_QUERY_RESULT>({
-    query: SERVICES_QUERY,
-    tags: [createCollectionTag("service")],
-  })
+  const services = cleanSanityData(
+    (
+      await sanityFetch({
+        query: SERVICES_QUERY,
+        tags: [createCollectionTag("service")],
+        ...(await getDynamicSanityFetchOptions()),
+      })
+    ).data
+  )
 
   return (
     <main className="pt-28 pb-16 md:pt-36 md:pb-24">

@@ -1,16 +1,12 @@
 import type { Metadata } from "next"
 
 import { Container } from "@workspace/ui/components/container"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import {
   ARCHIVED_CERTIFICATIONS_QUERY,
   CERTIFICATIONS_QUERY,
 } from "@workspace/sanity/query"
-import type {
-  ARCHIVED_CERTIFICATIONS_QUERY_RESULT,
-  CERTIFICATIONS_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
 import {
@@ -21,6 +17,10 @@ import {
   SectionNav,
   type SectionNavItem,
 } from "@/components/sections/section-nav"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 export const metadata: Metadata = {
   title: "Certifications",
@@ -29,16 +29,26 @@ export const metadata: Metadata = {
 }
 
 export default async function CertificationsPage() {
-  const [certifications, archivedCertifications] = await Promise.all([
-    sanityFetch<CERTIFICATIONS_QUERY_RESULT>({
-      query: CERTIFICATIONS_QUERY,
-      tags: [createCollectionTag("certification")],
-    }),
-    sanityFetch<ARCHIVED_CERTIFICATIONS_QUERY_RESULT>({
-      query: ARCHIVED_CERTIFICATIONS_QUERY,
-      tags: [createCollectionTag("certification")],
-    }),
-  ])
+  const dynamicOptions = await getDynamicSanityFetchOptions()
+
+  const [certificationsResult, archivedCertificationsResult] =
+    await Promise.all([
+      sanityFetch({
+        query: CERTIFICATIONS_QUERY,
+        tags: [createCollectionTag("certification")],
+        ...dynamicOptions,
+      }),
+      sanityFetch({
+        query: ARCHIVED_CERTIFICATIONS_QUERY,
+        tags: [createCollectionTag("certification")],
+        ...dynamicOptions,
+      }),
+    ])
+
+  const certifications = cleanSanityData(certificationsResult.data)
+  const archivedCertifications = cleanSanityData(
+    archivedCertificationsResult.data
+  )
 
   // Only offer a jump target for sections that actually rendered, so the bar
   // never points at an anchor that isn't on the page.

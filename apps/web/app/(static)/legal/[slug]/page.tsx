@@ -12,7 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@workspace/ui/components/breadcrumb"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import {
   createCollectionTag,
   createDocumentTag,
@@ -21,30 +21,36 @@ import {
   LEGAL_DOCUMENT_BY_SLUG_QUERY,
   LEGAL_DOCUMENTS_QUERY,
 } from "@workspace/sanity/query"
-import type {
-  LEGAL_DOCUMENTS_QUERY_RESULT,
-  LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { portableTextComponents } from "@/components/sanity/portable-text-components"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+  type SanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
-async function getLegalDocument(slug: string) {
-  return sanityFetch<LEGAL_DOCUMENT_BY_SLUG_QUERY_RESULT>({
+async function getLegalDocument(slug: string, options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: LEGAL_DOCUMENT_BY_SLUG_QUERY,
     params: { slug },
     tags: [createCollectionTag("legal"), createDocumentTag("legal", slug)],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
-async function getSlugs() {
-  return sanityFetch<LEGAL_DOCUMENTS_QUERY_RESULT>({
+async function getSlugs(options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: LEGAL_DOCUMENTS_QUERY,
     tags: [createCollectionTag("legal")],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
 export async function generateStaticParams() {
-  const docs = await getSlugs()
+  // Build time — draftMode() can't be called here, so always published.
+  const docs = await getSlugs({ perspective: "published", stega: false })
 
   return (docs ?? [])
     .map((doc) => doc.slug?.current)
@@ -58,7 +64,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const doc = await getLegalDocument(slug)
+  // Never let stega leak into <title>/<meta> — always published, clean.
+  const doc = await getLegalDocument(slug, {
+    perspective: "published",
+    stega: false,
+  })
 
   if (!doc) return {}
 
@@ -74,7 +84,7 @@ export default async function LegalDocumentPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const doc = await getLegalDocument(slug)
+  const doc = await getLegalDocument(slug, await getDynamicSanityFetchOptions())
 
   if (!doc) notFound()
 

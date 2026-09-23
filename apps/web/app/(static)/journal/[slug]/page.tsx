@@ -15,7 +15,7 @@ import {
   BreadcrumbSeparator,
 } from "@workspace/ui/components/breadcrumb"
 import { cardLift, cn } from "@workspace/ui/lib/utils"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import {
   createCollectionTag,
   createDocumentTag,
@@ -26,11 +26,6 @@ import {
   JOURNAL_ENTRY_SLUGS_QUERY,
   LATEST_JOURNAL_ENTRIES_QUERY,
 } from "@workspace/sanity/query"
-import type {
-  JOURNAL_ENTRY_BY_SLUG_QUERY_RESULT,
-  JOURNAL_ENTRY_SLUGS_QUERY_RESULT,
-  LATEST_JOURNAL_ENTRIES_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { SITE_CONFIG } from "@/config/site"
 import { postPortableTextComponents } from "@/components/blog/post-portable-text-components"
@@ -40,34 +35,46 @@ import { ReadingProgressBar } from "@/components/blog/reading-progress-bar"
 import { ShareButtons } from "@/components/blog/share-buttons"
 import { readingTime } from "@/lib/reading-time"
 import { extractToc } from "@/lib/toc"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+  type SanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
-async function getEntry(slug: string) {
-  return sanityFetch<JOURNAL_ENTRY_BY_SLUG_QUERY_RESULT>({
+async function getEntry(slug: string, options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: JOURNAL_ENTRY_BY_SLUG_QUERY,
     params: { slug },
     tags: [
       createCollectionTag("journalEntry"),
       createDocumentTag("journalEntry", slug),
     ],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
-async function getSlugs() {
-  return sanityFetch<JOURNAL_ENTRY_SLUGS_QUERY_RESULT>({
+async function getSlugs(options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: JOURNAL_ENTRY_SLUGS_QUERY,
     tags: [createCollectionTag("journalEntry")],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
-async function getLatest() {
-  return sanityFetch<LATEST_JOURNAL_ENTRIES_QUERY_RESULT>({
+async function getLatest(options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: LATEST_JOURNAL_ENTRIES_QUERY,
     tags: [createCollectionTag("journalEntry")],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
 export async function generateStaticParams() {
-  const entries = await getSlugs()
+  // Build time — draftMode() can't be called here, so always published.
+  const entries = await getSlugs({ perspective: "published", stega: false })
 
   return (entries ?? [])
     .map((entry) => entry.slug?.current)
@@ -88,7 +95,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const entry = await getEntry(slug)
+  // Never let stega leak into <title>/<meta>/OG tags — always published, clean.
+  const entry = await getEntry(slug, { perspective: "published", stega: false })
 
   if (!entry) return {}
 
@@ -129,10 +137,11 @@ export default async function JournalEntryPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  const dynamicOptions = await getDynamicSanityFetchOptions()
   const [entry, allSlugs, latest] = await Promise.all([
-    getEntry(slug),
-    getSlugs(),
-    getLatest(),
+    getEntry(slug, dynamicOptions),
+    getSlugs(dynamicOptions),
+    getLatest(dynamicOptions),
   ])
 
   if (!entry) notFound()

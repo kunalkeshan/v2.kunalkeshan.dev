@@ -18,7 +18,7 @@ import { SiAppstore, SiGoogleplay } from "react-icons/si"
 
 import { Container } from "@workspace/ui/components/container"
 import { cardLift, cn } from "@workspace/ui/lib/utils"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import {
   createCollectionTag,
   createDocumentTag,
@@ -28,10 +28,6 @@ import {
   PROJECT_BY_SLUG_QUERY,
   PROJECT_SLUGS_QUERY,
 } from "@workspace/sanity/query"
-import type {
-  PROJECT_BY_SLUG_QUERY_RESULT,
-  PROJECT_SLUGS_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { portableTextComponents } from "@/components/sanity/portable-text-components"
 import { ProjectGallery } from "@/components/sections/project-gallery"
@@ -42,6 +38,11 @@ import {
   PROJECT_STATUS_LABELS,
   attributionLine,
 } from "@/lib/projects"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+  type SanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 /**
  * `react-icons/si` for the two app stores: lucide deliberately ships no brand
@@ -58,23 +59,28 @@ const LINK_ICONS = {
   paper: ScrollTextIcon,
 } as const
 
-async function getProject(slug: string) {
-  return sanityFetch<PROJECT_BY_SLUG_QUERY_RESULT>({
+async function getProject(slug: string, options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: PROJECT_BY_SLUG_QUERY,
     params: { slug },
     tags: [createCollectionTag("project"), createDocumentTag("project", slug)],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
-async function getSlugs() {
-  return sanityFetch<PROJECT_SLUGS_QUERY_RESULT>({
+async function getSlugs(options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: PROJECT_SLUGS_QUERY,
     tags: [createCollectionTag("project")],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
 export async function generateStaticParams() {
-  const projects = await getSlugs()
+  // Build time — draftMode() can't be called here, so always published.
+  const projects = await getSlugs({ perspective: "published", stega: false })
 
   return (projects ?? [])
     .map((project) => project.slug?.current)
@@ -88,7 +94,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const project = await getProject(slug)
+  // Never let stega leak into <title>/<meta>/OG tags — always published, clean.
+  const project = await getProject(slug, { perspective: "published", stega: false })
 
   if (!project) return {}
 
@@ -141,9 +148,10 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  const dynamicOptions = await getDynamicSanityFetchOptions()
   const [project, allProjects] = await Promise.all([
-    getProject(slug),
-    getSlugs(),
+    getProject(slug, dynamicOptions),
+    getSlugs(dynamicOptions),
   ])
 
   // v1 redirected an unknown slug back to /projects, which hides broken links

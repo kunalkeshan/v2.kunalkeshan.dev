@@ -2,13 +2,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import nodemailer from "nodemailer"
 
 import { env } from "@workspace/env/server"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import { SERVICES_BY_IDS_QUERY, SITE_CONFIG_QUERY } from "@workspace/sanity/query"
-import type {
-  SERVICES_BY_IDS_QUERY_RESULT,
-  SITE_CONFIG_QUERY_RESULT,
-} from "@workspace/sanity/types"
 import { logoUrlFor } from "@workspace/sanity/image"
 import {
   renderEmailTemplateHtml,
@@ -62,9 +58,12 @@ export async function POST(req: NextRequest) {
       return new NextResponse(JSON.stringify({ message }), { status: 403 })
     }
 
-    const siteConfig = await sanityFetch<SITE_CONFIG_QUERY_RESULT>({
+    // Server action, no draft-mode concept applies — always published.
+    const { data: siteConfig } = await sanityFetch({
       query: SITE_CONFIG_QUERY,
       tags: [createCollectionTag("siteConfig")],
+      perspective: "published",
+      stega: false,
     })
 
     const notificationEmail = siteConfig?.contactNotificationEmail
@@ -81,13 +80,17 @@ export async function POST(req: NextRequest) {
       : undefined
 
     const resolvedServices = services.length
-      ? await sanityFetch<SERVICES_BY_IDS_QUERY_RESULT>({
-          query: SERVICES_BY_IDS_QUERY,
-          params: { ids: services },
-          tags: [createCollectionTag("service")],
-        })
+      ? (
+          await sanityFetch({
+            query: SERVICES_BY_IDS_QUERY,
+            params: { ids: services },
+            tags: [createCollectionTag("service")],
+            perspective: "published",
+            stega: false,
+          })
+        ).data
       : []
-    const serviceNames = resolvedServices
+    const serviceNames = (resolvedServices ?? [])
       .map((service) => service.name)
       .filter((name): name is string => Boolean(name))
 

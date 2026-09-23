@@ -1,10 +1,6 @@
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag, createDocumentTag } from "@workspace/sanity/cache-tags"
 import { POST_BY_SLUG_QUERY, SITE_CONFIG_QUERY } from "@workspace/sanity/query"
-import type {
-  POST_BY_SLUG_QUERY_RESULT,
-  SITE_CONFIG_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { readingTime } from "@/lib/reading-time"
 import { OG_IMAGE_SIZE, OG_IMAGE_CONTENT_TYPE, renderWritingOgImage } from "@/lib/og/writing-og-image"
@@ -31,15 +27,20 @@ export default async function Image({
 }) {
   const { slug } = await params
 
-  const [post, siteConfig] = await Promise.all([
-    sanityFetch<POST_BY_SLUG_QUERY_RESULT>({
+  // Generated images never carry stega markers — always published.
+  const [{ data: post }, { data: siteConfig }] = await Promise.all([
+    sanityFetch({
       query: POST_BY_SLUG_QUERY,
       params: { slug },
       tags: [createCollectionTag("post"), createDocumentTag("post", slug)],
+      perspective: "published",
+      stega: false,
     }),
-    sanityFetch<SITE_CONFIG_QUERY_RESULT>({
+    sanityFetch({
       query: SITE_CONFIG_QUERY,
       tags: [createCollectionTag("siteConfig")],
+      perspective: "published",
+      stega: false,
     }),
   ])
 

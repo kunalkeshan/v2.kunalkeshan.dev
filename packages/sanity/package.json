@@ -29,7 +29,7 @@
     "./query": "./src/query.ts",
     "./live": "./src/live.ts",
     "./image": "./src/image.ts",
-    "./fetch": "./src/fetch.ts",
+    "./token": "./src/token.ts",
     "./cache-tags": "./src/cache-tags.ts",
     "./types": "./src/sanity.types.ts"
   }

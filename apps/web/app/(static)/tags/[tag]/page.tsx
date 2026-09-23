@@ -2,35 +2,37 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import { Container } from "@workspace/ui/components/container"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag, createDocumentTag } from "@workspace/sanity/cache-tags"
 import {
   TAG_BY_SLUG_QUERY,
   WRITING_BY_TAG_QUERY,
   WRITING_COUNT_BY_TAG_QUERY,
 } from "@workspace/sanity/query"
-import type {
-  TAG_BY_SLUG_QUERY_RESULT,
-  WRITING_BY_TAG_QUERY_RESULT,
-  WRITING_COUNT_BY_TAG_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
 import { PostsGrid } from "@/components/blog/post-card"
 import { PostPagination } from "@/components/blog/post-pagination"
 import { pageCount, pageSlice, parsePage } from "@/lib/posts"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+  type SanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 interface TagPageProps {
   params: Promise<{ tag: string }>
   searchParams: Promise<{ page?: string }>
 }
 
-async function getTag(slug: string) {
-  return sanityFetch<TAG_BY_SLUG_QUERY_RESULT>({
+async function getTag(slug: string, options: SanityFetchOptions) {
+  const { data } = await sanityFetch({
     query: TAG_BY_SLUG_QUERY,
     params: { slug },
     tags: [createCollectionTag("tag"), createDocumentTag("tag", slug)],
+    ...options,
   })
+  return cleanSanityData(data)
 }
 
 export async function generateMetadata({
@@ -39,7 +41,8 @@ export async function generateMetadata({
   params: Promise<{ tag: string }>
 }): Promise<Metadata> {
   const { tag: slug } = await params
-  const tag = await getTag(slug)
+  // Never let stega leak into <title>/<meta> — always published, clean.
+  const tag = await getTag(slug, { perspective: "published", stega: false })
 
   if (!tag) return {}
 
@@ -57,21 +60,27 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
   const page = parsePage(pageParam)
   const { start, end } = pageSlice(page)
 
-  const tag = await getTag(slug)
+  const dynamicOptions = await getDynamicSanityFetchOptions()
+  const tag = await getTag(slug, dynamicOptions)
   if (!tag) notFound()
 
-  const [items, totalCount] = await Promise.all([
-    sanityFetch<WRITING_BY_TAG_QUERY_RESULT>({
+  const [itemsResult, totalCountResult] = await Promise.all([
+    sanityFetch({
       query: WRITING_BY_TAG_QUERY,
       params: { tagSlug: slug, start, end },
       tags: [createCollectionTag("post"), createCollectionTag("journalEntry")],
+      ...dynamicOptions,
     }),
-    sanityFetch<WRITING_COUNT_BY_TAG_QUERY_RESULT>({
+    sanityFetch({
       query: WRITING_COUNT_BY_TAG_QUERY,
       params: { tagSlug: slug },
       tags: [createCollectionTag("post"), createCollectionTag("journalEntry")],
+      ...dynamicOptions,
     }),
   ])
+
+  const items = cleanSanityData(itemsResult.data)
+  const totalCount = cleanSanityData(totalCountResult.data)
 
   const totalPages = pageCount(totalCount ?? 0)
 

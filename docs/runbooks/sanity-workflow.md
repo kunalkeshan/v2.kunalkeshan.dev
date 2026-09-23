@@ -124,6 +124,15 @@ delete the vendor file, the `vite` hook, and this section.
 
 The Studio deploys to Sanity's own hosting, independent of `apps/web`/Vercel.
 
+### Presentation Tool preview origin — resolved automatically per command
+
+`apps/studio/sanity.config.ts`'s `presentationTool` reads `SANITY_STUDIO_PREVIEW_ORIGIN` to know which frontend origin its Presentation tab should preview. This does **not** need manual swapping — Sanity's CLI runs `build`/`deploy` in `production` mode and everything else (`dev`) in `development` mode, and auto-loads the matching `.env.[mode]` file on top of the shared `.env`:
+
+- `apps/studio/.env` — `SANITY_STUDIO_PREVIEW_ORIGIN=http://localhost:3000` (local dev default)
+- `apps/studio/.env.production` (gitignored, matches the repo's blanket `.env*` rule — not in `env.sample` since it's a single non-secret URL, documented here instead) — `SANITY_STUDIO_PREVIEW_ORIGIN=https://v2-kunalkeshan-dev.vercel.app`, to be updated to `https://kunalkeshan.dev` once the custom domain is live
+
+So `pnpm --filter studio dev` always previews localhost and `pnpm --filter studio deploy`/`sanity build` always preview production, with no per-deploy edit required. If `apps/studio/.env.production` is ever missing (e.g. a fresh clone), `sanity.config.ts` falls back to `http://localhost:3000`, so a deploy without it just means the live Studio's Presentation tab loads localhost instead of production — recreate the file rather than editing `sanity.config.ts`.
+
 ### First deploy (already done once for this project)
 
 ```bash

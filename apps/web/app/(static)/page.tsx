@@ -1,4 +1,4 @@
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { urlFor } from "@workspace/sanity/image"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import {
@@ -9,14 +9,6 @@ import {
   FEATURED_PROJECTS_QUERY,
   FEATURED_TESTIMONIALS_QUERY,
 } from "@workspace/sanity/query"
-import type {
-  SITE_CONFIG_QUERY_RESULT,
-  FEATURED_SKILLS_QUERY_RESULT,
-  SERVICES_QUERY_RESULT,
-  FEATURED_EXPERIENCES_QUERY_RESULT,
-  FEATURED_PROJECTS_QUERY_RESULT,
-  FEATURED_TESTIMONIALS_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import Hero from "@/components/sections/hero"
 import Skills from "@/components/sections/skills"
@@ -26,6 +18,10 @@ import Experience from "@/components/sections/experience"
 import Projects from "@/components/sections/projects"
 import Testimonials from "@/components/sections/testimonials"
 import { fetchStars } from "@/lib/github"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 /**
  * Kunal has been building for the web since 2021, and working as a software
@@ -37,33 +33,54 @@ import { fetchStars } from "@/lib/github"
 const BUILDING_SINCE = 2021
 
 export default async function Home() {
-  const [siteConfig, skills, services, experiences, projects, testimonials] =
-    await Promise.all([
-      sanityFetch<SITE_CONFIG_QUERY_RESULT>({
-        query: SITE_CONFIG_QUERY,
-        tags: [createCollectionTag("siteConfig")],
-      }),
-      sanityFetch<FEATURED_SKILLS_QUERY_RESULT>({
-        query: FEATURED_SKILLS_QUERY,
-        tags: [createCollectionTag("skill")],
-      }),
-      sanityFetch<SERVICES_QUERY_RESULT>({
-        query: SERVICES_QUERY,
-        tags: [createCollectionTag("service")],
-      }),
-      sanityFetch<FEATURED_EXPERIENCES_QUERY_RESULT>({
-        query: FEATURED_EXPERIENCES_QUERY,
-        tags: [createCollectionTag("experience")],
-      }),
-      sanityFetch<FEATURED_PROJECTS_QUERY_RESULT>({
-        query: FEATURED_PROJECTS_QUERY,
-        tags: [createCollectionTag("project")],
-      }),
-      sanityFetch<FEATURED_TESTIMONIALS_QUERY_RESULT>({
-        query: FEATURED_TESTIMONIALS_QUERY,
-        tags: [createCollectionTag("testimonial")],
-      }),
-    ])
+  const dynamicOptions = await getDynamicSanityFetchOptions()
+
+  const [
+    siteConfigResult,
+    skillsResult,
+    servicesResult,
+    experiencesResult,
+    projectsResult,
+    testimonialsResult,
+  ] = await Promise.all([
+    sanityFetch({
+      query: SITE_CONFIG_QUERY,
+      tags: [createCollectionTag("siteConfig")],
+      ...dynamicOptions,
+    }),
+    sanityFetch({
+      query: FEATURED_SKILLS_QUERY,
+      tags: [createCollectionTag("skill")],
+      ...dynamicOptions,
+    }),
+    sanityFetch({
+      query: SERVICES_QUERY,
+      tags: [createCollectionTag("service")],
+      ...dynamicOptions,
+    }),
+    sanityFetch({
+      query: FEATURED_EXPERIENCES_QUERY,
+      tags: [createCollectionTag("experience")],
+      ...dynamicOptions,
+    }),
+    sanityFetch({
+      query: FEATURED_PROJECTS_QUERY,
+      tags: [createCollectionTag("project")],
+      ...dynamicOptions,
+    }),
+    sanityFetch({
+      query: FEATURED_TESTIMONIALS_QUERY,
+      tags: [createCollectionTag("testimonial")],
+      ...dynamicOptions,
+    }),
+  ])
+
+  const siteConfig = cleanSanityData(siteConfigResult.data)
+  const skills = cleanSanityData(skillsResult.data)
+  const services = cleanSanityData(servicesResult.data)
+  const experiences = cleanSanityData(experiencesResult.data)
+  const projects = cleanSanityData(projectsResult.data)
+  const testimonials = cleanSanityData(testimonialsResult.data)
 
   // Batched once for the section rather than per card — see lib/github.ts on
   // why the unauthenticated rate limit makes that distinction matter.

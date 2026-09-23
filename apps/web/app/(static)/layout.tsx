@@ -1,27 +1,33 @@
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
+import { VisualEditing } from "next-sanity/visual-editing";
 
 import { Toaster } from "@workspace/ui/components/sonner";
-import { sanityFetch } from "@workspace/sanity/fetch";
+import { sanityFetch, SanityLive } from "@workspace/sanity/live";
 import { urlFor } from "@workspace/sanity/image";
 import { createCollectionTag } from "@workspace/sanity/cache-tags";
 import {
   SITE_CONFIG_QUERY,
   FOOTER_LEGAL_LINKS_QUERY,
 } from "@workspace/sanity/query";
-import type {
-  SITE_CONFIG_QUERY_RESULT,
-  FOOTER_LEGAL_LINKS_QUERY_RESULT,
-} from "@workspace/sanity/types";
 
 import Navbar from "@/components/layouts/navbar";
 import Footer from "@/components/layouts/footer";
 import { ViewTransitionWrapper } from "@/components/layouts/view-transition-wrapper";
 import { Providers } from "@/providers/providers";
+import { DisableDraftMode } from "@/components/sanity/disable-draft-mode";
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+} from "@/lib/sanity-fetch-options";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const siteConfig = await sanityFetch<SITE_CONFIG_QUERY_RESULT>({
+  // Never let stega leak into <title>/<meta>/OG tags — always published, clean.
+  const { data: siteConfig } = await sanityFetch({
     query: SITE_CONFIG_QUERY,
     tags: [createCollectionTag("siteConfig")],
+    perspective: "published",
+    stega: false,
   });
 
   const title = siteConfig?.title || "Kunal Keshan — Software Engineer";
@@ -81,16 +87,25 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [siteConfig, legalLinks] = await Promise.all([
-    sanityFetch<SITE_CONFIG_QUERY_RESULT>({
+  const dynamicOptions = await getDynamicSanityFetchOptions();
+
+  const [siteConfigResult, legalLinksResult] = await Promise.all([
+    sanityFetch({
       query: SITE_CONFIG_QUERY,
       tags: [createCollectionTag("siteConfig")],
+      ...dynamicOptions,
     }),
-    sanityFetch<FOOTER_LEGAL_LINKS_QUERY_RESULT>({
+    sanityFetch({
       query: FOOTER_LEGAL_LINKS_QUERY,
       tags: [createCollectionTag("siteConfig")],
+      ...dynamicOptions,
     }),
   ]);
+
+  const siteConfig = cleanSanityData(siteConfigResult.data);
+  const legalLinks = cleanSanityData(legalLinksResult.data);
+
+  const { isEnabled: isDraftMode } = await draftMode();
 
   return (
     <>
@@ -102,6 +117,13 @@ export default async function RootLayout({
           <Toaster richColors />
         </ViewTransitionWrapper>
       </Providers>
+      <SanityLive />
+      {isDraftMode && (
+        <>
+          <VisualEditing />
+          <DisableDraftMode />
+        </>
+      )}
     </>
   );
 }

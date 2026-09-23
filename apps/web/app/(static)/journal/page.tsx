@@ -2,18 +2,13 @@ import { Suspense } from "react"
 import type { Metadata } from "next"
 
 import { Container } from "@workspace/ui/components/container"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import {
   JOURNAL_ENTRIES_QUERY,
   JOURNAL_ENTRY_COUNT_QUERY,
   TAGS_QUERY,
 } from "@workspace/sanity/query"
-import type {
-  JOURNAL_ENTRIES_QUERY_RESULT,
-  JOURNAL_ENTRY_COUNT_QUERY_RESULT,
-  TAGS_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
 import { PostsGrid } from "@/components/blog/post-card"
@@ -21,6 +16,10 @@ import { PostListingControls } from "@/components/blog/post-listing-controls"
 import { PostPagination } from "@/components/blog/post-pagination"
 import { FilterResultsTransition } from "@/components/filters/filter-results-transition"
 import { pageCount, pageSlice, parsePage } from "@/lib/posts"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 export const metadata: Metadata = {
   title: "Journal",
@@ -39,22 +38,31 @@ export default async function JournalPage({ searchParams }: JournalPageProps) {
   const page = parsePage(params.page)
   const { start, end } = pageSlice(page)
 
-  const [entries, totalCount, tags] = await Promise.all([
-    sanityFetch<JOURNAL_ENTRIES_QUERY_RESULT>({
+  const dynamicOptions = await getDynamicSanityFetchOptions()
+
+  const [entriesResult, totalCountResult, tagsResult] = await Promise.all([
+    sanityFetch({
       query: JOURNAL_ENTRIES_QUERY,
       params: { start, end, search, tagSlug },
       tags: [createCollectionTag("journalEntry")],
+      ...dynamicOptions,
     }),
-    sanityFetch<JOURNAL_ENTRY_COUNT_QUERY_RESULT>({
+    sanityFetch({
       query: JOURNAL_ENTRY_COUNT_QUERY,
       params: { search, tagSlug },
       tags: [createCollectionTag("journalEntry")],
+      ...dynamicOptions,
     }),
-    sanityFetch<TAGS_QUERY_RESULT>({
+    sanityFetch({
       query: TAGS_QUERY,
       tags: [createCollectionTag("tag")],
+      ...dynamicOptions,
     }),
   ])
+
+  const entries = cleanSanityData(entriesResult.data)
+  const totalCount = cleanSanityData(totalCountResult.data)
+  const tags = cleanSanityData(tagsResult.data)
 
   const totalPages = pageCount(totalCount ?? 0)
 

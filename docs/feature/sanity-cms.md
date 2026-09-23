@@ -60,21 +60,23 @@ All written with `next-sanity`'s `defineQuery` for typegen support.
 
 ## Revalidation model
 
-On-demand only — `useCdn: true` with `revalidate: false` by default in `sanityFetch`, invalidated via cache tags (`createCollectionTag`/`createDocumentTag` in `packages/sanity/src/cache-tags.ts`) when the Sanity webhook fires. There is no time-based ISR polling.
+On-demand only — tag-based, invalidated via `createCollectionTag`/`createDocumentTag` (`packages/sanity/src/cache-tags.ts`) when the Sanity webhook fires `revalidateTag` in `apps/web/app/api/revalidate/route.ts`. There is no time-based ISR polling.
 
-> **⚠️ No webhook is currently configured on the Sanity project.** Verified against the
-> management API (`/v2021-06-07/hooks/projects/eqohkmfj`) — it returns an empty list, so
-> `/api/revalidate` has never actually been called. Because `sanityFetch` uses
-> `revalidate: false`, this means **published content changes do not reach the live site
-> until the next deploy**, for every document type, not just new ones. The route handler
-> itself is correct and complete; the missing piece is the webhook in the Sanity
-> dashboard (Project → API → Webhooks), which needs the deployed
-> `/api/revalidate` URL, the `SANITY_WEBHOOK_SECRET`, and a projection that includes
-> `_type` (plus `slug` for `legal`/`project`).
->
-> When adding a new document type, remember it needs a `case` in the switch in
-> `apps/web/app/api/revalidate/route.ts` as well — an unhandled type falls through to
-> `default`, which logs a warning and revalidates nothing.
+The webhook itself is registered in the Sanity project dashboard (Project → API → Webhooks), pointed at the deployed `/api/revalidate` URL (both `https://v2-kunalkeshan-dev.vercel.app/api/revalidate` and, once the custom domain is live, `https://kunalkeshan.dev/api/revalidate`), firing on Create/Update/Delete for all document types with no filter, and signed with `SANITY_WEBHOOK_SECRET`.
+
+When adding a new document type, remember it needs a `case` in the switch in `apps/web/app/api/revalidate/route.ts` as well — an unhandled type falls through to `default`, which logs a warning and revalidates nothing.
+
+## Live preview / Visual Editing
+
+`apps/web` uses `next-sanity`'s Live Content API (`defineLive`, `packages/sanity/src/live.ts`) for every fetch — `sanityFetch` from `@workspace/sanity/live` returns `{ data, sourceMap, tags }` rather than a raw value, and connects the rendered page to real-time content updates via `<SanityLive />` (mounted in `apps/web/app/(static)/layout.tsx`).
+
+**Stega and draft mode**: every request-time fetch resolves its `perspective`/`stega` options dynamically via `apps/web/lib/sanity-fetch-options.ts`'s `getDynamicSanityFetchOptions()` — `stega: false, perspective: "published"` normally, switching to `stega: true, perspective: "drafts"` only while Next.js Draft Mode is enabled (i.e. only inside an active Presentation Tool preview session). Regular visitors and production builds never see stega-encoded strings. Build-time-only fetches (`generateStaticParams`, `generateMetadata`, `opengraph-image.tsx`, `sitemap.ts`, the contact API route) always pass `{ perspective: "published", stega: false }` literally instead — `draftMode()` can't be called outside a request scope, and metadata/OG/sitemap output must never carry invisible stega characters regardless.
+
+**Draft mode routes**: `apps/web/app/api/draft-mode/enable/route.ts` (via `next-sanity/draft-mode`'s `defineEnableDraftMode`, using a Viewer-role `SANITY_API_READ_TOKEN`) and `.../disable/route.ts` (plain `draftMode().disable()`). `apps/web/components/sanity/disable-draft-mode.tsx` renders a visible exit link outside the Presentation Tool's own iframe (hidden inside it via `useIsPresentationTool()`).
+
+**Presentation Tool**: configured in `apps/studio/sanity.config.ts` (`presentationTool` from `sanity/presentation`), with document-type → route mapping in `apps/studio/presentation/resolve.ts`. Its `previewUrl.origin` reads `SANITY_STUDIO_PREVIEW_ORIGIN`, resolved automatically per command via Sanity's `.env`/`.env.production` mode-file loading (no manual swap) — see `docs/runbooks/sanity-workflow.md`.
+
+**Token**: `SANITY_API_READ_TOKEN` (Viewer role, read-only) is read via `packages/sanity/src/token.ts`'s `getSanityReadToken()`, which returns `undefined` rather than throwing when unset. This is deliberate: `defineLive`/the draft-mode enable route evaluate it at module scope, which Next.js runs during build-time route collection for every route (including ones that never touch draft mode, like `sitemap.ts`, since it imports `@workspace/sanity/live`) — so a missing token must never fail a build. Without it, `defineLive` just serves published content with no live/draft capability, and the enable route fails at request time (a normal Sanity API auth error) only if actually hit.
 
 ## Adding a new field or query
 

@@ -9,6 +9,7 @@
       "env": [
         "SITE_URL",
         "SANITY_WEBHOOK_SECRET",
+        "SANITY_API_READ_TOKEN",
         "NODEMAILER_EMAIL",
         "NODEMAILER_PASSWORD",
         "TURNSTILE_SECRET_KEY"

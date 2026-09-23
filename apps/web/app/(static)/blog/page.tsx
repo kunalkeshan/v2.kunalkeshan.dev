@@ -2,14 +2,9 @@ import { Suspense } from "react"
 import type { Metadata } from "next"
 
 import { Container } from "@workspace/ui/components/container"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import { POSTS_QUERY, POST_COUNT_QUERY, TAGS_QUERY } from "@workspace/sanity/query"
-import type {
-  POSTS_QUERY_RESULT,
-  POST_COUNT_QUERY_RESULT,
-  TAGS_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
 import { PostsGrid } from "@/components/blog/post-card"
@@ -17,6 +12,10 @@ import { PostListingControls } from "@/components/blog/post-listing-controls"
 import { PostPagination } from "@/components/blog/post-pagination"
 import { FilterResultsTransition } from "@/components/filters/filter-results-transition"
 import { pageCount, pageSlice, parsePage } from "@/lib/posts"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -35,22 +34,31 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const page = parsePage(params.page)
   const { start, end } = pageSlice(page)
 
-  const [posts, totalCount, tags] = await Promise.all([
-    sanityFetch<POSTS_QUERY_RESULT>({
+  const dynamicOptions = await getDynamicSanityFetchOptions()
+
+  const [postsResult, totalCountResult, tagsResult] = await Promise.all([
+    sanityFetch({
       query: POSTS_QUERY,
       params: { start, end, search, tagSlug },
       tags: [createCollectionTag("post")],
+      ...dynamicOptions,
     }),
-    sanityFetch<POST_COUNT_QUERY_RESULT>({
+    sanityFetch({
       query: POST_COUNT_QUERY,
       params: { search, tagSlug },
       tags: [createCollectionTag("post")],
+      ...dynamicOptions,
     }),
-    sanityFetch<TAGS_QUERY_RESULT>({
+    sanityFetch({
       query: TAGS_QUERY,
       tags: [createCollectionTag("tag")],
+      ...dynamicOptions,
     }),
   ])
+
+  const posts = cleanSanityData(postsResult.data)
+  const totalCount = cleanSanityData(totalCountResult.data)
+  const tags = cleanSanityData(tagsResult.data)
 
   const totalPages = pageCount(totalCount ?? 0)
 

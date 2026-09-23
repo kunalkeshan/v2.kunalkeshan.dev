@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 import { Container } from "@workspace/ui/components/container"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { urlFor } from "@workspace/sanity/image"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import {
@@ -9,16 +9,15 @@ import {
   VALUES_QUERY,
   FEATURED_SKILLS_QUERY,
 } from "@workspace/sanity/query"
-import type {
-  ABOUT_PAGE_QUERY_RESULT,
-  VALUES_QUERY_RESULT,
-  FEATURED_SKILLS_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
 import AboutStory from "@/components/sections/about-story"
 import SkillsMarquee from "@/components/sections/skills-marquee"
 import Values from "@/components/sections/values"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 export const metadata: Metadata = {
   title: "About",
@@ -34,20 +33,29 @@ export const metadata: Metadata = {
 const BUILDING_SINCE = 2021
 
 export default async function AboutPage() {
-  const [about, values, skills] = await Promise.all([
-    sanityFetch<ABOUT_PAGE_QUERY_RESULT>({
+  const dynamicOptions = await getDynamicSanityFetchOptions()
+
+  const [aboutResult, valuesResult, skillsResult] = await Promise.all([
+    sanityFetch({
       query: ABOUT_PAGE_QUERY,
       tags: [createCollectionTag("siteConfig")],
+      ...dynamicOptions,
     }),
-    sanityFetch<VALUES_QUERY_RESULT>({
+    sanityFetch({
       query: VALUES_QUERY,
       tags: [createCollectionTag("value")],
+      ...dynamicOptions,
     }),
-    sanityFetch<FEATURED_SKILLS_QUERY_RESULT>({
+    sanityFetch({
       query: FEATURED_SKILLS_QUERY,
       tags: [createCollectionTag("skill")],
+      ...dynamicOptions,
     }),
   ])
+
+  const about = cleanSanityData(aboutResult.data)
+  const values = cleanSanityData(valuesResult.data)
+  const skills = cleanSanityData(skillsResult.data)
 
   const yearsBuilding = new Date().getFullYear() - BUILDING_SINCE
 

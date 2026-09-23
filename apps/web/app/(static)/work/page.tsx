@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 import { Container } from "@workspace/ui/components/container"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import {
   EDUCATION_QUERY,
@@ -9,12 +9,6 @@ import {
   PUBLICATIONS_QUERY,
   SITE_CONFIG_QUERY,
 } from "@workspace/sanity/query"
-import type {
-  EDUCATION_QUERY_RESULT,
-  EXPERIENCES_QUERY_RESULT,
-  PUBLICATIONS_QUERY_RESULT,
-  SITE_CONFIG_QUERY_RESULT,
-} from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
 import { ExperienceTimeline } from "@/components/sections/experience"
@@ -24,6 +18,10 @@ import {
   SectionNav,
   type SectionNavItem,
 } from "@/components/sections/section-nav"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 export const metadata: Metadata = {
   title: "Experience",
@@ -32,24 +30,36 @@ export const metadata: Metadata = {
 }
 
 export default async function ExperiencePage() {
-  const [siteConfig, experiences, education, publications] = await Promise.all([
-    sanityFetch<SITE_CONFIG_QUERY_RESULT>({
-      query: SITE_CONFIG_QUERY,
-      tags: [createCollectionTag("siteConfig")],
-    }),
-    sanityFetch<EXPERIENCES_QUERY_RESULT>({
-      query: EXPERIENCES_QUERY,
-      tags: [createCollectionTag("experience")],
-    }),
-    sanityFetch<EDUCATION_QUERY_RESULT>({
-      query: EDUCATION_QUERY,
-      tags: [createCollectionTag("experience")],
-    }),
-    sanityFetch<PUBLICATIONS_QUERY_RESULT>({
-      query: PUBLICATIONS_QUERY,
-      tags: [createCollectionTag("publication")],
-    }),
-  ])
+  const dynamicOptions = await getDynamicSanityFetchOptions()
+
+  const [siteConfigResult, experiencesResult, educationResult, publicationsResult] =
+    await Promise.all([
+      sanityFetch({
+        query: SITE_CONFIG_QUERY,
+        tags: [createCollectionTag("siteConfig")],
+        ...dynamicOptions,
+      }),
+      sanityFetch({
+        query: EXPERIENCES_QUERY,
+        tags: [createCollectionTag("experience")],
+        ...dynamicOptions,
+      }),
+      sanityFetch({
+        query: EDUCATION_QUERY,
+        tags: [createCollectionTag("experience")],
+        ...dynamicOptions,
+      }),
+      sanityFetch({
+        query: PUBLICATIONS_QUERY,
+        tags: [createCollectionTag("publication")],
+        ...dynamicOptions,
+      }),
+    ])
+
+  const siteConfig = cleanSanityData(siteConfigResult.data)
+  const experiences = cleanSanityData(experiencesResult.data)
+  const education = cleanSanityData(educationResult.data)
+  const publications = cleanSanityData(publicationsResult.data)
 
   const resumeUrl = siteConfig?.resumePdf?.asset?.url ?? null
 

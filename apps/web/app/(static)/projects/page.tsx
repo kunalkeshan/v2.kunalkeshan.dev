@@ -2,14 +2,17 @@ import { Suspense } from "react"
 import type { Metadata } from "next"
 
 import { Container } from "@workspace/ui/components/container"
-import { sanityFetch } from "@workspace/sanity/fetch"
+import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import { PROJECTS_QUERY } from "@workspace/sanity/query"
-import type { PROJECTS_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
 import { ProjectsFiltered } from "@/components/sections/projects-filtered"
 import { fetchStars } from "@/lib/github"
+import {
+  cleanSanityData,
+  getDynamicSanityFetchOptions,
+} from "@/lib/sanity-fetch-options"
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -18,10 +21,15 @@ export const metadata: Metadata = {
 }
 
 export default async function ProjectsPage() {
-  const projects = await sanityFetch<PROJECTS_QUERY_RESULT>({
-    query: PROJECTS_QUERY,
-    tags: [createCollectionTag("project")],
-  })
+  const projects = cleanSanityData(
+    (
+      await sanityFetch({
+        query: PROJECTS_QUERY,
+        tags: [createCollectionTag("project")],
+        ...(await getDynamicSanityFetchOptions()),
+      })
+    ).data
+  )
 
   // One batched call for the whole page rather than one per card: GitHub's
   // unauthenticated budget is 60 requests/hour for the entire build machine.
