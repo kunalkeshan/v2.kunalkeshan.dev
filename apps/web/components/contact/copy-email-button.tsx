@@ -5,6 +5,7 @@ import { CheckIcon, CopyIcon, MailIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { cn } from "@workspace/ui/lib/utils"
+import { trackUiEvent } from "@/lib/analytics"
 
 interface CopyEmailButtonProps {
   email: string
@@ -18,6 +19,7 @@ export function CopyEmailButton({ email }: CopyEmailButtonProps) {
       await navigator.clipboard.writeText(email)
       setCopied(true)
       toast.success("Email copied to clipboard")
+      trackUiEvent({ name: "copy_email_click", placement: "contact_copy_email" })
       setTimeout(() => setCopied(false), 2000)
     } catch {
       toast.error("Unable to copy email")

@@ -3,6 +3,8 @@
 import * as React from "react"
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes"
 
+import { trackUiEvent } from "@/lib/analytics"
+
 function ThemeProvider({
   children,
   ...props
@@ -55,7 +57,9 @@ function ThemeHotkey() {
         return
       }
 
-      setTheme(resolvedTheme === "dark" ? "light" : "dark")
+      const nextTheme = resolvedTheme === "dark" ? "light" : "dark"
+      setTheme(nextTheme)
+      trackUiEvent({ name: "theme_toggle", placement: "global", theme: nextTheme })
     }
 
     window.addEventListener("keydown", onKeyDown)

@@ -1,3 +1,5 @@
+"use client"
+
 import {
   FaBlog,
   FaDiscord,
@@ -12,6 +14,7 @@ import {
 } from "react-icons/fa"
 
 import type { SITE_CONFIG_QUERY_RESULT } from "@workspace/sanity/types"
+import { trackLinkClick } from "@/lib/analytics"
 
 type SocialMedia = NonNullable<SITE_CONFIG_QUERY_RESULT>["socialMedia"]
 
@@ -50,6 +53,13 @@ export function SocialsRow({ socialMedia }: SocialsRowProps) {
             rel="noopener noreferrer"
             title={social.label ?? social.platform}
             aria-label={social.label ?? social.platform}
+            onClick={() =>
+              trackLinkClick({
+                platform: social.platform ?? "unknown",
+                url: social.url ?? "",
+                placement: "contact_socials",
+              })
+            }
             className="flex size-10 items-center justify-center rounded-full border-2 border-border bg-card text-lg shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap hover:-translate-y-0.5 hover:shadow-lg"
           >
             <Icon />

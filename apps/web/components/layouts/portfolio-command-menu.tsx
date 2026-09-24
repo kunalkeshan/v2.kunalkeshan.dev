@@ -39,6 +39,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { SITE_CONFIG_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { useRickrollAudio } from "@/providers/rickroll-audio-provider"
+import { trackUiEvent } from "@/lib/analytics"
 
 interface CommandAction {
   id: string
@@ -322,6 +323,7 @@ export function PortfolioCommandMenu({
 
   const runAction = (action: CommandAction) => {
     setOpen(false)
+    trackUiEvent({ name: `command_menu_${action.id}`, placement: "command_menu" })
     action.onSelect()
   }
 

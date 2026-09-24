@@ -4,6 +4,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { PUBLICATIONS_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { formatMonthYear } from "@/lib/dates"
+import { TrackedLink } from "@/components/shared/tracked-link"
 
 interface PublicationsProps {
   publications: PUBLICATIONS_QUERY_RESULT
@@ -45,14 +46,20 @@ export function Publications({ publications }: PublicationsProps) {
             >
               <h3 className="font-heading text-lg font-black text-balance sm:text-xl">
                 {href ? (
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline-offset-4 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+                  <TrackedLink
+                    platform="publication"
+                    url={href}
+                    placement="publications"
                   >
-                    {publication.title}
-                  </a>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline-offset-4 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+                    >
+                      {publication.title}
+                    </a>
+                  </TrackedLink>
                 ) : (
                   publication.title
                 )}

@@ -26,6 +26,7 @@ import {
   type ContactFormValues,
 } from "@/lib/validations/contact"
 import { ServiceMultiSelect } from "@/components/contact/service-multi-select"
+import { trackFormEvent } from "@/lib/analytics"
 
 interface ContactFormProps {
   services: SERVICES_QUERY_RESULT
@@ -61,6 +62,7 @@ export function ContactForm({ services }: ContactFormProps) {
   async function onSubmit(values: ContactFormValues) {
     setStatus("submitting")
     setErrorMessage(null)
+    trackFormEvent({ formName: "contact_form", status: "submit" })
 
     try {
       const response = await fetch("/api/contact", {
@@ -84,6 +86,7 @@ export function ContactForm({ services }: ContactFormProps) {
 
       setStatus("success")
       toast.success("Message sent — I'll get back to you soon.")
+      trackFormEvent({ formName: "contact_form", status: "success" })
     } catch (error) {
       const message =
         error instanceof Error
@@ -92,6 +95,11 @@ export function ContactForm({ services }: ContactFormProps) {
       setErrorMessage(message)
       setStatus("idle")
       toast.error(message)
+      trackFormEvent({
+        formName: "contact_form",
+        status: "error",
+        errorMessage: message,
+      })
     }
   }
 

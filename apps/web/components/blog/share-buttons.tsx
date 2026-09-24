@@ -6,6 +6,7 @@ import { FaLinkedin, FaWhatsapp, FaXTwitter } from "react-icons/fa6"
 import { toast } from "sonner"
 
 import { cn } from "@workspace/ui/lib/utils"
+import { trackLinkClick, trackUiEvent } from "@/lib/analytics"
 
 export interface ShareButtonsProps {
   url: string
@@ -30,16 +31,19 @@ export function ShareButtons({ url, title }: ShareButtonsProps) {
   const links = [
     {
       label: "Share on X",
+      platform: "x",
       href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
       icon: FaXTwitter,
     },
     {
       label: "Share on LinkedIn",
+      platform: "linkedin",
       href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
       icon: FaLinkedin,
     },
     {
       label: "Share on WhatsApp",
+      platform: "whatsapp",
       href: `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}`,
       icon: FaWhatsapp,
     },
@@ -50,6 +54,7 @@ export function ShareButtons({ url, title }: ShareButtonsProps) {
       await navigator.clipboard.writeText(url)
       setCopied(true)
       toast.success("Link copied to clipboard")
+      trackUiEvent({ name: "copy_link_click", placement: "blog_share" })
       setTimeout(() => setCopied(false), 2000)
     } catch {
       toast.error("Unable to copy link")
@@ -59,13 +64,16 @@ export function ShareButtons({ url, title }: ShareButtonsProps) {
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm font-bold text-muted-foreground">Share:</span>
-      {links.map(({ label, href, icon: Icon }) => (
+      {links.map(({ label, platform, href, icon: Icon }) => (
         <a
           key={label}
           href={href}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={label}
+          onClick={() =>
+            trackLinkClick({ platform, url: href, placement: "blog_share" })
+          }
           className={iconButtonClass}
         >
           <Icon className="size-4" aria-hidden="true" />

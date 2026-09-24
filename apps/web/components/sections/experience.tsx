@@ -30,6 +30,7 @@ import {
   sectionRevealTransition,
   sectionRevealViewport,
 } from "@/lib/motion"
+import { trackLinkClick } from "@/lib/analytics"
 
 type Role = EXPERIENCES_QUERY_RESULT[number]
 type Education = EDUCATION_QUERY_RESULT[number]
@@ -91,6 +92,13 @@ function RoleLinks({ links }: { links: Role["links"] }) {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                trackLinkClick({
+                  platform: link.type ?? "external",
+                  url: link.url ?? "",
+                  placement: "experience",
+                })
+              }
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-sm border-2 border-border bg-muted px-2.5 py-1",
                 "text-xs font-bold",
@@ -276,6 +284,13 @@ function OrganizationBlock({ group }: { group: OrganizationGroup }) {
                   href={group.website}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() =>
+                    trackLinkClick({
+                      platform: "organization",
+                      url: group.website ?? "",
+                      placement: "experience",
+                    })
+                  }
                   className="underline-offset-4 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                 >
                   {group.name}
@@ -427,6 +442,13 @@ function FeaturedCard({ role }: { role: FeaturedRole }) {
               href={website}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                trackLinkClick({
+                  platform: "organization",
+                  url: website,
+                  placement: "experience",
+                })
+              }
               className="font-semibold underline-offset-4 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
             >
               {name}

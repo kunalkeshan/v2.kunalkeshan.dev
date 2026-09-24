@@ -8,6 +8,7 @@ import type {
 
 import { OrganizationLogoMark } from "@/components/organization-logo-mark"
 import { formatMonthYear } from "@/lib/dates"
+import { TrackedLink } from "@/components/shared/tracked-link"
 
 type Certification =
   | CERTIFICATIONS_QUERY_RESULT[number]
@@ -61,21 +62,27 @@ function CertificationCard({
 
       <div className="mt-auto flex flex-wrap items-center gap-3">
         {certification.verifyUrl && (
-          <a
-            href={certification.verifyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-sm border-2 border-border bg-muted px-2.5 py-1",
-              "text-xs font-bold",
-              "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
-              "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
-              "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
-            )}
+          <TrackedLink
+            platform="certification"
+            url={certification.verifyUrl}
+            placement="certifications"
           >
-            <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
-            View credential
-          </a>
+            <a
+              href={certification.verifyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-sm border-2 border-border bg-muted px-2.5 py-1",
+                "text-xs font-bold",
+                "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
+                "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
+                "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+              )}
+            >
+              <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
+              View credential
+            </a>
+          </TrackedLink>
         )}
         {certification.credentialId && (
           <p className="font-mono text-xs text-muted-foreground">

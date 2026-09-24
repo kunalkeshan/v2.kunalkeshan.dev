@@ -5,6 +5,8 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "@workspace/ui/globals.css";
 import { rootBodyClassName } from "@workspace/ui/lib/fonts";
 import { ThemeProvider } from "@/components/theme-provider";
+import { GoogleAnalyticsScript } from "@/components/analytics/google-analytics";
+import { ClarityScript } from "@/components/analytics/clarity";
 import { SITE_CONFIG } from "@/config/site";
 
 export const metadata: Metadata = {
@@ -32,6 +34,8 @@ export default function RootLayout({
         <NuqsAdapter>
           <ThemeProvider>{children}</ThemeProvider>
         </NuqsAdapter>
+        <GoogleAnalyticsScript />
+        <ClarityScript />
       </body>
     </html>
   );

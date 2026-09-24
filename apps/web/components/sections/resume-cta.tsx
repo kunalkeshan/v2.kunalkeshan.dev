@@ -6,6 +6,7 @@ import { BadgeCheckIcon, DownloadIcon } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
+import { trackLinkClick } from "@/lib/analytics"
 
 interface ResumeCtaProps {
   /** Absolute URL of the uploaded PDF. The banner renders nothing without one. */
@@ -104,6 +105,14 @@ export function ResumeCta({
                   download={fileName}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() =>
+                    trackLinkClick({
+                      platform: "resume",
+                      url: fileUrl,
+                      placement: "resume_cta",
+                      position: "primary",
+                    })
+                  }
                 />
               }
               nativeButton={false}

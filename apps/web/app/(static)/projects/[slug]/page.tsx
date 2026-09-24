@@ -32,6 +32,7 @@ import {
 import { portableTextComponents } from "@/components/sanity/portable-text-components"
 import { ProjectGallery } from "@/components/sections/project-gallery"
 import { JsonLd } from "@/components/shared/json-ld"
+import { TrackedLink } from "@/components/shared/tracked-link"
 import { formatDateRange } from "@/lib/dates"
 import { fetchStars } from "@/lib/github"
 import {
@@ -401,26 +402,33 @@ export default async function ProjectPage({
                   <h2 className="font-heading text-lg font-black">Links</h2>
 
                   {primaryLink?.url && (
-                    <a
-                      href={primaryLink.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn(
-                        "mt-3 flex items-center justify-center gap-2 rounded-lg border-2 border-border bg-primary px-4 py-2.5",
-                        "font-heading text-sm font-bold text-primary-foreground",
-                        "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
-                        "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
-                        "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
-                      )}
+                    <TrackedLink
+                      platform={primaryLink.type ?? "external"}
+                      url={primaryLink.url}
+                      placement="project_detail"
+                      position="primary"
                     >
-                      {(() => {
-                        const Icon = primaryLink.type
-                          ? LINK_ICONS[primaryLink.type]
-                          : LinkIcon
-                        return <Icon className="size-4" aria-hidden="true" />
-                      })()}
-                      {primaryLink.label ?? "Visit"}
-                    </a>
+                      <a
+                        href={primaryLink.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          "mt-3 flex items-center justify-center gap-2 rounded-lg border-2 border-border bg-primary px-4 py-2.5",
+                          "font-heading text-sm font-bold text-primary-foreground",
+                          "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
+                          "hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
+                          "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+                        )}
+                      >
+                        {(() => {
+                          const Icon = primaryLink.type
+                            ? LINK_ICONS[primaryLink.type]
+                            : LinkIcon
+                          return <Icon className="size-4" aria-hidden="true" />
+                        })()}
+                        {primaryLink.label ?? "Visit"}
+                      </a>
+                    </TrackedLink>
                   )}
 
                   {secondaryLinks.length > 0 && (
@@ -433,21 +441,28 @@ export default async function ProjectPage({
 
                         return (
                           <li key={`${link.url}-${link.label}`}>
-                            <a
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={cn(
-                                "inline-flex items-center gap-1.5 rounded-sm border-2 border-border bg-background px-2.5 py-1",
-                                "text-xs font-bold",
-                                "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
-                                "hover:translate-x-0.5 hover:translate-y-0.5 hover:bg-muted hover:shadow-none",
-                                "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
-                              )}
+                            <TrackedLink
+                              platform={link.type ?? "external"}
+                              url={link.url}
+                              placement="project_detail"
+                              position="secondary"
                             >
-                              <Icon className="size-3.5" aria-hidden="true" />
-                              {link.label ?? "Link"}
-                            </a>
+                              <a
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={cn(
+                                  "inline-flex items-center gap-1.5 rounded-sm border-2 border-border bg-background px-2.5 py-1",
+                                  "text-xs font-bold",
+                                  "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
+                                  "hover:translate-x-0.5 hover:translate-y-0.5 hover:bg-muted hover:shadow-none",
+                                  "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+                                )}
+                              >
+                                <Icon className="size-3.5" aria-hidden="true" />
+                                {link.label ?? "Link"}
+                              </a>
+                            </TrackedLink>
                           </li>
                         )
                       })}

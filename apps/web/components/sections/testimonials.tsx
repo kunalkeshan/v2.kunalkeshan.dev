@@ -26,6 +26,7 @@ import {
   sectionRevealTransition,
   sectionRevealViewport,
 } from "@/lib/motion"
+import { trackLinkClick } from "@/lib/analytics"
 
 type Testimonial = FEATURED_TESTIMONIALS_QUERY_RESULT[number]
 
@@ -108,6 +109,13 @@ function TestimonialCard({
       href={author.website}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() =>
+        trackLinkClick({
+          platform: "testimonial_author",
+          url: author.website ?? "",
+          placement: "testimonials",
+        })
+      }
       className="rounded-sm underline-offset-2 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
     >
       {author.name}

@@ -21,6 +21,7 @@ import { primaryLinks, workLinks, moreLinks } from "@/components/layouts/nav-lin
 import { SocialsRow } from "@/components/contact/socials-row";
 import { CopyEmailButton } from "@/components/contact/copy-email-button";
 import { useRickrollAudio } from "@/providers/rickroll-audio-provider";
+import { trackLinkClick, trackUiEvent } from "@/lib/analytics";
 
 interface Props {
   siteConfig: SITE_CONFIG_QUERY_RESULT;
@@ -101,6 +102,13 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
                   href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() =>
+                    trackLinkClick({
+                      platform: "github",
+                      url: REPO_URL,
+                      placement: "footer",
+                    })
+                  }
                   className="inline-flex items-center gap-1.5 hover:text-foreground"
                 >
                   <FaGithub className="size-3.5" aria-hidden="true" />
@@ -112,6 +120,13 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
                   href={SANITY_STUDIO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() =>
+                    trackLinkClick({
+                      platform: "sanity_studio",
+                      url: SANITY_STUDIO_URL,
+                      placement: "footer",
+                    })
+                  }
                   className="hover:text-foreground"
                 >
                   Sanity Studio
@@ -126,7 +141,10 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
                 <li suppressHydrationWarning>
                   <button
                     type="button"
-                    onClick={toggleRickroll}
+                    onClick={() => {
+                      toggleRickroll();
+                      trackUiEvent({ name: "rickroll_toggle", placement: "footer" });
+                    }}
                     aria-pressed={isRickrollPlaying}
                     aria-label="Toggle a little surprise"
                     className="hover:text-foreground"
@@ -170,6 +188,13 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
             href="https://paperfolio.webflow.io/"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              trackLinkClick({
+                platform: "paperfolio",
+                url: "https://paperfolio.webflow.io/",
+                placement: "footer",
+              })
+            }
             className="underline underline-offset-2 hover:text-foreground"
           >
             Paperfolio
@@ -180,6 +205,13 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
             href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              trackLinkClick({
+                platform: "github",
+                url: REPO_URL,
+                placement: "footer",
+              })
+            }
             className="underline underline-offset-2 hover:text-foreground"
           >
             GitHub
@@ -190,6 +222,13 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
             href="https://nextjs.org/"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              trackLinkClick({
+                platform: "nextjs",
+                url: "https://nextjs.org/",
+                placement: "footer",
+              })
+            }
             className="underline underline-offset-2 hover:text-foreground"
           >
             Next.js
