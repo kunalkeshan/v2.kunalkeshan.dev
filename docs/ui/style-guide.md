@@ -88,10 +88,13 @@ tooling — no npm package publish, no Storybook.
   Next.js's static file handling, no route handler needed. These generated files are
   tracked in git (not gitignored) since there's no build-time hook regenerating them
   yet.
-- A consumer configures `@kunalkeshan` as
-  `https://v2-kunalkeshan-dev.vercel.app/r/{name}.json` in `components.json`, then uses
-  `shadcn add @kunalkeshan/button`. The `/style-guide` page includes copyable setup,
-  discovery, and install commands for pnpm, npm, yarn, and bun.
+- A consumer configures `@kunalkeshan` as `<site-url>/r/{name}.json` in
+  `components.json`, then uses `shadcn add @kunalkeshan/button`. The `/style-guide`
+  page's registry instructions (`_components/registry-guide.tsx`, a Client Component)
+  build this from `env.NEXT_PUBLIC_SITE_URL` (`@workspace/env/client`) rather than a
+  hardcoded domain, so they always reflect whichever environment is actually serving
+  the page — local dev, a preview deployment, or production — and include copyable
+  setup, discovery, and install commands for pnpm, npm, yarn, and bun.
 
 **This is currently a manual step, not wired into `apps/web`'s build.** Re-run
 `pnpm --filter ui registry:build` after changing `registry.json` or any registered

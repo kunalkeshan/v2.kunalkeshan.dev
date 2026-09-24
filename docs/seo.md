@@ -53,12 +53,35 @@ Picking a type for a page that doesn't fit the table: prefer the closest matchin
 schema.org type over inventing a custom one, and default to `WebPage` when nothing fits
 better (see `buildWebPageJsonLd` in `structured-data.ts`).
 
+## Site base URL
+
+The single source of truth for the site's own base URL is the
+`NEXT_PUBLIC_SITE_URL` env var (validated via `@workspace/env/client`, see
+`apps/web/env.sample`) — never a hardcoded domain literal anywhere in `apps/web` or
+`packages/*`.
+
+- **Server code** (route handlers, Server Components, plain lib files like
+  `apps/web/lib/structured-data.ts`) should go through `apps/web/config/site.ts`'s
+  `SITE_CONFIG.URL`, which additionally prefers Vercel's auto-injected
+  `VERCEL_PROJECT_PRODUCTION_URL` over `NEXT_PUBLIC_SITE_URL` when present (so
+  Vercel preview/production deployments resolve automatically without a matching
+  manual env var update).
+- **Client Components** that need the base URL (e.g. the `/style-guide` page's
+  shadcn-registry instructions) can't use `SITE_CONFIG.URL` — `VERCEL_PROJECT_PRODUCTION_URL`
+  is server-only — so they import `env` from `@workspace/env/client` directly and
+  read `env.NEXT_PUBLIC_SITE_URL`.
+
+Adding a new absolute-URL consumer: reach for `SITE_CONFIG.URL` (server) or
+`env.NEXT_PUBLIC_SITE_URL` (client) first, and only fall back to prop-drilling a
+server-computed URL into a client component (see `shareUrl` in the blog/journal
+detail pages) when the value also needs data unavailable to `@workspace/env/client`.
+
 ## Canonical URLs
 
 Every page-level `metadata`/`generateMetadata` sets `alternates: { canonical: "<path>" }`
 (a relative path — it resolves against `metadataBase`, set once in the root
-`app/layout.tsx`). This includes the home page (`page.tsx` in the `(static)` route group),
-which previously had no `metadata` export at all.
+`app/layout.tsx` from `SITE_CONFIG.URL`). This includes the home page (`page.tsx` in
+the `(static)` route group), which previously had no `metadata` export at all.
 
 **Filterable/paginated listing pages** (`/blog`, `/journal`, `/tags/[tag]` — all support
 `?q=`/`?tag=`/`?page=`) canonicalize to the clean, unfiltered URL always, regardless of the

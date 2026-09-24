@@ -1,5 +1,6 @@
 "use client"
 
+import { env } from "@workspace/env/client"
 import {
   Tabs,
   TabsContent,
@@ -9,7 +10,9 @@ import {
 
 import { CopyButton } from "./copy-button"
 
-const registryUrl = "https://v2-kunalkeshan-dev.vercel.app/r/{name}.json"
+const registryUrl = `${env.NEXT_PUBLIC_SITE_URL}/r/{name}.json`
+const registryIndexUrl = `${env.NEXT_PUBLIC_SITE_URL}/r/registry.json`
+const registryButtonUrl = `${env.NEXT_PUBLIC_SITE_URL}/r/button.json`
 const registryConfig = JSON.stringify(
   { registries: { "@kunalkeshan": registryUrl } },
   null,
@@ -34,7 +37,7 @@ const commands = [
   { label: "Install a component", command: "add @kunalkeshan/button" },
   {
     label: "Install by direct URL",
-    command: "add https://v2-kunalkeshan-dev.vercel.app/r/button.json",
+    command: "add " + registryButtonUrl,
   },
 ]
 
@@ -83,7 +86,7 @@ export function RegistryGuide() {
           Add the registry namespace to your project, then use the shadcn CLI to
           browse and install components. The registry index is available at{" "}
           <a
-            href="https://v2-kunalkeshan-dev.vercel.app/r/registry.json"
+            href={registryIndexUrl}
             className="font-mono underline underline-offset-4 hover:text-foreground"
             target="_blank"
             rel="noreferrer"

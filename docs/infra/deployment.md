@@ -18,7 +18,7 @@ Production env vars, as set in the Vercel dashboard (see `apps/web/env.sample` f
 | `NEXT_PUBLIC_SANITY_DATASET` | `production` |
 | `NEXT_PUBLIC_SANITY_API_VERSION` | `2026-01-08` |
 | `NEXT_PUBLIC_SANITY_STUDIO_URL` | `https://kunalkeshan.sanity.studio` |
-| `SITE_URL` | `https://v2-kunalkeshan-dev.vercel.app` |
+| `NEXT_PUBLIC_SITE_URL` | `https://v2-kunalkeshan-dev.vercel.app` |
 | `SANITY_WEBHOOK_SECRET` | set once the webhook below is registered — see `apps/web/env.sample` for how to generate it |
 | `SANITY_API_READ_TOKEN` | Viewer-role token for Live Content API / draft-mode preview — see `apps/web/env.sample` for how to create it |
 

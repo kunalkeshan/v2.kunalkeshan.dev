@@ -18,7 +18,6 @@ const optionalSecret = () =>
 
 export const env = createEnv({
   server: {
-    SITE_URL: z.url(),
     SANITY_WEBHOOK_SECRET: optionalSecret(),
 
     // Viewer-role read token for the Live Content API / draft-mode preview
@@ -39,7 +38,6 @@ export const env = createEnv({
     TURNSTILE_SECRET_KEY: optionalSecret(),
   },
   experimental__runtimeEnv: {
-    SITE_URL: process.env.SITE_URL,
     SANITY_WEBHOOK_SECRET: process.env.SANITY_WEBHOOK_SECRET,
     SANITY_API_READ_TOKEN: process.env.SANITY_API_READ_TOKEN,
     NODEMAILER_EMAIL: process.env.NODEMAILER_EMAIL,

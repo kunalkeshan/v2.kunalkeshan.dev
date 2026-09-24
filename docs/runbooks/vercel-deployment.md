@@ -33,7 +33,7 @@ Set per-project in the Vercel dashboard (Project → Settings → Environment Va
 - `NEXT_PUBLIC_SANITY_DATASET`
 - `NEXT_PUBLIC_SANITY_API_VERSION`
 - `NEXT_PUBLIC_SANITY_STUDIO_URL` — production value: `https://kunalkeshan.sanity.studio`
-- `SITE_URL` — production value: `https://v2-kunalkeshan-dev.vercel.app`
+- `NEXT_PUBLIC_SITE_URL` — production value: `https://v2-kunalkeshan-dev.vercel.app`
 - `SANITY_WEBHOOK_SECRET` — see `docs/infra/deployment.md`'s "Revalidation webhook" section for how it's registered
 - `SANITY_API_READ_TOKEN` — Viewer-role token for Live Content API / draft-mode preview, see `apps/web/env.sample`
 
