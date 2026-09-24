@@ -48,6 +48,26 @@ domain is finalized, add the site to it, then set both keys above (locally
 and in Vercel's project env). No code change is needed — both ends start
 enforcing the moment the keys exist.
 
+For `kunalkeshan.dev`: register the widget against the bare apex domain
+only (`kunalkeshan.dev`, no `www` — nothing in this repo redirects or
+serves `www.kunalkeshan.dev`; every canonical URL reference in the codebase
+uses the apex), in **Managed** mode. Set both keys in Vercel's
+**Production** environment only — Preview deploys (`*.vercel.app`) keep
+both vars unset intentionally, so `verifyTurnstileToken` skips verification
+there the same way it does in local dev without keys, rather than 403'ing
+every preview submission against a widget that isn't registered for that
+hostname.
+
+`contact-form.tsx` passes `options={{ theme: "auto" }}` explicitly to
+`<Turnstile>` so the light/dark tracking behavior is a deliberate,
+documented choice (it also happens to be the library's default). This is
+the only styling lever available: the widget renders inside a
+Cloudflare-controlled iframe, so this site's neobrutalist border/shadow/
+radius tokens (`docs/ui/design-system.md`) cannot reach its internals — only
+`theme`, `size`, and `appearance` render options exist, plus
+`className`/`style` on the outer wrapper div. Don't attempt deeper visual
+customization; it isn't supported by Cloudflare's embed.
+
 ## The `@workspace/emails` package
 
 Email templates live in `packages/emails/src/`, structured like:

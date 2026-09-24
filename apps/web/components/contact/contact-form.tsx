@@ -252,6 +252,7 @@ export function ContactForm({ services }: ContactFormProps) {
         {TURNSTILE_SITE_KEY ? (
           <Turnstile
             siteKey={TURNSTILE_SITE_KEY}
+            options={{ theme: "auto" }}
             onSuccess={(token) => form.setValue("turnstileToken", token)}
             onExpire={() => form.setValue("turnstileToken", undefined)}
           />
