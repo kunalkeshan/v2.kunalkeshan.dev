@@ -1,6 +1,8 @@
-# v2.kunalkeshan.dev
+# kunalkeshan.dev
 
 Personal portfolio site. Turborepo monorepo using pnpm workspaces and shadcn/ui's monorepo scaffold.
+
+Successor to [github.com/kunalkeshan/kunalkeshan.dev](https://github.com/kunalkeshan/kunalkeshan.dev) (now serving [v1.kunalkeshan.dev](https://v1.kunalkeshan.dev)). This repo is the live portfolio at [kunalkeshan.dev](https://kunalkeshan.dev).
 
 ## Structure
 
