@@ -737,3 +737,89 @@
   top: 16px;
   width: 94%;
 }
+
+/*
+ * Sonner toast — third-party component, styled via the classNames hooks set
+ * in packages/ui/src/components/sonner.tsx's `toastOptions.classNames`
+ * rather than via our own component variants, since sonner owns the markup.
+ *
+ * Container sits at the same "floating chrome / dialog" tier as sheets and
+ * dialogs per docs/ui/design-system.md: border-3, shadow-xl, rounded-lg.
+ * Semantic coloring (success/warning/error/info) comes from the
+ * --{type}-bg/-text/-border CSS vars sonner.tsx wires per toast type; the
+ * border itself always stays var(--border) regardless of type (see
+ * badge.tsx's variants — colored fill, never a colored border).
+ */
+@layer components {
+  .cn-toast {
+    border-width: 3px !important;
+    border-color: var(--border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-xl) !important;
+  }
+
+  /* Title styled like badge.tsx/button.tsx's loud neobrutalist voice —
+   * font-heading (the serif display face aliased at --font-heading),
+   * heavier weight, tightened tracking. Kept to the title only, not the
+   * description, so longer message text underneath still reads easily. */
+  .cn-toast-title {
+    font-family: var(--font-heading) !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em;
+  }
+
+  /* Description text on a solid semantic fill needs to stay legible against
+   * every variant's background — sonner's own default dims it toward
+   * --muted-foreground, which reads as low-contrast gray on a solid
+   * orange/red/green fill. Inheriting the toast's own text color at reduced
+   * opacity keeps it readable across all variants without a per-variant
+   * override. */
+  .cn-toast-description {
+    color: currentColor !important;
+    opacity: 0.8;
+  }
+
+  /* Action / cancel / close buttons — bordered, small, modeled on
+   * button.tsx's icon-button tier, since they must sit legibly on four
+   * different solid background colors (popover/success/warning/error). */
+  .cn-toast-action,
+  .cn-toast-cancel {
+    border-width: 2px !important;
+    border-color: var(--border) !important;
+    border-radius: var(--radius-base) !important;
+    font-weight: 500;
+    transition:
+      translate var(--dur-press) var(--ease-snap),
+      box-shadow var(--dur-press) var(--ease-snap);
+  }
+
+  .cn-toast-action {
+    background-color: var(--foreground) !important;
+    color: var(--background) !important;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .cn-toast-action:hover {
+    translate: 1px 1px;
+    box-shadow: none;
+  }
+
+  .cn-toast-cancel {
+    background-color: transparent !important;
+    color: currentColor !important;
+  }
+
+  .cn-toast-close {
+    border-width: 2px !important;
+    border-color: var(--border) !important;
+    border-radius: var(--radius-sm) !important;
+    background-color: var(--popover) !important;
+    color: var(--popover-foreground) !important;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .cn-toast-close:hover {
+    translate: 1px 1px;
+    box-shadow: none;
+  }
+}
