@@ -39,5 +39,6 @@ Operational how-tos for recurring or step-by-step tasks.
 - [`vercel-deployment.md`](./runbooks/vercel-deployment.md) — linking and deploying `apps/web` to Vercel (manual, on-demand only — not part of every change's Definition of Done)
 - [`contact-form.md`](./runbooks/contact-form.md) — `/contact` form env vars (nodemailer, Turnstile), the `@workspace/emails` package, and why rate limiting isn't implemented yet
 - [`analytics.md`](./runbooks/analytics.md) — Google Analytics + Microsoft Clarity setup, env vars, the `lib/analytics.ts` custom-event wrapper, and why there's no consent gate yet
+- [`releases.md`](./runbooks/releases.md) — per-app versioning via GitHub Releases (`<app-dir>-vX.Y.Z` tags), the `sync-version.yml` workflow, and how an app displays its version
 
 This directory starts small on purpose — add a runbook when a real recurring task or incident happens, not speculatively.

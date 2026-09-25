@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "private": true,
   "scripts": {
@@ -22,6 +22,7 @@
     "@workspace/env": "workspace:*",
     "@workspace/sanity": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "@workspace/version": "workspace:*",
     "cmdk": "^1.1.1",
     "lucide-react": "^1.45.0",
     "motion": "^12.23.24",

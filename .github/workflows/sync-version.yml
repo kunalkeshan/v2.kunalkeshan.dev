@@ -1,0 +1,97 @@
+name: Sync app version with release
+
+# Manual release model (see docs/runbooks/releases.md): a human publishes a
+# GitHub Release tagged "<app-dir>-vX.Y.Z" (e.g. web-v1.2.3). This workflow
+# bumps that app's apps/<app-dir>/package.json "version" field to match, via
+# an auto-merged PR. The tag prefix maps mechanically to the apps/<prefix>
+# directory — adding a new app needs zero changes here, as long as that
+# app's package.json "name" field equals its apps/<name> directory name.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Full tag to sync (e.g. web-v1.2.3). Leave empty to use the latest published release."
+        required: false
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Resolve tag and app prefix
+        id: resolve
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG_NAME="${{ github.event.inputs.tag }}"
+            echo "Using manually provided tag: $TAG_NAME"
+          elif [ "${{ github.event_name }}" = "release" ]; then
+            TAG_NAME="${{ github.event.release.tag_name }}"
+            echo "Using release tag: $TAG_NAME"
+          else
+            echo "Fetching latest release from GitHub API..."
+            TAG_NAME=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r .tag_name)
+            if [ "$TAG_NAME" = "null" ] || [ -z "$TAG_NAME" ]; then
+              echo "No releases found, exiting"
+              exit 1
+            fi
+            echo "Using latest release tag: $TAG_NAME"
+          fi
+
+          # Tag shape: <prefix>-v<semver>, e.g. web-v1.2.3 -> prefix=web, version=1.2.3
+          if [[ ! "$TAG_NAME" =~ ^([a-z0-9-]+)-v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "Tag '$TAG_NAME' doesn't match the required <prefix>-v<semver> shape, e.g. web-v1.0.0"
+            exit 1
+          fi
+          APP_PREFIX="${BASH_REMATCH[1]}"
+          VERSION="${BASH_REMATCH[2]}"
+
+          if [ ! -f "apps/$APP_PREFIX/package.json" ]; then
+            echo "No apps/$APP_PREFIX/package.json found for prefix '$APP_PREFIX' (tag prefix must match an apps/* directory name)"
+            exit 1
+          fi
+
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "app_prefix=$APP_PREFIX" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Update apps/${{ steps.resolve.outputs.app_prefix }}/package.json version
+        run: pnpm --filter ${{ steps.resolve.outputs.app_prefix }} version ${{ steps.resolve.outputs.version }} --no-git-tag-version --allow-same-version
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: sync ${{ steps.resolve.outputs.app_prefix }} version to ${{ steps.resolve.outputs.tag_name }}"
+          branch: chore/version-${{ steps.resolve.outputs.tag_name }}
+          title: "chore: sync ${{ steps.resolve.outputs.app_prefix }} version to ${{ steps.resolve.outputs.tag_name }}"
+          body: "Auto-generated version sync from release ${{ steps.resolve.outputs.tag_name }}."
+          base: main
+
+      - name: Enable auto-merge
+        if: steps.cpr.outputs.pull-request-number != ''
+        run: gh pr merge ${{ steps.cpr.outputs.pull-request-number }} --auto --squash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

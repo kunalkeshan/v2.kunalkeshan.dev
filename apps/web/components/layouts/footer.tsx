@@ -11,6 +11,7 @@ import type {
   FOOTER_LEGAL_LINKS_QUERY_RESULT,
   SITE_CONFIG_QUERY_RESULT,
 } from "@workspace/sanity/types";
+import { getReleasesUrl, formatVersion } from "@workspace/version";
 
 import {
   sectionReveal,
@@ -22,6 +23,7 @@ import { SocialsRow } from "@/components/contact/socials-row";
 import { CopyEmailButton } from "@/components/contact/copy-email-button";
 import { useRickrollAudio } from "@/providers/rickroll-audio-provider";
 import { trackLinkClick, trackUiEvent } from "@/lib/analytics";
+import { APP_VERSION } from "@/config/version";
 
 interface Props {
   siteConfig: SITE_CONFIG_QUERY_RESULT;
@@ -232,6 +234,22 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
             className="underline underline-offset-2 hover:text-foreground"
           >
             Next.js
+          </a>
+          {" · "}
+          <a
+            href={getReleasesUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() =>
+              trackLinkClick({
+                platform: "github_release",
+                url: getReleasesUrl(),
+                placement: "footer",
+              })
+            }
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            {formatVersion(APP_VERSION)}
           </a>
         </p>
       </Container>

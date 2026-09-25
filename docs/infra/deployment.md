@@ -1,6 +1,6 @@
 # Deployment
 
-`apps/web` and `apps/studio` deploy completely independently — different targets, different pipelines, no shared release process.
+`apps/web` and `apps/studio` deploy completely independently — different targets, different pipelines, no shared *deploy* process. Each app is versioned and released independently too, via manually published GitHub Releases (`<app-dir>-vX.Y.Z` tags) that trigger a version-bump workflow — see [`docs/runbooks/releases.md`](../runbooks/releases.md). That's a release/versioning process, not a deploy pipeline: publishing a release doesn't itself deploy anything, it just bumps the app's `package.json` version ahead of that app's own next (manual/on-demand) deploy below.
 
 ## `apps/web` — Vercel
 
