@@ -12,7 +12,7 @@ import { HighlightText } from "@/components/highlight-text"
 import { ContactForm } from "@/components/contact/contact-form"
 import { SocialsList } from "@/components/contact/socials-list"
 import { CopyEmailButton } from "@/components/contact/copy-email-button"
-import { heroReveal, heroRevealTransition } from "@/lib/motion"
+import { heroRevealNoTransform, heroRevealTransition } from "@/lib/motion"
 
 interface ContactHeroProps {
   siteConfig: SITE_CONFIG_QUERY_RESULT
@@ -21,9 +21,15 @@ interface ContactHeroProps {
 
 /**
  * Above-the-fold block: heading/socials/copy-email on the left, the form on
- * the right. Uses `heroReveal` (mount-entrance), not `sectionReveal`
- * (scroll-into-view) — this content is visible immediately on load, same
- * reasoning as `apps/web/components/sections/hero.tsx`.
+ * the right. Uses `heroRevealNoTransform` (mount-entrance, fade-only), not
+ * `sectionReveal` (scroll-into-view) — this content is visible immediately
+ * on load, same reasoning as `apps/web/components/sections/hero.tsx`.
+ *
+ * Fade-only, not the usual `heroReveal`: this section wraps the sticky form
+ * column below, and `heroReveal`'s `y` animation leaves an inline `transform`
+ * on this element, which creates a new containing block and silently breaks
+ * `position: sticky` on the form. See `heroRevealNoTransform` in
+ * `lib/motion.ts` for the full explanation.
  */
 export function ContactHero({ siteConfig, services }: ContactHeroProps) {
   const primaryEmail = siteConfig?.emails?.[0]?.email
@@ -32,15 +38,27 @@ export function ContactHero({ siteConfig, services }: ContactHeroProps) {
     <motion.section
       initial="hidden"
       animate="visible"
-      variants={heroReveal}
+      variants={heroRevealNoTransform}
       transition={heroRevealTransition}
     >
       <Container>
         <div className="mx-auto grid w-full grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8">
-          {/* `lg:h-fit` matters: as a grid child this would otherwise stretch
-           * to the row's full height, leaving the sticky column no room to
-           * travel — sticky would silently do nothing. Same trap documented
-           * on the project detail page's sticky sidebar.
+          {/* No `lg:h-fit` on the sticky column here — that's the inverse of
+           * the project detail page's trap. There, the sticky aside is a
+           * flex sibling that would otherwise STRETCH to match a taller
+           * sibling, so `h-fit` stops it stretching and gives its own sticky
+           * child room to travel *within* that stretched height.
+           *
+           * Here the roles are flipped: this column is the SHORTER one, and
+           * it needs to stretch to the row's full height (this is a CSS
+           * grid, whose cells stretch to the row height by default) so its
+           * sticky child has somewhere to travel *inside the cell itself*.
+           * Adding `lg:h-fit` collapses this cell down to exactly the sticky
+           * child's own height, leaving zero travel room — the child
+           * detaches from `top` almost immediately and just scrolls with
+           * the page, which is the bug this comment used to cause. Sticky
+           * needs a positioned ancestor taller than itself; never make that
+           * ancestor `h-fit` to its sticky child specifically.
            *
            * The sticky side lives on whichever column is SHORTER, so it has
            * room to travel while the taller column scrolls past it — not on
@@ -72,7 +90,7 @@ export function ContactHero({ siteConfig, services }: ContactHeroProps) {
             </div>
           </div>
 
-          <div className="flex items-center justify-center lg:h-fit lg:self-start">
+          <div className="flex items-center justify-center">
             <div className="w-full lg:sticky lg:top-28">
               <ContactForm services={services} />
             </div>

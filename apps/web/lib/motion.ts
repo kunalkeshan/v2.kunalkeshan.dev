@@ -64,3 +64,18 @@ export const heroReveal: Variants = {
 }
 
 export const heroRevealTransition: Transition = springTransition
+
+/**
+ * Fade-only counterpart to `heroReveal`, for a mount-entrance wrapper that
+ * contains a `position: sticky` descendant. `heroReveal` animates `y`, which
+ * Framer Motion implements as an inline `transform` on the animated element
+ * — and a non-`none` transform on an ancestor creates a new containing
+ * block, which silently breaks `position: sticky` for anything inside it
+ * (the sticky element ends up positioned relative to that ancestor's box
+ * instead of the actual scroll container). Use this wherever `heroReveal`
+ * would otherwise wrap a sticky child, e.g. `ContactHero`.
+ */
+export const heroRevealNoTransform: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+}
