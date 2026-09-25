@@ -10,7 +10,7 @@ import type {
 
 import { HighlightText } from "@/components/highlight-text"
 import { ContactForm } from "@/components/contact/contact-form"
-import { SocialsRow } from "@/components/contact/socials-row"
+import { SocialsList } from "@/components/contact/socials-list"
 import { CopyEmailButton } from "@/components/contact/copy-email-button"
 import { heroReveal, heroRevealTransition } from "@/lib/motion"
 
@@ -40,36 +40,42 @@ export function ContactHero({ siteConfig, services }: ContactHeroProps) {
           {/* `lg:h-fit` matters: as a grid child this would otherwise stretch
            * to the row's full height, leaving the sticky column no room to
            * travel — sticky would silently do nothing. Same trap documented
-           * on the project detail page's sticky sidebar. The form (right
-           * column) is the one likely to grow taller — validation errors,
-           * the "Other" field, Turnstile — so the shorter left column is the
-           * one that sticks while the form scrolls past it. */}
-          <div className="flex w-full flex-col items-center gap-6 text-center lg:h-fit lg:items-start lg:self-start lg:text-left">
-            <div className="w-full lg:sticky lg:top-28">
-              <div>
-                <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
-                  <HighlightText variant="secondary">Contact</HighlightText> me
-                </h1>
-                <p className="mt-3 max-w-md text-base leading-relaxed text-body-foreground md:text-lg">
-                  Feel free to connect with me through email, my socials, or
-                  simply drop me a message — I&apos;ll get back to you soon.
-                </p>
-              </div>
+           * on the project detail page's sticky sidebar.
+           *
+           * The sticky side lives on whichever column is SHORTER, so it has
+           * room to travel while the taller column scrolls past it — not on
+           * a fixed left/right assumption. This was the form (right column)
+           * until the detailed `SocialsList` row list replaced the old
+           * icon-only `SocialsRow`: the left column (heading + email +
+           * socials) is now reliably the taller one, so the form is the
+           * side that sticks instead. If the left column's content ever
+           * shrinks back below the form's height, flip this back. */}
+          <div className="flex w-full flex-col items-center gap-6 text-center lg:items-start lg:text-left">
+            <div>
+              <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
+                <HighlightText variant="secondary">Contact</HighlightText> me
+              </h1>
+              <p className="mt-3 max-w-md text-base leading-relaxed text-body-foreground md:text-lg">
+                Feel free to connect with me through email, my socials, or
+                simply drop me a message — I&apos;ll get back to you soon.
+              </p>
+            </div>
 
-              {primaryEmail ? (
-                <div className="mt-6">
-                  <CopyEmailButton email={primaryEmail} />
-                </div>
-              ) : null}
-
+            {primaryEmail ? (
               <div className="mt-6">
-                <SocialsRow socialMedia={siteConfig?.socialMedia ?? null} />
+                <CopyEmailButton email={primaryEmail} />
               </div>
+            ) : null}
+
+            <div className="mt-8 w-full">
+              <SocialsList socialMedia={siteConfig?.socialMedia ?? null} />
             </div>
           </div>
 
-          <div className="flex items-center justify-center">
-            <ContactForm services={services} />
+          <div className="flex items-center justify-center lg:h-fit lg:self-start">
+            <div className="w-full lg:sticky lg:top-28">
+              <ContactForm services={services} />
+            </div>
           </div>
         </div>
       </Container>

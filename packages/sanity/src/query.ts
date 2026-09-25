@@ -73,7 +73,8 @@ export const SITE_CONFIG_QUERY = defineQuery(`
     socialMedia[] {
       platform,
       url,
-      label
+      label,
+      description
     },
     resumePdf {
       asset->

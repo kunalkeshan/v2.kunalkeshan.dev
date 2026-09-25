@@ -545,8 +545,8 @@ duration constants existed outside framer-motion's own spring defaults.
 - Use the `motion` package (the current name for framer-motion; see
   `apps/web/package.json`) — never `next/font`-style ad-hoc per-file reinvention of the
   same values.
-- **Section reveal-on-scroll** keeps v1's exact values as the default (they're a good,
-  proven baseline) but centralizes them in `apps/web/lib/motion.ts`
+- **Section reveal-on-scroll** keeps v1's exact `opacity`/`y` shape as the default
+  (a good, proven baseline) but centralizes it in `apps/web/lib/motion.ts`
   (`sectionReveal` variants + `sectionRevealTransition` + `sectionRevealViewport`) —
   `initial="hidden" whileInView="visible" variants={sectionReveal}
 transition={sectionRevealTransition} viewport={sectionRevealViewport}`. Import from
@@ -557,21 +557,35 @@ transition={sectionRevealTransition} viewport={sectionRevealViewport}`. Import f
   `apps/web/components/layouts/footer.tsx` is the working reference implementation —
   copy its `motion.footer` wrapper (and its `"use client"` directive, required for any
   component using `motion.*`) for new sections rather than re-deriving the pattern.
+  **The transition itself is a fixed `duration: 0.6` + `ease-out-quint`
+  (`cubic-bezier(0.22, 1, 0.36, 1)`, the same coss.com/Penner curve `globals.css`
+  already names `--ease-out-quint`) — not spring physics.** An earlier version ran
+  these reveals on `type: "spring"` (retuned once, `200/20/0.6` → `350/28/0.5`, still
+  read as "ragged"/inconsistent across the 15+ consumers importing this file — spring
+  physics settles with a travel-distance-dependent velocity curve and a touch of
+  overshoot, which doesn't repeat identically the way a fixed duration+curve does.
+  `sectionRevealTransition` and `heroRevealTransition` (via `springTransition`) had
+  also drifted into two *different* untuned spring instances before this — worth
+  remembering if reveal timing is ever revisited: don't reach for `type: "spring"` for
+  a one-shot reveal-then-settle animation; reserve real spring physics for something
+  that's actually interruptible/interactive mid-flight (a drag, a gesture-driven
+  panel), where physical continuity matters. `springTransition`'s *name* stayed as-is
+  through this change since every existing import still reads naturally.
 - **Scroll-driven navbar morph + mount entrance** (see
   `apps/web/components/layouts/navbar.tsx`): `useScroll` (a small hysteresis-based
   scroll-position hook, `packages/ui/src/hooks/use-scroll.ts`) drives a `motion.nav`
   between **named `variants`** — `enter` (mount-only: `opacity: 0, y: -20`, at the
   `default` shape), `default`, and `scrolled` — rather than raw inline objects computed
   per render. `initial="enter"`, `animate={scrolled ? "scrolled" : "default"}`,
-  transitioning with `springTransition` from `apps/web/lib/motion.ts`
-  (`stiffness: 200, damping: 20, mass: 0.6`, no second timing pair — see the button
-  hover-timing note above for why that matters). **Use named variants, not ad-hoc
-  merged objects, for any `motion` component with more than one animated state**: an
-  early version of this navbar built `initial`/`animate` by hand-spreading plain
-  objects per render (`{ opacity: 1, ...shapeProps }`), and because one variant defined
-  a `y` transform the other never explicitly reset, the entrance intermittently got
-  stuck mid-animation instead of settling — `variants` avoids this because every named
-  state declares its full property set. Always gate this kind of animation behind
+  transitioning with `springTransition` from `apps/web/lib/motion.ts` (the shared
+  `duration: 0.6` / `ease-out-quint` transition described above — no second timing pair,
+  see the button hover-timing note above for why that matters). **Use named variants,
+  not ad-hoc merged objects, for any `motion` component with more than one animated
+  state**: an early version of this navbar built `initial`/`animate` by hand-spreading
+  plain objects per render (`{ opacity: 1, ...shapeProps }`), and because one variant
+  defined a `y` transform the other never explicitly reset, the entrance intermittently
+  got stuck mid-animation instead of settling — `variants` avoids this because every
+  named state declares its full property set. Always gate this kind of animation behind
   `useReducedMotion()` (from `motion/react`) and fall back to `initial={false}` /
   `{ duration: 0 }` — see the navbar for the exact pattern.
 - Still no dedicated page-transition/route system — that remains genuinely out of scope

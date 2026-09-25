@@ -530,6 +530,13 @@ export const siteConfigType = defineType({
               type: "string",
               description: "Custom label for the social media link",
             },
+            {
+              name: "description",
+              title: "Description (optional)",
+              type: "string",
+              description:
+                "A short one-liner shown under the link on the contact page's detailed socials list (e.g. \"Commit history doesn't lie, unlike my sleep schedule.\"). Leave empty to omit this link from that list.",
+            },
           ],
           preview: {
             select: {
