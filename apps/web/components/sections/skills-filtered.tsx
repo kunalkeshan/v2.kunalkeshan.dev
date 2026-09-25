@@ -1,6 +1,6 @@
 "use client"
 
-import { useTransition } from "react"
+import { useState, useTransition } from "react"
 import { parseAsArrayOf, parseAsString, useQueryStates } from "nuqs"
 
 import type { SKILLS_QUERY_RESULT } from "@workspace/sanity/types"
@@ -14,6 +14,9 @@ import {
   SKILL_CATEGORY_LABELS,
   SKILL_CATEGORY_ORDER,
 } from "@/lib/skill-categories"
+import { useRevealGroup } from "@/hooks/use-reveal"
+import { Reveal } from "@/components/reveal"
+import { chipStaggerDelay } from "@/lib/reveal-stagger"
 
 interface SkillsFilteredProps {
   skills: SKILLS_QUERY_RESULT
@@ -24,6 +27,14 @@ interface SkillsFilteredProps {
  * on /blog, /journal and /projects — a filtered skills view is then
  * shareable and survives back/forward, instead of resetting on navigation
  * the way the previous local `useState` version did.
+ *
+ * The chip grid staggers in (`chipStaggerDelay`, same mechanism as the home
+ * page's featured-skills strip) only on first load — see `everFiltered`
+ * above. Once the user has filtered even once, every later render (including
+ * clearing back to the unfiltered set) renders plain `SkillChip`s with no
+ * `<Reveal>`, leaving `FilterResultsTransition`'s crossfade as the only
+ * motion — re-staggering a 20-30 chip grid on every keystroke or category
+ * toggle would read as sluggish for a control used repeatedly.
  */
 export function SkillsFiltered({ skills }: SkillsFilteredProps) {
   const [isPending, startTransition] = useTransition()
@@ -36,6 +47,21 @@ export function SkillsFiltered({ skills }: SkillsFilteredProps) {
     },
     { startTransition }
   )
+  // Stagger the chip grid in only on first load. Any filter/search change
+  // after that is `FilterResultsTransition`'s job (a plain crossfade of the
+  // whole grid) — re-running a 20-30 chip ripple on every keystroke or
+  // category toggle would feel sluggish for a control someone uses
+  // repeatedly, not celebratory the way a one-time page-load reveal is.
+  //
+  // "Adjust state during rendering" (react.dev), not an effect: this only
+  // ever flips one way (false -> true) and must be true for the SAME render
+  // that shows the filtered result, not one render later.
+  const filtersActive = filters.q.length > 0 || filters.category.length > 0
+  const [everFiltered, setEverFiltered] = useState(filtersActive)
+  if (filtersActive && !everFiltered) {
+    setEverFiltered(true)
+  }
+  const { ref, state, Provider } = useRevealGroup<HTMLDivElement>("mount")
 
   const byCategory = new Map<string, NonNullable<SKILLS_QUERY_RESULT>>()
   for (const skill of skills ?? []) {
@@ -65,7 +91,7 @@ export function SkillsFiltered({ skills }: SkillsFilteredProps) {
   const resultsKey = visibleSkills.map((skill) => skill._id).join(",")
 
   return (
-    <div>
+    <div ref={ref}>
       <FilterSearchInput
         value={filters.q}
         onChange={(value) => setFilters({ q: value || null })}
@@ -96,17 +122,25 @@ export function SkillsFiltered({ skills }: SkillsFilteredProps) {
 
       <div className="mt-8">
         <FilterResultsTransition resultsKey={resultsKey}>
-          <div className="flex flex-wrap gap-2">
-            {visibleSkills.map((skill) => (
-              <SkillChip key={skill._id} skill={skill} />
-            ))}
+          <Provider state={state}>
+            <div className="flex flex-wrap gap-2">
+              {visibleSkills.map((skill, index) =>
+                everFiltered ? (
+                  <SkillChip key={skill._id} skill={skill} />
+                ) : (
+                  <Reveal key={skill._id} delay={chipStaggerDelay(index)}>
+                    <SkillChip skill={skill} />
+                  </Reveal>
+                )
+              )}
 
-            {visibleSkills.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                No skills match your search.
-              </p>
-            )}
-          </div>
+              {visibleSkills.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No skills match your search.
+                </p>
+              )}
+            </div>
+          </Provider>
         </FilterResultsTransition>
       </div>
     </div>

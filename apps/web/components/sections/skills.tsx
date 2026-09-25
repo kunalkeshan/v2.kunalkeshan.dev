@@ -11,7 +11,9 @@ import { urlFor } from "@workspace/sanity/image"
 import type { FEATURED_SKILLS_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
-import { useReveal } from "@/hooks/use-reveal"
+import { useRevealGroup } from "@/hooks/use-reveal"
+import { Reveal } from "@/components/reveal"
+import { chipStaggerDelay } from "@/lib/reveal-stagger"
 
 type Skill = NonNullable<FEATURED_SKILLS_QUERY_RESULT>[number]
 
@@ -51,41 +53,45 @@ function SkillCell({ skill }: { skill: Skill }) {
 }
 
 const Skills = ({ skills }: SkillsProps) => {
-  const { ref, state } = useReveal<HTMLElement>("in-view")
+  const { ref, state, Provider } = useRevealGroup<HTMLElement>("in-view")
 
   if (!skills || skills.length === 0) return null
 
   return (
-    <section
-      ref={ref}
-      data-reveal={state}
-      className="reveal-delay-200 py-10 md:py-16"
-    >
-      <Container>
-        <h2 className="mb-6 font-heading text-2xl font-black sm:text-3xl">
-          A good workman never blames his tools
-          {"—"}
-          <HighlightText variant="secondary">
-            but a great one collects them
-          </HighlightText>
-        </h2>
+    <Provider state={state}>
+      <section ref={ref} className="py-10 md:py-16">
+        <Container>
+          <Reveal delay={0.2}>
+            <h2 className="mb-6 font-heading text-2xl font-black sm:text-3xl">
+              A good workman never blames his tools
+              {"—"}
+              <HighlightText variant="secondary">
+                but a great one collects them
+              </HighlightText>
+            </h2>
+          </Reveal>
 
-        <div className="flex flex-wrap gap-2">
-          {skills.map((skill) => (
-            <SkillCell key={skill._id} skill={skill} />
-          ))}
-          <Button
-            variant="outline"
-            className="h-auto rounded-lg border-2 px-3 py-2.5 text-xs font-bold sm:text-sm"
-            render={<Link href="/skills" />}
-            nativeButton={false}
-          >
-            And more
-            <ArrowRightIcon data-icon="inline-end" className="size-4" />
-          </Button>
-        </div>
-      </Container>
-    </section>
+          <div className="flex flex-wrap gap-2">
+            {skills.map((skill, index) => (
+              <Reveal key={skill._id} delay={0.32 + chipStaggerDelay(index)}>
+                <SkillCell skill={skill} />
+              </Reveal>
+            ))}
+            <Reveal delay={0.32 + chipStaggerDelay(skills.length)}>
+              <Button
+                variant="outline"
+                className="h-auto rounded-lg border-2 px-3 py-2.5 text-xs font-bold sm:text-sm"
+                render={<Link href="/skills" />}
+                nativeButton={false}
+              >
+                And more
+                <ArrowRightIcon data-icon="inline-end" className="size-4" />
+              </Button>
+            </Reveal>
+          </div>
+        </Container>
+      </section>
+    </Provider>
   )
 }
 

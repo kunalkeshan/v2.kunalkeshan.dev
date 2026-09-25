@@ -24,7 +24,9 @@ import type {
 import { HighlightText } from "@/components/highlight-text"
 import { OrganizationLogoMark } from "@/components/organization-logo-mark"
 import { formatDateRange, formatDuration, spanOf } from "@/lib/dates"
-import { useReveal } from "@/hooks/use-reveal"
+import { useRevealGroup } from "@/hooks/use-reveal"
+import { Reveal } from "@/components/reveal"
+import { CARD_STAGGER_STEP_S } from "@/lib/reveal-stagger"
 import { trackLinkClick } from "@/lib/analytics"
 
 type Role = EXPERIENCES_QUERY_RESULT[number]
@@ -483,58 +485,69 @@ interface ExperienceProps {
  * from v1's landing Experience section, which used the same shape.
  */
 const Experience = ({ experiences, yearsBuilding }: ExperienceProps) => {
-  const { ref, state } = useReveal<HTMLElement>("in-view")
+  const { ref, state, Provider } = useRevealGroup<HTMLElement>("in-view")
 
   if (!experiences || experiences.length === 0) return null
 
   return (
-    <section
-      id="experience"
-      ref={ref}
-      data-reveal={state}
-      className={cn(
-        "reveal-delay-200 py-14 md:py-20",
-        // v1 ran this section on a hard black panel. `.on-inverted` reproduces
-        // it by flipping the design tokens for this subtree, so descendant
-        // shadows and focus rings re-derive against the dark ground instead of
-        // rendering black-on-black. See docs/ui/design-system.md.
-        "on-inverted"
-      )}
-    >
-      <Container>
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <div className="lg:sticky lg:top-28">
-              <h2 className="font-heading text-2xl font-black text-balance sm:text-3xl">
-                Started from the bottom,{" "}
-                <HighlightText variant="primary">now we&apos;re here</HighlightText>
-              </h2>
-              <p className="mt-4 text-base leading-relaxed text-body-foreground md:text-lg">
-                {yearsBuilding} years of clubs, contracts, and full-time work,
-                and the experience that actually stuck.
-              </p>
-              <Button
-                size="lg"
-                variant="secondary"
-                className="mt-8 w-full md:w-fit"
-                render={<Link href="/work" />}
-                nativeButton={false}
-              >
-                <FileTextIcon data-icon="inline-start" />
-                See full experience
-                <ArrowRightIcon data-icon="inline-end" />
-              </Button>
+    <Provider state={state}>
+      <section
+        id="experience"
+        ref={ref}
+        className={cn(
+          "py-14 md:py-20",
+          // v1 ran this section on a hard black panel. `.on-inverted` reproduces
+          // it by flipping the design tokens for this subtree, so descendant
+          // shadows and focus rings re-derive against the dark ground instead of
+          // rendering black-on-black. See docs/ui/design-system.md.
+          "on-inverted"
+        )}
+      >
+        <Container>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
+            <Reveal delay={0.2}>
+              {/* Sticky lives on this inner div, one level below the
+               * `Reveal` itself, so animating the `Reveal`'s `transform`
+               * doesn't touch the sticky element's own containing block. */}
+              <div className="lg:sticky lg:top-28">
+                <h2 className="font-heading text-2xl font-black text-balance sm:text-3xl">
+                  Started from the bottom,{" "}
+                  <HighlightText variant="primary">
+                    now we&apos;re here
+                  </HighlightText>
+                </h2>
+                <p className="mt-4 text-base leading-relaxed text-body-foreground md:text-lg">
+                  {yearsBuilding} years of clubs, contracts, and full-time
+                  work, and the experience that actually stuck.
+                </p>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="mt-8 w-full md:w-fit"
+                  render={<Link href="/work" />}
+                  nativeButton={false}
+                >
+                  <FileTextIcon data-icon="inline-start" />
+                  See full experience
+                  <ArrowRightIcon data-icon="inline-end" />
+                </Button>
+              </div>
+            </Reveal>
+
+            <div className="flex flex-col gap-5">
+              {experiences.map((role, index) => (
+                <Reveal
+                  key={role._id}
+                  delay={0.32 + index * CARD_STAGGER_STEP_S}
+                >
+                  <FeaturedCard role={role} />
+                </Reveal>
+              ))}
             </div>
           </div>
-
-          <div className="flex flex-col gap-5">
-            {experiences.map((role) => (
-              <FeaturedCard key={role._id} role={role} />
-            ))}
-          </div>
-        </div>
-      </Container>
-    </section>
+        </Container>
+      </section>
+    </Provider>
   )
 }
 

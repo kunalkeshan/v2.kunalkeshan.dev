@@ -509,6 +509,17 @@
 [data-reveal="hidden"] {
   opacity: 0;
   transform: translateY(20px);
+  /* Promotes the element to its own compositor layer *before* the
+   * transition starts, not partway through it. Without this, the browser
+   * only promotes an element once it detects an active `transform`/`opacity`
+   * transition, and demotes it back the instant the transition ends — that
+   * demotion (dropping back into the main layer, one frame after settling)
+   * is what read as a jerky "hitch" right at the end of the reveal, not the
+   * easing curve itself. `will-change` here means it's already promoted
+   * before `[data-reveal="visible"]`'s transition ever begins, so there's no
+   * layer-promotion cost mid-animation and no visible demotion glitch at the
+   * tail — the layer settles the same way it started. */
+  will-change: opacity, transform;
 }
 
 [data-reveal="visible"] {
@@ -559,6 +570,9 @@
 [data-reveal-sweep="hidden"] {
   transform: scaleX(0);
   transform-origin: left;
+  /* See the `[data-reveal="hidden"]` comment above — same compositor-layer
+   * promotion, ahead of the transition rather than mid-flight. */
+  will-change: transform;
 }
 
 [data-reveal-sweep="visible"] {

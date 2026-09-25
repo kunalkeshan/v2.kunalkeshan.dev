@@ -9,7 +9,9 @@ import { urlFor } from "@workspace/sanity/image"
 import type { SERVICES_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
-import { useReveal } from "@/hooks/use-reveal"
+import { useReveal, useRevealGroup } from "@/hooks/use-reveal"
+import { Reveal } from "@/components/reveal"
+import { CARD_STAGGER_STEP_S } from "@/lib/reveal-stagger"
 
 type Service = NonNullable<SERVICES_QUERY_RESULT>[number]
 
@@ -119,17 +121,39 @@ function ContactCard() {
  * both inside `Services` below (home strip) and directly on the standalone
  * `/services` page, which supplies its own `<h1>` and intro copy instead of
  * this component's heading.
+ *
+ * Owns its own `useRevealGroup("in-view")` rather than inheriting one from a
+ * parent section: the standalone `/services` page renders this with no
+ * reveal-triggering ancestor at all, so relying on a parent `Provider` would
+ * leave every card permanently at `data-reveal="hidden"` there (`Reveal`
+ * falls back to `"hidden"`, not "always visible", when rendered outside any
+ * `Provider` — see `apps/web/components/reveal.tsx`). On the home page this
+ * means the heading (`Services`, below) and the grid are two independently
+ * triggered reveals rather than one shared trigger — negligible in practice
+ * since they sit right next to each other and typically cross the viewport
+ * threshold within the same scroll frame.
  */
 export function ServicesGrid({ services }: ServicesGridProps) {
+  const { ref, state, Provider } = useRevealGroup<HTMLDivElement>("in-view")
+
   if (!services || services.length === 0) return null
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {services.map((service) => (
-        <ServiceCard key={service._id} service={service} />
-      ))}
-      <ContactCard />
-    </div>
+    <Provider state={state}>
+      <div
+        ref={ref}
+        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+      >
+        {services.map((service, index) => (
+          <Reveal key={service._id} delay={index * CARD_STAGGER_STEP_S}>
+            <ServiceCard service={service} />
+          </Reveal>
+        ))}
+        <Reveal delay={services.length * CARD_STAGGER_STEP_S}>
+          <ContactCard />
+        </Reveal>
+      </div>
+    </Provider>
   )
 }
 

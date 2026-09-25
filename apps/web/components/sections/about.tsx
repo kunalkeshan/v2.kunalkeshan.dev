@@ -9,7 +9,8 @@ import { Container } from "@workspace/ui/components/container"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { HighlightText } from "@/components/highlight-text"
-import { useReveal } from "@/hooks/use-reveal"
+import { useRevealGroup } from "@/hooks/use-reveal"
+import { Reveal } from "@/components/reveal"
 
 interface AboutHighlight {
   title: string | null
@@ -42,93 +43,93 @@ const About = ({
   imageUrl,
   imageAlt,
 }: AboutProps) => {
-  const { ref, state } = useReveal<HTMLElement>("in-view")
+  const { ref, state, Provider } = useRevealGroup<HTMLElement>("in-view")
 
   return (
-    <section
-      id="about"
-      ref={ref}
-      data-reveal={state}
-      className="reveal-delay-200 py-10 md:py-16"
-    >
-      <Container>
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="order-last flex w-full items-center justify-center lg:order-0">
-            <div
-              className={cn(
-                "aspect-square w-full max-w-md overflow-hidden rounded-full",
-                "border-3 border-border shadow-xl",
-                "transition-shadow duration-press ease-snap",
-                "hover:shadow-2xl"
+    <Provider state={state}>
+      <section id="about" ref={ref} className="py-10 md:py-16">
+        <Container>
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+            <Reveal
+              delay={0.2}
+              className="order-last flex w-full items-center justify-center lg:order-0"
+            >
+              <div
+                className={cn(
+                  "aspect-square w-full max-w-md overflow-hidden rounded-full",
+                  "border-3 border-border shadow-xl",
+                  "transition-shadow duration-press ease-snap",
+                  "hover:shadow-2xl"
+                )}
+              >
+                <Image
+                  src={imageUrl}
+                  alt={imageAlt}
+                  width={1433}
+                  height={1956}
+                  // On common laptop/desktop viewport heights this section sits
+                  // within the initial viewport alongside Hero, so Next has
+                  // measured it as the actual Largest Contentful Paint element
+                  // (not Hero's image) and flagged it for lacking an eager/
+                  // priority load hint. `priority` sets loading="eager" and
+                  // fetchPriority="high" so it's requested immediately instead
+                  // of only once it scrolls into view.
+                  priority
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.32} className="flex w-full flex-col">
+              <h2 className="font-heading text-2xl font-black sm:text-3xl">
+                {headingLead}{" "}
+                <HighlightText variant="secondary">
+                  {headingHighlight}
+                </HighlightText>
+              </h2>
+
+              <p className="mt-4 text-base leading-relaxed text-body-foreground md:text-lg">
+                {body}
+              </p>
+
+              {highlights.length > 0 && (
+                <ul className="mt-6 flex flex-col gap-5">
+                  {highlights.map((highlight, index) => (
+                    <li key={highlight.title} className="flex gap-3">
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "mt-1.5 size-5 shrink-0 rounded-sm border-2 border-border",
+                          index % 2 ? "bg-primary" : "bg-secondary"
+                        )}
+                      />
+                      <div>
+                        <h3 className="font-heading text-xl font-black sm:text-2xl">
+                          {highlight.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed text-body-foreground md:text-base">
+                          {highlight.description}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               )}
-            >
-              <Image
-                src={imageUrl}
-                alt={imageAlt}
-                width={1433}
-                height={1956}
-                // On common laptop/desktop viewport heights this section sits
-                // within the initial viewport alongside Hero, so Next has
-                // measured it as the actual Largest Contentful Paint element
-                // (not Hero's image) and flagged it for lacking an eager/
-                // priority load hint. `priority` sets loading="eager" and
-                // fetchPriority="high" so it's requested immediately instead
-                // of only once it scrolls into view.
-                priority
-                className="h-full w-full object-cover"
-              />
-            </div>
+
+              <Button
+                size="lg"
+                className="mt-8 w-full md:w-fit"
+                render={<Link href="/about" />}
+                nativeButton={false}
+              >
+                <UserIcon data-icon="inline-start" />
+                More about me
+              </Button>
+            </Reveal>
           </div>
-
-          <div className="flex w-full flex-col">
-            <h2 className="font-heading text-2xl font-black sm:text-3xl">
-              {headingLead}{" "}
-              <HighlightText variant="secondary">
-                {headingHighlight}
-              </HighlightText>
-            </h2>
-
-            <p className="mt-4 text-base leading-relaxed text-body-foreground md:text-lg">
-              {body}
-            </p>
-
-            {highlights.length > 0 && (
-              <ul className="mt-6 flex flex-col gap-5">
-                {highlights.map((highlight, index) => (
-                  <li key={highlight.title} className="flex gap-3">
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        "mt-1.5 size-5 shrink-0 rounded-sm border-2 border-border",
-                        index % 2 ? "bg-primary" : "bg-secondary"
-                      )}
-                    />
-                    <div>
-                      <h3 className="font-heading text-xl font-black sm:text-2xl">
-                        {highlight.title}
-                      </h3>
-                      <p className="mt-2 text-sm leading-relaxed text-body-foreground md:text-base">
-                        {highlight.description}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            <Button
-              size="lg"
-              className="mt-8 w-full md:w-fit"
-              render={<Link href="/about" />}
-              nativeButton={false}
-            >
-              <UserIcon data-icon="inline-start" />
-              More about me
-            </Button>
-          </div>
-        </div>
-      </Container>
-    </section>
+        </Container>
+      </section>
+    </Provider>
   )
 }
 

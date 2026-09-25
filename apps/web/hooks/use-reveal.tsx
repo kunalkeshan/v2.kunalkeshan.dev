@@ -70,6 +70,27 @@ export function useReveal<T extends HTMLElement>(mode: "mount" | "in-view") {
     const node = ref.current
     if (!node) return
 
+    // React Strict Mode (on in dev by default) mounts every component
+    // twice: effect → cleanup → effect again, back to back. Observed in dev
+    // only, not in a production build: an `IntersectionObserver` created in
+    // that second pass can miss the element's *current* intersection state
+    // if the scroll position already changed between the two passes (e.g. a
+    // test/automation script scrolling immediately after mount) — the
+    // callback only fires on a future *change*, so if the element is
+    // already intersecting when `observe()` is called, nothing ever fires
+    // and the reveal is stuck at `"hidden"` until some later scroll event.
+    // A synchronous `getBoundingClientRect()` check right after `observe()`
+    // closes that gap: if it's already in view, reveal immediately instead
+    // of waiting on a callback that isn't guaranteed to come.
+    const rect = node.getBoundingClientRect()
+    const alreadyInView =
+      rect.top < window.innerHeight && rect.bottom > 0 && rect.height > 0
+
+    if (alreadyInView) {
+      setState("visible")
+      return
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {

@@ -20,7 +20,8 @@ import { logoUrlFor, urlFor } from "@workspace/sanity/image"
 import type { FEATURED_TESTIMONIALS_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
-import { useReveal } from "@/hooks/use-reveal"
+import { useRevealGroup } from "@/hooks/use-reveal"
+import { Reveal } from "@/components/reveal"
 import { trackLinkClick } from "@/lib/analytics"
 
 type Testimonial = FEATURED_TESTIMONIALS_QUERY_RESULT[number]
@@ -355,34 +356,39 @@ const Testimonials = ({
   headingHighlight,
   intro,
 }: TestimonialsProps) => {
-  const { ref, state } = useReveal<HTMLElement>("in-view")
+  const { ref, state, Provider } = useRevealGroup<HTMLElement>("in-view")
 
   if (!testimonials || testimonials.length === 0) return null
 
   return (
-    <section
-      id="testimonials"
-      ref={ref}
-      data-reveal={state}
-      // `overflow-hidden` matches the reference's `.testimonial-section`: the
-      // portrait deliberately overhangs its card, and this keeps that overhang
-      // from widening the page into a horizontal scrollbar.
-      className="reveal-delay-200 overflow-hidden py-10 md:py-16"
-    >
-      <Container>
-        <h2 className="font-heading text-2xl font-black text-balance sm:text-3xl">
-          {headingLead}{" "}
-          <HighlightText variant="secondary">{headingHighlight}</HighlightText>
-        </h2>
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg">
-          {intro}
-        </p>
+    <Provider state={state}>
+      <section
+        id="testimonials"
+        ref={ref}
+        // `overflow-hidden` matches the reference's `.testimonial-section`: the
+        // portrait deliberately overhangs its card, and this keeps that overhang
+        // from widening the page into a horizontal scrollbar.
+        className="overflow-hidden py-10 md:py-16"
+      >
+        <Container>
+          <Reveal delay={0.2}>
+            <h2 className="font-heading text-2xl font-black text-balance sm:text-3xl">
+              {headingLead}{" "}
+              <HighlightText variant="secondary">
+                {headingHighlight}
+              </HighlightText>
+            </h2>
+            <p className="mt-3 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg">
+              {intro}
+            </p>
+          </Reveal>
 
-        <div className="mt-8">
-          <TestimonialsCarousel testimonials={testimonials} />
-        </div>
-      </Container>
-    </section>
+          <Reveal delay={0.32} className="mt-8">
+            <TestimonialsCarousel testimonials={testimonials} />
+          </Reveal>
+        </Container>
+      </section>
+    </Provider>
   )
 }
 

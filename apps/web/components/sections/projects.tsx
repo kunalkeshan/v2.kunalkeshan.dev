@@ -19,7 +19,9 @@ import {
   PROJECT_STATUS_LABELS,
   attributionLine,
 } from "@/lib/projects"
-import { useReveal } from "@/hooks/use-reveal"
+import { useReveal, useRevealGroup } from "@/hooks/use-reveal"
+import { Reveal } from "@/components/reveal"
+import { CARD_STAGGER_STEP_S } from "@/lib/reveal-stagger"
 
 /**
  * The listing query is the wider of the two, so cards are typed against it and
@@ -357,10 +359,22 @@ interface ProjectsGridProps {
 
 /**
  * The grid on its own, with no heading/section/motion wrapper — used inside
- * `Projects` below and directly on /projects, which supplies its own `h1`.
- * Mirrors the `ServicesGrid` / `ExperienceTimeline` split.
+ * `Projects` below, directly on /projects (both the "current" and "earlier
+ * work" strips in `projects-filtered.tsx`), and on the standalone /projects
+ * page. Mirrors the `ServicesGrid` / `ExperienceTimeline` split.
  *
- * `relative` on the item wrapper anchors each card's stretched title link.
+ * Owns its own `useRevealGroup("in-view")` rather than inheriting one from a
+ * parent section — same reasoning as `ServicesGrid`: some of these call
+ * sites have no reveal-triggering ancestor at all, so depending on one would
+ * leave cards permanently hidden there. On `/projects`, `ProjectsGrid` is
+ * remounted fresh (new React `key`) whenever the filtered result set changes
+ * (`FilterResultsTransition`'s `resultsKey`), so the stagger naturally
+ * replays every time filters change — the grid is already in view at that
+ * point, so its `IntersectionObserver` fires on the very next tick.
+ *
+ * `relative` on the item wrapper (folded into the `Reveal` here, since both
+ * need to be the same element rather than nested) anchors each card's
+ * stretched title link.
  */
 export function ProjectsGrid({
   projects,
@@ -369,31 +383,41 @@ export function ProjectsGrid({
   columns = 2,
   split,
 }: ProjectsGridProps) {
+  const { ref, state, Provider } = useRevealGroup<HTMLDivElement>("in-view")
+
   if (!projects || projects.length === 0) return null
 
   return (
-    <div
-      className={cn(
-        "grid grid-cols-1 gap-6",
-        // Split cards stay one per row: each is then full page width, so the
-        // 60/40 halves are both wide enough to work. Stacked cards tile.
-        !split && "sm:grid-cols-2",
-        // `compact` (the Earlier-work strip) always runs 3-up regardless, since
-        // those cards carry less content.
-        !split && (compact || columns === 3) && "lg:grid-cols-3"
-      )}
-    >
-      {projects.map((project) => (
-        <div key={project._id} className="relative">
-          <ProjectCard
-            project={project}
-            stars={stars}
-            compact={compact}
-            split={split}
-          />
-        </div>
-      ))}
-    </div>
+    <Provider state={state}>
+      <div
+        ref={ref}
+        className={cn(
+          "grid grid-cols-1 gap-6",
+          // Split cards stay one per row: each is then full page width, so
+          // the 60/40 halves are both wide enough to work. Stacked cards
+          // tile.
+          !split && "sm:grid-cols-2",
+          // `compact` (the Earlier-work strip) always runs 3-up regardless,
+          // since those cards carry less content.
+          !split && (compact || columns === 3) && "lg:grid-cols-3"
+        )}
+      >
+        {projects.map((project, index) => (
+          <Reveal
+            key={project._id}
+            delay={index * CARD_STAGGER_STEP_S}
+            className="relative"
+          >
+            <ProjectCard
+              project={project}
+              stars={stars}
+              compact={compact}
+              split={split}
+            />
+          </Reveal>
+        ))}
+      </div>
+    </Provider>
   )
 }
 

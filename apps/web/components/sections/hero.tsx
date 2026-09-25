@@ -65,7 +65,7 @@ const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
                 </div>
               </Reveal>
 
-              <Reveal delay={0.2}>
+              <Reveal delay={0.12}>
                 <p className="max-w-lg text-base leading-relaxed text-body-foreground md:text-lg">
                   I build products with a focus on clean design and systems
                   that hold up over time — currently as a{" "}
@@ -77,7 +77,7 @@ const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
                 </p>
               </Reveal>
 
-              <Reveal delay={0.3}>
+              <Reveal delay={0.24}>
                 <div className="flex flex-col gap-3 md:flex-row">
                   <Button
                     size="lg"
@@ -103,7 +103,7 @@ const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
             </div>
 
             <Reveal
-              delay={0.4}
+              delay={0.36}
               className="flex h-fit max-h-130 w-full max-w-lg items-center justify-center overflow-hidden rounded-lg border-3 border-border shadow-xl transition-shadow duration-press ease-snap hover:shadow-2xl md:mx-auto"
             >
               <Image

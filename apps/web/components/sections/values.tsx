@@ -7,7 +7,9 @@ import { cardLift, cn } from "@workspace/ui/lib/utils"
 import { urlFor } from "@workspace/sanity/image"
 import type { VALUES_QUERY_RESULT } from "@workspace/sanity/types"
 
-import { useReveal } from "@/hooks/use-reveal"
+import { useReveal, useRevealGroup } from "@/hooks/use-reveal"
+import { Reveal } from "@/components/reveal"
+import { CARD_STAGGER_STEP_S } from "@/lib/reveal-stagger"
 
 type Value = NonNullable<VALUES_QUERY_RESULT>[number]
 
@@ -84,34 +86,50 @@ function ValueCard({ value }: { value: Value }) {
 /**
  * The grid on its own, with no heading/section/motion wrapper — same split as
  * `ServicesGrid`, so a future surface can reuse it under its own `<h1>`.
+ *
+ * Owns its own `useRevealGroup("in-view")` — same reasoning as `ServicesGrid`
+ * (see that component's doc comment) so this stays correct if ever reused
+ * without a reveal-triggering ancestor.
  */
 export function ValuesGrid({ values }: ValuesGridProps) {
+  const { ref, state, Provider } = useRevealGroup<HTMLUListElement>("in-view")
+
   if (!values || values.length === 0) return null
 
   return (
-    /*
-     * A masonry column flow, not a grid — deliberately.
-     *
-     * The copy lengths are genuinely uneven and are not being edited: five
-     * values sit at ~190-220 characters while Perspective and Discipline run
-     * close to double that. CSS grid gives two bad options for that spread.
-     * Stretching cards to a shared row height pads every short card in a row
-     * with trailing dead space; letting each card end at its own copy
-     * (`items-start`) leaves ragged gaps between rows, which reads as broken in
-     * a 3-up layout.
-     *
-     * `columns` sidesteps the choice: there are no rows to align, so each card
-     * ends exactly at its copy and the next one packs directly beneath it. The
-     * variance becomes vertical flow rather than holes. `break-inside-avoid`
-     * keeps a card from splitting across a column boundary.
-     */
-    <ul className="gap-6 space-y-6 sm:columns-2 sm:space-y-0 xl:columns-3 [&>li]:mb-6 [&>li]:break-inside-avoid">
-      {values.map((value) => (
-        <li key={value._id} className="list-none">
-          <ValueCard value={value} />
-        </li>
-      ))}
-    </ul>
+    <Provider state={state}>
+      {/*
+       * A masonry column flow, not a grid — deliberately.
+       *
+       * The copy lengths are genuinely uneven and are not being edited: five
+       * values sit at ~190-220 characters while Perspective and Discipline run
+       * close to double that. CSS grid gives two bad options for that spread.
+       * Stretching cards to a shared row height pads every short card in a row
+       * with trailing dead space; letting each card end at its own copy
+       * (`items-start`) leaves ragged gaps between rows, which reads as broken in
+       * a 3-up layout.
+       *
+       * `columns` sidesteps the choice: there are no rows to align, so each card
+       * ends exactly at its copy and the next one packs directly beneath it. The
+       * variance becomes vertical flow rather than holes. `break-inside-avoid`
+       * keeps a card from splitting across a column boundary.
+       */}
+      <ul
+        ref={ref}
+        className="gap-6 space-y-6 sm:columns-2 sm:space-y-0 xl:columns-3 [&>li]:mb-6 [&>li]:break-inside-avoid"
+      >
+        {values.map((value, index) => (
+          <Reveal
+            key={value._id}
+            as="li"
+            delay={index * CARD_STAGGER_STEP_S}
+            className="list-none"
+          >
+            <ValueCard value={value} />
+          </Reveal>
+        ))}
+      </ul>
+    </Provider>
   )
 }
 
