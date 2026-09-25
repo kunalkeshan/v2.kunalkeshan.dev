@@ -1,18 +1,13 @@
 "use client"
 
 import Image from "next/image"
-import { motion } from "motion/react"
 
 import { Container } from "@workspace/ui/components/container"
 import { cardLift, cn } from "@workspace/ui/lib/utils"
 import { urlFor } from "@workspace/sanity/image"
 import type { VALUES_QUERY_RESULT } from "@workspace/sanity/types"
 
-import {
-  sectionReveal,
-  sectionRevealTransition,
-  sectionRevealViewport,
-} from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 
 type Value = NonNullable<VALUES_QUERY_RESULT>[number]
 
@@ -133,17 +128,16 @@ interface ValuesProps {
  * two sweeps on the `<h1>` and the story heading.
  */
 const Values = ({ values, heading, intro }: ValuesProps) => {
+  const { ref, state } = useReveal<HTMLElement>("in-view")
+
   if (!values || values.length === 0) return null
 
   return (
-    <motion.section
+    <section
       id="values"
-      initial="hidden"
-      whileInView="visible"
-      variants={sectionReveal}
-      transition={sectionRevealTransition}
-      viewport={sectionRevealViewport}
-      className="py-10 md:py-16"
+      ref={ref}
+      data-reveal={state}
+      className="reveal-delay-200 py-10 md:py-16"
     >
       <Container>
         <h2 className="font-heading text-2xl font-black sm:text-3xl">
@@ -157,7 +151,7 @@ const Values = ({ values, heading, intro }: ValuesProps) => {
           <ValuesGrid values={values} />
         </div>
       </Container>
-    </motion.section>
+    </section>
   )
 }
 

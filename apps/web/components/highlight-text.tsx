@@ -1,10 +1,8 @@
 "use client"
 
-import { motion } from "motion/react"
-
 import { cn } from "@workspace/ui/lib/utils"
 
-import { sectionRevealTransition, sectionRevealViewport } from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 
 interface HighlightTextProps {
   children: React.ReactNode
@@ -28,8 +26,9 @@ const variantBg = {
  *
  * The colored background sweeps in left-to-right (like a real highlighter
  * stroke) once, the first time it scrolls into view — rather than fading in
- * as a solid block. Uses the same spring feel as `sectionReveal` so it reads
- * as part of the same reveal interaction.
+ * as a solid block. Uses the same reveal timing (`[data-reveal-sweep]` in
+ * `packages/ui/src/styles/globals.css`) as the heading's own scroll reveal so
+ * it reads as part of the same reveal moment.
  *
  * Mandatory for every section heading that uses a highlight span — see
  * docs/ui/design-system.md "Highlight text sweep".
@@ -39,15 +38,14 @@ export function HighlightText({
   className,
   variant = "primary",
 }: HighlightTextProps) {
+  const { ref, state } = useReveal<HTMLSpanElement>("in-view")
+
   return (
     <span className={cn("relative inline-block px-1", className)}>
-      <motion.span
+      <span
+        ref={ref}
         aria-hidden
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={sectionRevealViewport}
-        transition={sectionRevealTransition}
-        style={{ originX: 0 }}
+        data-reveal-sweep={state}
         className={cn("absolute inset-0", variantBg[variant])}
       />
       <span className={cn("relative", variantClasses[variant])}>

@@ -1,7 +1,5 @@
 "use client"
 
-import { motion } from "motion/react"
-
 import { Container } from "@workspace/ui/components/container"
 import type {
   SERVICES_QUERY_RESULT,
@@ -12,7 +10,7 @@ import { HighlightText } from "@/components/highlight-text"
 import { ContactForm } from "@/components/contact/contact-form"
 import { SocialsList } from "@/components/contact/socials-list"
 import { CopyEmailButton } from "@/components/contact/copy-email-button"
-import { heroRevealNoTransform, heroRevealTransition } from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 
 interface ContactHeroProps {
   siteConfig: SITE_CONFIG_QUERY_RESULT
@@ -21,26 +19,23 @@ interface ContactHeroProps {
 
 /**
  * Above-the-fold block: heading/socials/copy-email on the left, the form on
- * the right. Uses `heroRevealNoTransform` (mount-entrance, fade-only), not
- * `sectionReveal` (scroll-into-view) — this content is visible immediately
- * on load, same reasoning as `apps/web/components/sections/hero.tsx`.
+ * the right. Mount-entrance reveal (`useReveal("mount")`), not scroll-into-
+ * view — this content is visible immediately on load, same reasoning as
+ * `apps/web/components/sections/hero.tsx`.
  *
- * Fade-only, not the usual `heroReveal`: this section wraps the sticky form
- * column below, and `heroReveal`'s `y` animation leaves an inline `transform`
- * on this element, which creates a new containing block and silently breaks
- * `position: sticky` on the form. See `heroRevealNoTransform` in
- * `lib/motion.ts` for the full explanation.
+ * Fade-only (`data-reveal-fade`), not the usual `[data-reveal]` translateY:
+ * this section wraps the sticky form column below, and animating `transform`
+ * leaves a non-`none` transform on this element, which creates a new
+ * containing block and silently breaks `position: sticky` on the form. See
+ * the `[data-reveal-fade]` rules in `packages/ui/src/styles/globals.css` for
+ * the full explanation.
  */
 export function ContactHero({ siteConfig, services }: ContactHeroProps) {
   const primaryEmail = siteConfig?.emails?.[0]?.email
+  const { ref, state } = useReveal<HTMLElement>("mount")
 
   return (
-    <motion.section
-      initial="hidden"
-      animate="visible"
-      variants={heroRevealNoTransform}
-      transition={heroRevealTransition}
-    >
+    <section ref={ref} data-reveal={state} data-reveal-fade>
       <Container>
         <div className="mx-auto grid w-full grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8">
           {/* No `lg:h-fit` on the sticky column here — that's the inverse of
@@ -97,6 +92,6 @@ export function ContactHero({ siteConfig, services }: ContactHeroProps) {
           </div>
         </div>
       </Container>
-    </motion.section>
+    </section>
   )
 }

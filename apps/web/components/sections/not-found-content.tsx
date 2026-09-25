@@ -1,6 +1,5 @@
 "use client"
 
-import { motion, useReducedMotion } from "motion/react"
 import { HomeIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -8,21 +7,17 @@ import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
 import { Container } from "@workspace/ui/components/container"
 
-import { heroReveal, heroRevealTransition } from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 
 const NotFoundContent = () => {
-  const prefersReducedMotion = useReducedMotion()
+  const { ref, state } = useReveal<HTMLDivElement>("mount")
 
   return (
     <section className="flex min-h-[calc(100svh-7rem)] items-center py-16 md:py-24">
       <Container>
-        <motion.div
-          initial={prefersReducedMotion ? false : "hidden"}
-          animate="visible"
-          variants={heroReveal}
-          transition={
-            prefersReducedMotion ? { duration: 0 } : heroRevealTransition
-          }
+        <div
+          ref={ref}
+          data-reveal={state}
           className="relative flex flex-col items-center justify-center gap-10 text-center lg:flex-row lg:gap-16 lg:text-left"
         >
           <span
@@ -60,7 +55,7 @@ const NotFoundContent = () => {
               Go back home
             </Button>
           </div>
-        </motion.div>
+        </div>
       </Container>
     </section>
   )

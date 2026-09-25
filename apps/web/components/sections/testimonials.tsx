@@ -3,7 +3,6 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "motion/react"
 import { Quote } from "lucide-react"
 
 import { Container } from "@workspace/ui/components/container"
@@ -21,11 +20,7 @@ import { logoUrlFor, urlFor } from "@workspace/sanity/image"
 import type { FEATURED_TESTIMONIALS_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
-import {
-  sectionReveal,
-  sectionRevealTransition,
-  sectionRevealViewport,
-} from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 import { trackLinkClick } from "@/lib/analytics"
 
 type Testimonial = FEATURED_TESTIMONIALS_QUERY_RESULT[number]
@@ -360,20 +355,19 @@ const Testimonials = ({
   headingHighlight,
   intro,
 }: TestimonialsProps) => {
+  const { ref, state } = useReveal<HTMLElement>("in-view")
+
   if (!testimonials || testimonials.length === 0) return null
 
   return (
-    <motion.section
+    <section
       id="testimonials"
-      initial="hidden"
-      whileInView="visible"
-      variants={sectionReveal}
-      transition={sectionRevealTransition}
-      viewport={sectionRevealViewport}
+      ref={ref}
+      data-reveal={state}
       // `overflow-hidden` matches the reference's `.testimonial-section`: the
       // portrait deliberately overhangs its card, and this keeps that overhang
       // from widening the page into a horizontal scrollbar.
-      className="overflow-hidden py-10 md:py-16"
+      className="reveal-delay-200 overflow-hidden py-10 md:py-16"
     >
       <Container>
         <h2 className="font-heading text-2xl font-black text-balance sm:text-3xl">
@@ -388,7 +382,7 @@ const Testimonials = ({
           <TestimonialsCarousel testimonials={testimonials} />
         </div>
       </Container>
-    </motion.section>
+    </section>
   )
 }
 

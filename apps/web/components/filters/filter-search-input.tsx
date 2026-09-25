@@ -1,6 +1,5 @@
 "use client"
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { Loader2Icon, SearchIcon } from "lucide-react"
 
 import {
@@ -9,6 +8,7 @@ import {
   InputGroupIcon,
   InputGroupInput,
 } from "@workspace/ui/components/input-group"
+import { cn } from "@workspace/ui/lib/utils"
 
 export interface FilterSearchInputProps {
   value: string
@@ -23,6 +23,11 @@ export interface FilterSearchInputProps {
  * The search icon swaps for a spinner while `isPending` is true, instead of
  * adding separate loading chrome (a skeleton, a toast, a border pulse) — the
  * one element already sitting where someone's attention is anyway.
+ *
+ * Both icons stay mounted, absolutely stacked, and cross-fade via opacity —
+ * unlike `FilterClearButton`/`FilterResultsTransition`, this needs no
+ * delayed-unmount timing (`apps/web/hooks/use-delayed-unmount.ts`) since
+ * nothing ever actually unmounts.
  */
 export function FilterSearchInput({
   value,
@@ -31,37 +36,21 @@ export function FilterSearchInput({
   isPending,
   ...props
 }: FilterSearchInputProps) {
-  const prefersReducedMotion = useReducedMotion()
-  const fadeTransition = { duration: prefersReducedMotion ? 0 : 0.15 }
-
   return (
     <InputGroup className="max-w-sm">
-      <InputGroupIcon>
-        <AnimatePresence initial={false} mode="wait">
-          {isPending ? (
-            <motion.span
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={fadeTransition}
-              className="block"
-            >
-              <Loader2Icon className="size-4 animate-spin" />
-            </motion.span>
-          ) : (
-            <motion.span
-              key="idle"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={fadeTransition}
-              className="block"
-            >
-              <SearchIcon className="size-4" />
-            </motion.span>
+      <InputGroupIcon className="relative size-4">
+        <SearchIcon
+          className={cn(
+            "absolute inset-0 size-4 transition-opacity duration-150 ease-snap",
+            isPending ? "opacity-0" : "opacity-100"
           )}
-        </AnimatePresence>
+        />
+        <Loader2Icon
+          className={cn(
+            "absolute inset-0 size-4 animate-spin transition-opacity duration-150 ease-snap",
+            isPending ? "opacity-100" : "opacity-0"
+          )}
+        />
       </InputGroupIcon>
       <InputGroupInput
         type="text"

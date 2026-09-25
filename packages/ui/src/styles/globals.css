@@ -169,6 +169,12 @@
   --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
   --ease-out-quad: cubic-bezier(0.5, 1, 0.89, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  /* One deliberate one-off: the resume-cta expanding rings previously used
+   * motion/react's named `"circOut"` easing (not part of the Penner set
+   * above). Kept as its own token rather than folding into `--ease-out-quint`
+   * so that effect's feel doesn't drift if the shared reveal curve is ever
+   * retuned. */
+  --ease-circ-out: cubic-bezier(0, 0.55, 0.45, 1);
 
   /* `--ease-snap` stays the name every component already references, so this
    * retune reaches all of them at once. It is ease-out-expo: the strongest
@@ -478,4 +484,242 @@
   .animate-marquee-right {
     animation: none;
   }
+}
+
+/* Reveal system — CSS-only replacement for the old `motion/react`
+ * (`apps/web/lib/motion.ts`) reveal transitions.
+ *
+ * `motion/react` interpolates every frame with JS (`requestAnimationFrame`),
+ * and under CPU throttling those callbacks get delayed or dropped, which
+ * reads as stutter — most noticeably on the hero and contact-hero, which
+ * animate immediately on load, competing with the rest of the page's JS for
+ * the main thread. A native CSS `transition`/`animation` runs on the
+ * compositor instead and stays smooth under the same conditions. React still
+ * decides *when* to reveal (via `apps/web/hooks/use-reveal.ts` — mount for
+ * hero-style content, `IntersectionObserver` for scroll-discovered content),
+ * it just no longer interpolates the animation itself.
+ *
+ * `data-reveal="hidden"` is the pre-reveal state (set on initial render, no
+ * transition yet); `data-reveal="visible"` is the settled state and is the
+ * one that carries the `transition` declaration, so the state flip is what
+ * animates. `--dur-reveal`/`--ease-out-quint` are the same tokens the old
+ * `sectionRevealTransition`/`heroRevealTransition` used (`duration: 0.6`,
+ * `cubic-bezier(0.22, 1, 0.36, 1)`) — this is a mechanism change, not a
+ * timing change. */
+[data-reveal="hidden"] {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+[data-reveal="visible"] {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity var(--dur-reveal) var(--ease-out-quint),
+    transform var(--dur-reveal) var(--ease-out-quint);
+}
+
+/* Fade-only variant — for a reveal wrapper with a `position: sticky`
+ * descendant (e.g. ContactHero's form column, the navbar). Animating
+ * `transform` leaves a non-`none` `transform` on the element while it's
+ * mid-transition (and `translateY(0)` is still a `transform` value, not
+ * `none`, once settled), which creates a new containing block and silently
+ * breaks `position: sticky` for anything inside it. Replaces the old
+ * `heroRevealNoTransform` variant — same fix, same reasoning, just CSS
+ * instead of a second Framer variants object.
+ *
+ * Deliberately does NOT touch `transition`/`transition-property`: an earlier
+ * version set `transition-property: opacity` here, which — because this
+ * selector (`[data-reveal-fade][data-reveal="visible"]`, 2 attribute
+ * selectors) is MORE specific than `[data-nav-state]` (1 attribute selector)
+ * below — permanently won the `transition-property` cascade on the navbar
+ * (the one `[data-reveal-fade]` consumer that also has `[data-nav-state]`),
+ * silently dropping `max-width`/`top`/`width` from the transition list no
+ * matter what `[data-nav-state]` declared. `transform: none` alone is enough
+ * to fix the sticky bug; the transition itself is safe to leave to whichever
+ * selector below actually owns it. */
+[data-reveal-fade][data-reveal="hidden"],
+[data-reveal-fade][data-reveal="visible"] {
+  transform: none;
+}
+
+/* Matches `sectionRevealTransition`'s `delay: 0.2s` — scroll-discovered
+ * content only; mount reveals (hero, contact-hero, 404) have no delay, same
+ * as before. Set `style={{ transitionDelay: "0.2s" }}` (or this class) on the
+ * same element as `data-reveal`. */
+@utility reveal-delay-200 {
+  transition-delay: 200ms;
+}
+
+/* Highlighter-stroke sweep behind a heading's highlighted phrase
+ * (`HighlightText`) — was a `motion.span` animating `scaleX: 0 → 1` with
+ * `originX: 0`. `transform-origin: left` + `scaleX()` is the direct CSS
+ * translation; kept as its own rule (not reusing `[data-reveal]`) since it
+ * animates `transform` only, never `opacity`. */
+[data-reveal-sweep="hidden"] {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+[data-reveal-sweep="visible"] {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform var(--dur-reveal) var(--ease-out-quint);
+  transition-delay: 200ms;
+}
+
+/* Expanding rings behind the resume-cta card — three concentric circles that
+ * scale in from a per-ring starting size while fading in, on scroll-into-view.
+ * `--ring-from-scale` is set inline per ring (1.4 / 1.8 / 2.2), the same way
+ * `--marquee-duration` is parameterized above. Uses `--ease-circ-out`, the
+ * one deliberate non-`ease-out-quint` curve in this system (see its token
+ * comment), and a longer 0.9s duration matching the old `motion/react`
+ * transition. */
+@keyframes resume-cta-ring-in {
+  from {
+    transform: scale(var(--ring-from-scale, 1.4));
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@utility animate-resume-cta-ring {
+  animation: resume-cta-ring-in 0.9s var(--ease-circ-out) both;
+}
+
+/* Hero role-text crossfade (the rotating role under the hero name) — small,
+ * frequent retrigger (every 2.6s), so it's a `@keyframes` restarted by
+ * changing the element's `key` (forces React to remount the node, which
+ * restarts the CSS animation), not a `[data-reveal]` state flip. */
+@keyframes role-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-role-fade-in {
+  animation: role-fade-in 0.25s ease-out both;
+}
+
+/* Mobile nav sheet — staggered fade/slide-in of each link when the sheet
+ * opens. `--stagger-index` is set inline per item (0, 1, 2, …); the 100ms
+ * base delay + 50ms-per-item step matches the old
+ * `staggerChildren: 0.05, delayChildren: 0.1`. No exit animation: the sheet
+ * itself (Radix/Base UI) handles unmounting the whole panel, so only the
+ * opening stagger needs to exist here. */
+@keyframes nav-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-nav-item-in {
+  animation: nav-item-in var(--dur-press) var(--ease-snap) both;
+  animation-delay: calc(100ms + var(--stagger-index, 0) * 50ms);
+}
+
+/* Delayed-unmount exit transitions (`apps/web/hooks/use-delayed-unmount.ts`)
+ * — `FilterClearButton` and `FilterResultsTransition`. `data-transition-state`
+ * is set by that hook; CSS only needs to animate the "exiting" ->
+ * "entering"/"visible" boundary, since the hook keeps the node mounted for
+ * the transition's own duration before actually removing it.
+ *
+ * `--transition-duration` is set inline per consumer (150ms for the results
+ * crossfade, 180ms for the clear button — the same durations each hook call
+ * passes to `useDelayedUnmount`, kept in sync manually since CSS can't read
+ * a JS constant). Transform is opt-in: `FilterResultsTransition` is opacity
+ * only, `FilterClearButton` also slides via its own `data-transition-state`
+ * selectors below. */
+[data-transition-state="entering"],
+[data-transition-state="exiting"] {
+  opacity: 0;
+}
+
+[data-transition-state="visible"] {
+  opacity: 1;
+}
+
+[data-transition-state] {
+  transition: opacity var(--transition-duration, 150ms) var(--ease-out-quint);
+}
+
+/* Reduced motion: settle every reveal/animation above instantly rather than
+ * hiding the content or leaving it stuck mid-transition. Consolidates what
+ * were previously ~8 separate `useReducedMotion()` JS call sites into one
+ * rule, the same convention the marquee already used — and, as a side
+ * effect, now correctly covers a few reveals (`sectionReveal` consumers,
+ * `HighlightText`) that never actually checked `useReducedMotion()` before. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal-sweep],
+  [data-transition-state] {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .animate-resume-cta-ring,
+  .animate-role-fade-in,
+  .animate-nav-item-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  [data-nav-state] {
+    transition: none !important;
+  }
+}
+
+/* Navbar scroll-morph — was `motion.nav` with named `variants` (`enter` /
+ * `default` / `scrolled`); the `enter` state's only difference from
+ * `default` was the mount-in opacity, which `[data-reveal-fade]` (above)
+ * already owns, so only two discrete states are needed here.
+ * `max-width`/`top`/`width` are ordinary CSS properties, so a single
+ * `transition: all` between `[data-nav-state="default"]` and
+ * `[data-nav-state="scrolled"]` reproduces the morph — same
+ * `--dur-reveal`/`--ease-out-quint` timing as `springTransition` used
+ * (`duration: 0.6s`, `ease-out-quint` — not spring physics, see the token
+ * comment further up this file).
+ *
+ * `opacity` is included here too, not left to `[data-reveal="visible"]`'s own
+ * transition: the navbar has both `[data-reveal]` and `[data-nav-state]`
+ * attributes, both set a `transition` shorthand at equal specificity, and a
+ * `transition` shorthand fully replaces (never merges with) another — so
+ * whichever of these two rules is later in this file wins outright and the
+ * other's transition list is silently dropped. Declaring `opacity` in the
+ * rule that must win avoids depending on source order between two unrelated
+ * sections of this file to get the right combined property list. */
+[data-nav-state] {
+  transition:
+    opacity var(--dur-reveal) var(--ease-out-quint),
+    max-width var(--dur-reveal) var(--ease-out-quint),
+    top var(--dur-reveal) var(--ease-out-quint),
+    width var(--dur-reveal) var(--ease-out-quint);
+}
+
+[data-nav-state="default"] {
+  max-width: 48rem;
+  top: 24px;
+  width: 96%;
+}
+
+[data-nav-state="scrolled"] {
+  max-width: 42rem;
+  top: 16px;
+  width: 94%;
 }

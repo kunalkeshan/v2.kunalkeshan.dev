@@ -1,7 +1,6 @@
 "use client"
 
 import Image from "next/image"
-import { motion } from "motion/react"
 import { ArrowRightIcon, MailIcon } from "lucide-react"
 
 import { Container } from "@workspace/ui/components/container"
@@ -10,11 +9,7 @@ import { urlFor } from "@workspace/sanity/image"
 import type { SERVICES_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
-import {
-  sectionReveal,
-  sectionRevealTransition,
-  sectionRevealViewport,
-} from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 
 type Service = NonNullable<SERVICES_QUERY_RESULT>[number]
 
@@ -143,16 +138,15 @@ interface ServicesProps {
 }
 
 const Services = ({ services }: ServicesProps) => {
+  const { ref, state } = useReveal<HTMLElement>("in-view")
+
   if (!services || services.length === 0) return null
 
   return (
-    <motion.section
-      initial="hidden"
-      whileInView="visible"
-      variants={sectionReveal}
-      transition={sectionRevealTransition}
-      viewport={sectionRevealViewport}
-      className="py-10 md:py-16"
+    <section
+      ref={ref}
+      data-reveal={state}
+      className="reveal-delay-200 py-10 md:py-16"
       id="services"
     >
       <Container>
@@ -163,7 +157,7 @@ const Services = ({ services }: ServicesProps) => {
 
         <ServicesGrid services={services} />
       </Container>
-    </motion.section>
+    </section>
   )
 }
 

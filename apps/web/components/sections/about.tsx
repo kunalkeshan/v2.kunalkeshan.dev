@@ -2,7 +2,6 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "motion/react"
 import { UserIcon } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
@@ -10,11 +9,7 @@ import { Container } from "@workspace/ui/components/container"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { HighlightText } from "@/components/highlight-text"
-import {
-  sectionReveal,
-  sectionRevealTransition,
-  sectionRevealViewport,
-} from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 
 interface AboutHighlight {
   title: string | null
@@ -47,15 +42,14 @@ const About = ({
   imageUrl,
   imageAlt,
 }: AboutProps) => {
+  const { ref, state } = useReveal<HTMLElement>("in-view")
+
   return (
-    <motion.section
+    <section
       id="about"
-      initial="hidden"
-      whileInView="visible"
-      variants={sectionReveal}
-      transition={sectionRevealTransition}
-      viewport={sectionRevealViewport}
-      className="py-10 md:py-16"
+      ref={ref}
+      data-reveal={state}
+      className="reveal-delay-200 py-10 md:py-16"
     >
       <Container>
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
@@ -134,7 +128,7 @@ const About = ({
           </div>
         </div>
       </Container>
-    </motion.section>
+    </section>
   )
 }
 

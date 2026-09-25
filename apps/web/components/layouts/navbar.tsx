@@ -1,6 +1,5 @@
 "use client"
 
-import { motion, useReducedMotion } from "motion/react"
 import { MailIcon } from "lucide-react"
 import Link from "next/link"
 
@@ -13,56 +12,35 @@ import type { SITE_CONFIG_QUERY_RESULT } from "@workspace/sanity/types"
 import { DesktopNav } from "@/components/layouts/desktop-nav"
 import { MobileNav } from "@/components/layouts/mobile-nav"
 import { PortfolioCommandMenu } from "@/components/layouts/portfolio-command-menu"
-import { springTransition } from "@/lib/motion"
-
-const navVariants = {
-  enter: {
-    opacity: 0,
-    y: -20,
-    borderRadius: "var(--radius-lg)",
-    maxWidth: "48rem",
-    top: 24,
-    width: "96%",
-    paddingInline: "1rem",
-  },
-  default: {
-    opacity: 1,
-    y: 0,
-    borderRadius: "var(--radius-lg)",
-    maxWidth: "48rem",
-    top: 24,
-    width: "96%",
-    paddingInline: "1rem",
-  },
-  scrolled: {
-    opacity: 1,
-    y: 0,
-    borderRadius: "var(--radius-lg)",
-    maxWidth: "42rem",
-    top: 16,
-    width: "94%",
-    paddingInline: "1rem",
-  },
-} as const
+import { useReveal } from "@/hooks/use-reveal"
 
 interface Props {
   siteConfig: SITE_CONFIG_QUERY_RESULT
 }
 
+/**
+ * Scroll-morph between `default` and `scrolled` shapes (`data-nav-state`, see
+ * `packages/ui/src/styles/globals.css`) plus a mount-in reveal
+ * (`useReveal("mount")`, fade-only — the nav is `fixed`, not `sticky`, so the
+ * `[data-reveal]` translateY variant would work too, but fade-only reads
+ * identically here and keeps one fewer property in flight during the very
+ * first paint). `useScroll` is the same hysteresis hook as before — it
+ * already returned a plain boolean, no motion dependency.
+ */
 const Navbar = ({ siteConfig }: Props) => {
   const scrolled = useScroll(20)
-  const prefersReducedMotion = useReducedMotion()
+  const { ref, state } = useReveal<HTMLElement>("mount")
   const logoSrc = siteConfig?.logo?.asset
     ? urlFor(siteConfig.logo).width(112).height(112).url()
     : undefined
 
   return (
-    <motion.nav
-      initial={prefersReducedMotion ? false : "enter"}
-      animate={scrolled ? "scrolled" : "default"}
-      variants={navVariants}
-      transition={prefersReducedMotion ? { duration: 0 } : springTransition}
-      className="fixed left-1/2 z-50 flex -translate-x-1/2 items-center justify-between border-3 border-border bg-card py-2 shadow-xl"
+    <nav
+      ref={ref}
+      data-reveal={state}
+      data-reveal-fade
+      data-nav-state={scrolled ? "scrolled" : "default"}
+      className="fixed left-1/2 z-50 flex -translate-x-1/2 items-center justify-between rounded-lg border-3 border-border bg-card px-4 py-2 shadow-xl"
     >
       <Logo size="sm" preload src={logoSrc} />
 
@@ -81,7 +59,7 @@ const Navbar = ({ siteConfig }: Props) => {
         </Button>
         <MobileNav logoSrc={logoSrc} />
       </div>
-    </motion.nav>
+    </nav>
   )
 }
 

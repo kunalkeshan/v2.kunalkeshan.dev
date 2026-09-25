@@ -2,7 +2,6 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "motion/react"
 import { ArrowRightIcon, FolderKanbanIcon, StarIcon } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
@@ -20,11 +19,7 @@ import {
   PROJECT_STATUS_LABELS,
   attributionLine,
 } from "@/lib/projects"
-import {
-  sectionReveal,
-  sectionRevealTransition,
-  sectionRevealViewport,
-} from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 
 /**
  * The listing query is the wider of the two, so cards are typed against it and
@@ -415,17 +410,16 @@ interface ProjectsProps {
  * than defaulting every section to the same colour.
  */
 const Projects = ({ projects, stars }: ProjectsProps) => {
+  const { ref, state } = useReveal<HTMLElement>("in-view")
+
   if (!projects || projects.length === 0) return null
 
   return (
-    <motion.section
+    <section
       id="projects"
-      initial="hidden"
-      whileInView="visible"
-      variants={sectionReveal}
-      transition={sectionRevealTransition}
-      viewport={sectionRevealViewport}
-      className="py-10 md:py-16"
+      ref={ref}
+      data-reveal={state}
+      className="reveal-delay-200 py-10 md:py-16"
     >
       <Container>
         {/*
@@ -452,7 +446,7 @@ const Projects = ({ projects, stars }: ProjectsProps) => {
           <ArrowRightIcon data-icon="inline-end" />
         </Button>
       </Container>
-    </motion.section>
+    </section>
   )
 }
 

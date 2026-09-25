@@ -1,8 +1,11 @@
 "use client"
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-
 import { Button } from "@workspace/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
+
+import { useDelayedUnmount } from "@/hooks/use-delayed-unmount"
+
+const EXIT_DURATION_MS = 180
 
 export interface FilterClearButtonProps {
   show: boolean
@@ -11,38 +14,43 @@ export interface FilterClearButtonProps {
 }
 
 /**
- * Fade + slight slide, mirroring `sectionReveal`/`heroReveal` in
- * `lib/motion.ts` — the same enter/exit language already used site-wide for
- * content appearing, rather than a new one just for this link.
+ * Fade + slight slide, mirroring the site's other reveal transitions — the
+ * same enter/exit language already used site-wide for content appearing,
+ * rather than a new one just for this link. `useDelayedUnmount` keeps the
+ * node mounted long enough for the exit transition to actually play (CSS has
+ * no declarative way to animate an unmount).
  */
 export function FilterClearButton({
   show,
   onClick,
   children = "Clear filters",
 }: FilterClearButtonProps) {
-  const prefersReducedMotion = useReducedMotion()
-  const offset = prefersReducedMotion ? 0 : -6
+  const { shouldRender, dataState } = useDelayedUnmount(show, EXIT_DURATION_MS)
+
+  if (!shouldRender) return null
 
   return (
-    <AnimatePresence initial={false}>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, y: offset }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: offset }}
-          transition={{ duration: prefersReducedMotion ? 0 : 0.18 }}
-          className="mt-3"
-        >
-          <Button
-            variant="link"
-            size="xs"
-            className="text-muted-foreground hover:text-foreground"
-            onClick={onClick}
-          >
-            {children}
-          </Button>
-        </motion.div>
+    <div
+      data-transition-state={dataState}
+      style={
+        {
+          "--transition-duration": `${EXIT_DURATION_MS}ms`,
+          transition: `opacity ${EXIT_DURATION_MS}ms var(--ease-snap), transform ${EXIT_DURATION_MS}ms var(--ease-snap)`,
+        } as React.CSSProperties
+      }
+      className={cn(
+        "mt-3",
+        dataState === "visible" ? "translate-y-0" : "-translate-y-1.5"
       )}
-    </AnimatePresence>
+    >
+      <Button
+        variant="link"
+        size="xs"
+        className="text-muted-foreground hover:text-foreground"
+        onClick={onClick}
+      >
+        {children}
+      </Button>
+    </div>
   )
 }

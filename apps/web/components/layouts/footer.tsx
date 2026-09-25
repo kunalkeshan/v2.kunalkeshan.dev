@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link";
-import { motion } from "motion/react";
 import { FaGithub } from "react-icons/fa";
 
 import { Logo } from "@workspace/ui/components/logo";
@@ -13,11 +12,7 @@ import type {
 } from "@workspace/sanity/types";
 import { getReleasesUrl, formatVersion } from "@workspace/version";
 
-import {
-  sectionReveal,
-  sectionRevealTransition,
-  sectionRevealViewport,
-} from "@/lib/motion";
+import { useReveal } from "@/hooks/use-reveal";
 import { primaryLinks, workLinks, moreLinks } from "@/components/layouts/nav-links";
 import { SocialsRow } from "@/components/contact/socials-row";
 import { CopyEmailButton } from "@/components/contact/copy-email-button";
@@ -56,15 +51,13 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
   const { isPlaying: isRickrollPlaying, tick, toggleRickroll } = useRickrollAudio();
 
   const primaryEmail = siteConfig?.emails?.find((entry) => entry.email)?.email;
+  const { ref, state } = useReveal<HTMLElement>("in-view");
 
   return (
-    <motion.footer
-      initial="hidden"
-      whileInView="visible"
-      variants={sectionReveal}
-      transition={sectionRevealTransition}
-      viewport={sectionRevealViewport}
-      className="border-t-3 border-border py-12"
+    <footer
+      ref={ref}
+      data-reveal={state}
+      className="reveal-delay-200 border-t-3 border-border py-12"
     >
       <Container>
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
@@ -253,7 +246,7 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
           </a>
         </p>
       </Container>
-    </motion.footer>
+    </footer>
   );
 };
 

@@ -533,64 +533,98 @@ module** — every section hand-rolled an identical inline snippet:
 >
 ```
 
-reused verbatim (copy-pasted, not imported) across ~15+ sections/pages, with one
-staggered variant (`delay: 0.4`) used only for the navbar's own entrance. There was no
-page-transition system at all (`pages/_app.tsx` rendered `<Component {...pageProps} />`
-directly, no `AnimatePresence`, no route keying) — each page's _content_ animating in on
-mount was the only thing that ever read as a "transition." No custom easing curves or
-duration constants existed outside framer-motion's own spring defaults.
+reused verbatim (copy-pasted, not imported) across ~15+ sections/pages. This repo's
+first pass centralized that into `apps/web/lib/motion.ts` and swapped `type: "spring"`
+for a fixed `duration: 0.6` + `ease-out-quint` (`cubic-bezier(0.22, 1, 0.36, 1)`) —
+still driven by the `motion` package (the current name for framer-motion), just with a
+deterministic, non-physics transition. That version is now itself superseded; see
+below.
 
-**This repo's convention going forward — a deliberate improvement, not a literal port:**
+**Current convention: CSS-only, no animation package.** The `motion` package has been
+removed from `apps/web` entirely (it was never a `packages/ui` dependency), and
+`apps/web/lib/motion.ts` is deleted. Every animation in the repo — reveals, the navbar
+morph, the mobile nav stagger, filter micro-interactions — is now a native CSS
+`transition`/`animation`, matching the marquee (`packages/ui/src/components/marquee.tsx`
++ its `@keyframes` in `globals.css`), which was always CSS-only.
 
-- Use the `motion` package (the current name for framer-motion; see
-  `apps/web/package.json`) — never `next/font`-style ad-hoc per-file reinvention of the
-  same values.
-- **Section reveal-on-scroll** keeps v1's exact `opacity`/`y` shape as the default
-  (a good, proven baseline) but centralizes it in `apps/web/lib/motion.ts`
-  (`sectionReveal` variants + `sectionRevealTransition` + `sectionRevealViewport`) —
-  `initial="hidden" whileInView="visible" variants={sectionReveal}
-transition={sectionRevealTransition} viewport={sectionRevealViewport}`. Import from
-  there instead of inlining the object literals per component. If a second app ever
-  needs the same section-reveal pattern, promote this file to
-  `packages/ui/src/lib/motion.ts` (same "genuinely shared vs. app-local" test used for
-  `packages/ui/src/hooks`) — don't duplicate it into a second app-local copy.
-  `apps/web/components/layouts/footer.tsx` is the working reference implementation —
-  copy its `motion.footer` wrapper (and its `"use client"` directive, required for any
-  component using `motion.*`) for new sections rather than re-deriving the pattern.
-  **The transition itself is a fixed `duration: 0.6` + `ease-out-quint`
-  (`cubic-bezier(0.22, 1, 0.36, 1)`, the same coss.com/Penner curve `globals.css`
-  already names `--ease-out-quint`) — not spring physics.** An earlier version ran
-  these reveals on `type: "spring"` (retuned once, `200/20/0.6` → `350/28/0.5`, still
-  read as "ragged"/inconsistent across the 15+ consumers importing this file — spring
-  physics settles with a travel-distance-dependent velocity curve and a touch of
-  overshoot, which doesn't repeat identically the way a fixed duration+curve does.
-  `sectionRevealTransition` and `heroRevealTransition` (via `springTransition`) had
-  also drifted into two *different* untuned spring instances before this — worth
-  remembering if reveal timing is ever revisited: don't reach for `type: "spring"` for
-  a one-shot reveal-then-settle animation; reserve real spring physics for something
-  that's actually interruptible/interactive mid-flight (a drag, a gesture-driven
-  panel), where physical continuity matters. `springTransition`'s *name* stayed as-is
-  through this change since every existing import still reads naturally.
-- **Scroll-driven navbar morph + mount entrance** (see
-  `apps/web/components/layouts/navbar.tsx`): `useScroll` (a small hysteresis-based
-  scroll-position hook, `packages/ui/src/hooks/use-scroll.ts`) drives a `motion.nav`
-  between **named `variants`** — `enter` (mount-only: `opacity: 0, y: -20`, at the
-  `default` shape), `default`, and `scrolled` — rather than raw inline objects computed
-  per render. `initial="enter"`, `animate={scrolled ? "scrolled" : "default"}`,
-  transitioning with `springTransition` from `apps/web/lib/motion.ts` (the shared
-  `duration: 0.6` / `ease-out-quint` transition described above — no second timing pair,
-  see the button hover-timing note above for why that matters). **Use named variants,
-  not ad-hoc merged objects, for any `motion` component with more than one animated
-  state**: an early version of this navbar built `initial`/`animate` by hand-spreading
-  plain objects per render (`{ opacity: 1, ...shapeProps }`), and because one variant
-  defined a `y` transform the other never explicitly reset, the entrance intermittently
-  got stuck mid-animation instead of settling — `variants` avoids this because every
-  named state declares its full property set. Always gate this kind of animation behind
-  `useReducedMotion()` (from `motion/react`) and fall back to `initial={false}` /
-  `{ duration: 0 }` — see the navbar for the exact pattern.
-- Still no dedicated page-transition/route system — that remains genuinely out of scope
-  until a real cross-route transition is actually requested; don't add
-  `AnimatePresence`-around-`{children}` speculatively.
+**Why this changed.** `motion/react` interpolates every animated frame with JS
+(`requestAnimationFrame`), which competes with the rest of the page's JS for the main
+thread — under CPU throttling (a low-end device, a busy tab, background work) those
+callbacks get delayed or dropped, which reads as visible stutter. This was most
+noticeable on the home hero and contact hero, which animate immediately on load,
+competing with the page's other startup JS. A native CSS `transition`/`animation` runs
+on the compositor instead, and stays smooth under the same conditions — this is also
+mechanically how Webflow's built-in page-load interactions work (the reference point
+for this migration): a small JS toggle flips a class/attribute, and the browser's own
+compositor does the interpolation, not a JS render loop.
+
+**The trigger/animation split.** React still decides *when* to reveal something — that
+part didn't change conceptually, it just moved out of `motion`'s `initial`/`animate`/
+`whileInView` props and into two small hooks:
+
+- `apps/web/hooks/use-reveal.ts` — `useReveal(mode)` returns a `ref` + `state`
+  (`"hidden" | "visible"`). `mode: "mount"` flips to `"visible"` shortly after mount
+  (the mount-entrance case — hero, contact-hero, 404, navbar); `mode: "in-view"` uses a
+  one-shot `IntersectionObserver` (the scroll-reveal case — every section that used to
+  import `sectionReveal`). Spread the returned `ref`/`data-reveal={state}` onto the
+  element; the CSS below owns the actual animation.
+- `apps/web/hooks/use-delayed-unmount.ts` — the one genuine gap CSS can't cover on its
+  own: animating an *unmount*. Keeps an outgoing element mounted for its exit
+  transition's duration before telling the caller to stop rendering it. Used by
+  `FilterClearButton` and `FilterResultsTransition` (the two former `AnimatePresence`
+  consumers that actually needed exit timing — `FilterSearchInput`'s icon↔spinner swap
+  doesn't, since both icons can stay mounted and cross-fade via opacity with nothing to
+  ever unmount).
+
+**Reduced motion is now handled entirely in CSS**, not per-component
+`useReducedMotion()` checks — one `@media (prefers-reduced-motion: reduce)` block in
+`packages/ui/src/styles/globals.css` (alongside the marquee's own) zeroes out every
+`[data-reveal]`/`[data-reveal-sweep]`/`[data-nav-state]`/`.animate-*` transition and
+animation at once. This is a strict improvement, not just a refactor: several
+`sectionReveal`/`HighlightText` consumers under the old `motion` system never actually
+checked `useReducedMotion()` despite the convention implying they should, so this
+consolidation newly (and correctly) covers them too.
+
+**The CSS contract** (all in `packages/ui/src/styles/globals.css`, modeled on the
+marquee's existing `@keyframes`/`@utility` pattern):
+
+- `[data-reveal="hidden"]` / `[data-reveal="visible"]` — the direct replacement for
+  `sectionReveal`/`heroReveal`: `opacity`/`translateY(20px)` → `opacity: 1`/
+  `translateY(0)`, transitioning over `var(--dur-reveal)` (600ms) with
+  `var(--ease-out-quint)` — the same duration/curve the old `motion` transition used.
+  Add the `reveal-delay-200` utility class for the 200ms delay scroll-reveals had
+  (`sectionRevealTransition`'s `delay: 0.2`); mount reveals have none, same as before.
+- `[data-reveal-fade]` — opt-in fade-only variant (add alongside `data-reveal`) for a
+  reveal wrapping a `position: sticky` descendant. Animating `transform` leaves a
+  non-`none` value on the element mid-transition, which creates a new containing block
+  and silently breaks `position: sticky` for anything inside it — this is the direct
+  replacement for the old `heroRevealNoTransform` variant (`ContactHero`, the navbar).
+- `[data-reveal-sweep]` — the `HighlightText` highlighter stroke: `scaleX(0)` →
+  `scaleX(1)` from a fixed `transform-origin: left`, same timing as the reveal above.
+- `--ease-circ-out` — one deliberate one-off token (`cubic-bezier(0, 0.55, 0.45, 1)`,
+  motion/react's old named `"circOut"`) for the resume-cta expanding rings
+  (`.animate-resume-cta-ring`), which never used the shared reveal curve.
+- `.animate-role-fade-in` / `.animate-nav-item-in` — `@keyframes`-based, for effects
+  that retrigger or stagger rather than fire once: the hero's rotating role text
+  (restarted by changing the element's `key`, same as before) and the mobile nav
+  sheet's per-item stagger (`--stagger-index` custom property drives
+  `animation-delay`, replacing `staggerChildren`/`delayChildren`).
+- `[data-nav-state="default"]` / `[data-nav-state="scrolled"]` — the navbar
+  scroll-morph. `packages/ui/src/hooks/use-scroll.ts` is unchanged (it already
+  returned a plain hysteresis-debounced boolean, no motion dependency); the old
+  `enter`/`default`/`scrolled` `motion.nav` variants collapse to two states here,
+  since `enter`'s only difference from `default` was the mount-in opacity, which
+  `[data-reveal-fade]` already owns.
+- `[data-transition-state]` — consumed by `useDelayedUnmount`'s `entering`/`visible`/
+  `exiting` states; set `--transition-duration` inline to match the duration passed to
+  the hook (CSS can't read a JS constant, so these are kept in sync manually — see the
+  two consumers for the exact values, 150ms/180ms).
+- Chip tap feedback (`FilterChipGroup`, previously `whileTap={{ scale: 0.96 }}`) is a
+  plain `active:scale-96` Tailwind utility now, gated by `motion-reduce:` the same way
+  `cardLift` is elsewhere in this codebase — no wrapper element needed at all.
+
+Still no dedicated page-transition/route system — that remains genuinely out of scope
+until a real cross-route transition is actually requested.
 
 ## `InputGroup` — icon-decorated inputs (`@workspace/ui/components/input-group`)
 
@@ -643,23 +677,27 @@ submit-driven vs. an instant-filter icon input, respectively.
 search-input + `Badge` chip-toggle + "Clear filters" markup (identical `chipClass`
 Tailwind string included) before this was extracted. All four now share:
 
-- `FilterSearchInput` — search icon swaps for a spinner via `AnimatePresence` while
-  `isPending` (driven by the caller's `useTransition`, wired into nuqs'
-  `startTransition` option), instead of separate loading chrome.
-- `FilterChipGroup` — a `selectionMode: "single" | "multiple"` chip toggle. Chips
-  press into their own shadow on click/tap (`whileTap={{ scale: 0.96 }}` plus the
-  existing `duration-press`/`ease-snap` hover styles) rather than using a new
-  spring-based motion language for a small, frequent control.
-- `FilterClearButton` — fades + slides in/out (`AnimatePresence`, matching
-  `sectionReveal`'s enter/exit language) only when a filter is active.
-- `FilterResultsTransition` — crossfades the whole results block
-  (`AnimatePresence mode="wait"`, keyed on a caller-supplied string that changes
-  whenever the visible result set changes) when filters change, instead of
-  animating individual card enter/exit/reorder — a filtered grid can reflow column
-  count between queries, which makes per-card position animation unreliable.
+- `FilterSearchInput` — search icon swaps for a spinner while `isPending` (driven by
+  the caller's `useTransition`, wired into nuqs' `startTransition` option), instead of
+  separate loading chrome. Both icons stay mounted, absolutely stacked, and cross-fade
+  via a plain CSS `transition-opacity` — no unmount ever happens, so this doesn't need
+  `useDelayedUnmount`.
+- `FilterChipGroup` — a `selectionMode: "single" | "multiple"` chip toggle. Chips press
+  into their own shadow on click/tap (a plain `active:scale-96` CSS rule, gated by
+  `motion-reduce:`, plus the existing `duration-press`/`ease-snap` hover styles) rather
+  than using a new spring-based motion language for a small, frequent control.
+- `FilterClearButton` — fades + slides in/out only when a filter is active, using
+  `apps/web/hooks/use-delayed-unmount.ts` (see "Motion / animation conventions" above)
+  to keep the exit transition mounted long enough to actually play.
+- `FilterResultsTransition` — crossfades the whole results block when filters change
+  (sequenced fade-out → child swap → fade-in via a small `setTimeout`, since `children`
+  itself changes shape between keys — there's no persistent DOM node to cross-fade),
+  instead of animating individual card enter/exit/reorder — a filtered grid can reflow
+  column count between queries, which makes per-card position animation unreliable.
 
-All four call `useReducedMotion()` and zero out their transition duration/offset
-when it's set, per the reduced-motion rule above.
+Reduced motion for all four is handled by the global `[data-reveal]`/
+`[data-transition-state]` CSS media query (see "Motion / animation conventions"
+above), not a per-component JS check.
 
 `skills-filtered.tsx` was migrated from local `useState` to `nuqs` URL state as
 part of this extraction, so all four screens now share the same "filters live in
@@ -677,9 +715,9 @@ highlighted headings) and is a going-forward requirement for any future section 
 highlighted title, not just those two.
 
 The reasoning: a solid highlight span that just fades in with the rest of the heading
-(via `sectionReveal`'s opacity/y transition) reads as inert — it's colored text, not a
-highlight. The intended effect is a real highlighter stroke: the color sweeps in
-left-to-right across the phrase, once, the first time the heading scrolls into view.
+reads as inert — it's colored text, not a highlight. The intended effect is a real
+highlighter stroke: the color sweeps in left-to-right across the phrase, once, the
+first time the heading scrolls into view.
 
 ```tsx
 <h2 className="mb-6 font-heading text-2xl font-black sm:text-3xl">
@@ -695,19 +733,21 @@ left-to-right across the phrase, once, the first time the heading scrolls into v
   the same hex pairs as this repo's `--primary`/`--secondary`) rather than making every
   highlight the same color; keep that alternation rather than defaulting every new
   section to `primary`.
-- **Mechanism**: an absolutely-positioned `motion.span` (the color fill) sits behind a
-  relatively-positioned text span, animating `scaleX: 0 → 1` with `style={{ originX: 0 }}`
-  so it grows from the left edge — not a `width`/`clip-path` animation, which would be
-  more expensive to composite for the same visual result. Triggered by
-  `whileInView`/`viewport={sectionRevealViewport}` (once-only, same as every other
-  scroll-reveal in this repo) and `transition={sectionRevealTransition}` — the same
-  spring feel as the heading's own `sectionReveal`, so the sweep reads as part of the
+- **Mechanism**: an absolutely-positioned `span` (the color fill) sits behind a
+  relatively-positioned text span, animating `transform: scaleX(0 → 1)` from a fixed
+  `transform-origin: left` so it grows from the left edge — not a `width`/`clip-path`
+  animation, which would be more expensive to composite for the same visual result.
+  Triggered by `apps/web/hooks/use-reveal.ts`'s `"in-view"` mode (once-only, same
+  `IntersectionObserver` every other scroll-reveal in this repo uses) via the
+  `[data-reveal-sweep]` CSS rules in `packages/ui/src/styles/globals.css` — same
+  duration/curve/delay as the heading's own reveal, so the sweep reads as part of the
   same reveal moment rather than a second, disconnected animation competing for
-  attention.
-- Lives in `apps/web/components/*` (not `packages/ui`) because `packages/ui` currently
-  has zero motion-package usage or dependency — see the "genuinely shared vs. app-local"
-  promotion test referenced above for `apps/web/lib/motion.ts`. Promote it the same way
-  if a second app needs the identical treatment.
+  attention. See "Motion / animation conventions" above for the full CSS contract.
+- Lives in `apps/web/components/*` (not `packages/ui`) — no package-boundary reason
+  now that this is plain CSS + a hook rather than a motion-package component, but it
+  stays app-local since nothing outside `apps/web` needs it yet; promote it under the
+  same "genuinely shared vs. app-local" test as any other `apps/web` utility if a
+  second app ever does.
 
 ## Anchor clearance under the fixed navbar
 

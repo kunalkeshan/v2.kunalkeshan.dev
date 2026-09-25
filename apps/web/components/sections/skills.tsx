@@ -2,7 +2,6 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "motion/react"
 import { ArrowRightIcon } from "lucide-react"
 
 import { Container } from "@workspace/ui/components/container"
@@ -12,11 +11,7 @@ import { urlFor } from "@workspace/sanity/image"
 import type { FEATURED_SKILLS_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { HighlightText } from "@/components/highlight-text"
-import {
-  sectionReveal,
-  sectionRevealTransition,
-  sectionRevealViewport,
-} from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 
 type Skill = NonNullable<FEATURED_SKILLS_QUERY_RESULT>[number]
 
@@ -56,16 +51,15 @@ function SkillCell({ skill }: { skill: Skill }) {
 }
 
 const Skills = ({ skills }: SkillsProps) => {
+  const { ref, state } = useReveal<HTMLElement>("in-view")
+
   if (!skills || skills.length === 0) return null
 
   return (
-    <motion.section
-      initial="hidden"
-      whileInView="visible"
-      variants={sectionReveal}
-      transition={sectionRevealTransition}
-      viewport={sectionRevealViewport}
-      className="py-10 md:py-16"
+    <section
+      ref={ref}
+      data-reveal={state}
+      className="reveal-delay-200 py-10 md:py-16"
     >
       <Container>
         <h2 className="mb-6 font-heading text-2xl font-black sm:text-3xl">
@@ -91,7 +85,7 @@ const Skills = ({ skills }: SkillsProps) => {
           </Button>
         </div>
       </Container>
-    </motion.section>
+    </section>
   )
 }
 

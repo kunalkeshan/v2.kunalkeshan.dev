@@ -2,7 +2,6 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "motion/react"
 import { ArrowRightIcon, FileTextIcon, MailIcon } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
@@ -10,11 +9,7 @@ import { Container } from "@workspace/ui/components/container"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { HighlightText } from "@/components/highlight-text"
-import {
-  sectionReveal,
-  sectionRevealTransition,
-  sectionRevealViewport,
-} from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 
 interface AboutStoryProps {
   headingLead: string
@@ -45,15 +40,14 @@ const AboutStory = ({
   imageUrl,
   imageAlt,
 }: AboutStoryProps) => {
+  const { ref, state } = useReveal<HTMLElement>("in-view")
+
   return (
-    <motion.section
+    <section
       id="story"
-      initial="hidden"
-      whileInView="visible"
-      variants={sectionReveal}
-      transition={sectionRevealTransition}
-      viewport={sectionRevealViewport}
-      className="py-10 md:py-16"
+      ref={ref}
+      data-reveal={state}
+      className="reveal-delay-200 py-10 md:py-16"
     >
       <Container>
         {/*
@@ -133,7 +127,7 @@ const AboutStory = ({
           </div>
         </div>
       </Container>
-    </motion.section>
+    </section>
   )
 }
 

@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { motion } from "motion/react"
 import {
   ArrowRightIcon,
   AwardIcon,
@@ -25,11 +24,7 @@ import type {
 import { HighlightText } from "@/components/highlight-text"
 import { OrganizationLogoMark } from "@/components/organization-logo-mark"
 import { formatDateRange, formatDuration, spanOf } from "@/lib/dates"
-import {
-  sectionReveal,
-  sectionRevealTransition,
-  sectionRevealViewport,
-} from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 import { trackLinkClick } from "@/lib/analytics"
 
 type Role = EXPERIENCES_QUERY_RESULT[number]
@@ -488,18 +483,17 @@ interface ExperienceProps {
  * from v1's landing Experience section, which used the same shape.
  */
 const Experience = ({ experiences, yearsBuilding }: ExperienceProps) => {
+  const { ref, state } = useReveal<HTMLElement>("in-view")
+
   if (!experiences || experiences.length === 0) return null
 
   return (
-    <motion.section
+    <section
       id="experience"
-      initial="hidden"
-      whileInView="visible"
-      variants={sectionReveal}
-      transition={sectionRevealTransition}
-      viewport={sectionRevealViewport}
+      ref={ref}
+      data-reveal={state}
       className={cn(
-        "py-14 md:py-20",
+        "reveal-delay-200 py-14 md:py-20",
         // v1 ran this section on a hard black panel. `.on-inverted` reproduces
         // it by flipping the design tokens for this subtree, so descendant
         // shadows and focus rings re-derive against the dark ground instead of
@@ -540,7 +534,7 @@ const Experience = ({ experiences, yearsBuilding }: ExperienceProps) => {
           </div>
         </div>
       </Container>
-    </motion.section>
+    </section>
   )
 }
 

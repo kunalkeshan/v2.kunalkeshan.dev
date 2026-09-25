@@ -1,12 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { motion, useReducedMotion } from "motion/react"
 import { BadgeCheckIcon, DownloadIcon } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { trackLinkClick } from "@/lib/analytics"
+import { useReveal } from "@/hooks/use-reveal"
 
 interface ResumeCtaProps {
   /** Absolute URL of the uploaded PDF. The banner renders nothing without one. */
@@ -43,7 +43,7 @@ export function ResumeCta({
   fileName,
   certificationsHref,
 }: ResumeCtaProps) {
-  const reduceMotion = useReducedMotion()
+  const { ref, state } = useReveal<HTMLDivElement>("in-view")
 
   if (!fileUrl && !certificationsHref) return null
 
@@ -64,18 +64,22 @@ export function ResumeCta({
       )}
     >
       <div
+        ref={ref}
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 flex items-center justify-center"
       >
         {rings.map((ring) => (
-          <motion.div
+          <div
             key={ring.size}
-            initial={reduceMotion ? false : { scale: ring.from, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, ease: "circOut" }}
+            style={
+              {
+                "--ring-from-scale": ring.from,
+                opacity: state === "visible" ? undefined : 0,
+              } as React.CSSProperties
+            }
             className={cn(
               "absolute rounded-full border-2",
+              state === "visible" && "animate-resume-cta-ring",
               ring.size,
               ring.opacity
             )}

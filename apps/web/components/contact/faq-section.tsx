@@ -1,7 +1,5 @@
 "use client"
 
-import { motion } from "motion/react"
-
 import { Container } from "@workspace/ui/components/container"
 import {
   Accordion,
@@ -11,28 +9,23 @@ import {
 } from "@workspace/ui/components/accordion"
 import type { FAQS_QUERY_RESULT } from "@workspace/sanity/types"
 
-import {
-  sectionReveal,
-  sectionRevealTransition,
-  sectionRevealViewport,
-} from "@/lib/motion"
+import { useReveal } from "@/hooks/use-reveal"
 
 interface FaqSectionProps {
   faqs: FAQS_QUERY_RESULT
 }
 
 export function FaqSection({ faqs }: FaqSectionProps) {
+  const { ref, state } = useReveal<HTMLElement>("in-view")
+
   if (!faqs?.faqItems || faqs.faqItems.length === 0) return null
 
   return (
-    <motion.section
+    <section
       id="faqs"
-      initial="hidden"
-      whileInView="visible"
-      variants={sectionReveal}
-      transition={sectionRevealTransition}
-      viewport={sectionRevealViewport}
-      className="py-10 md:py-16"
+      ref={ref}
+      data-reveal={state}
+      className="reveal-delay-200 py-10 md:py-16"
     >
       <Container className="max-w-3xl">
         <h2 className="mb-6 text-center font-heading text-2xl font-black sm:text-3xl">
@@ -53,6 +46,6 @@ export function FaqSection({ faqs }: FaqSectionProps) {
           ))}
         </Accordion>
       </Container>
-    </motion.section>
+    </section>
   )
 }
