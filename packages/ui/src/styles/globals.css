@@ -697,6 +697,10 @@
   [data-nav-state] {
     transition: none !important;
   }
+
+  [data-testimonial-height] {
+    transition: none !important;
+  }
 }
 
 /* Navbar scroll-morph — was `motion.nav` with named `variants` (`enter` /
@@ -730,6 +734,16 @@
   max-width: 48rem;
   top: 24px;
   width: 96%;
+}
+
+/* Testimonials carousel: the wrapper around <CarouselContent> whose inline
+ * `height` style tracks the active slide's own measured content height (see
+ * `testimonials.tsx`). Same `--dur-reveal`/`--ease-out-quint` timing as the
+ * navbar morph above, so a slide swap resizes the card smoothly instead of
+ * snapping — and, like every other transition in this file, is switched off
+ * wholesale by the `prefers-reduced-motion` block above. */
+[data-testimonial-height] {
+  transition: height var(--dur-reveal) var(--ease-out-quint);
 }
 
 [data-nav-state="scrolled"] {
