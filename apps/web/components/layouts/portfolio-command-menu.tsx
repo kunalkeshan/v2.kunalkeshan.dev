@@ -10,6 +10,7 @@ import {
   DownloadIcon,
   FolderKanbanIcon,
   HandshakeIcon,
+  HistoryIcon,
   HouseIcon,
   MailIcon,
   Music2Icon,
@@ -118,6 +119,13 @@ const pageDestinations = [
     href: "/journal",
     icon: BookOpenIcon,
     keywords: ["notes", "personal"],
+  },
+  {
+    id: "changelog",
+    label: "Changelog",
+    href: "/changelog",
+    icon: HistoryIcon,
+    keywords: ["releases", "updates", "history", "versions"],
   },
   {
     id: "contact",

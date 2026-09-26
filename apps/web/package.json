@@ -34,6 +34,8 @@
     "react-dom": "19.3.0",
     "react-hook-form": "^7.88.0",
     "react-icons": "^5.7.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "sonner": "^2.0.8",
     "yet-another-react-lightbox": "^3.32.2",
     "zod": "^4.6.4"

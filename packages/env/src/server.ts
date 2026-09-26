@@ -36,6 +36,12 @@ export const env = createEnv({
     // contact API route skips server-side verification entirely while this
     // is unset, so leaving it out never blocks submissions.
     TURNSTILE_SECRET_KEY: optionalSecret(),
+
+    // Optional GitHub token (fine-grained PAT, public read-only) for the
+    // /changelog page's GitHub Releases fetch (@workspace/version's
+    // getAppReleases). Raises the API rate limit from 60/hr to 5,000/hr;
+    // while unset, the fetch runs unauthenticated.
+    GITHUB_RELEASES_TOKEN: optionalSecret(),
   },
   experimental__runtimeEnv: {
     SANITY_WEBHOOK_SECRET: process.env.SANITY_WEBHOOK_SECRET,
@@ -43,5 +49,6 @@ export const env = createEnv({
     NODEMAILER_EMAIL: process.env.NODEMAILER_EMAIL,
     NODEMAILER_PASSWORD: process.env.NODEMAILER_PASSWORD,
     TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
+    GITHUB_RELEASES_TOKEN: process.env.GITHUB_RELEASES_TOKEN,
   },
 });

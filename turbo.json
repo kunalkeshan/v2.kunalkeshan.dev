@@ -12,7 +12,8 @@
         "SANITY_API_READ_TOKEN",
         "NODEMAILER_EMAIL",
         "NODEMAILER_PASSWORD",
-        "TURNSTILE_SECRET_KEY"
+        "TURNSTILE_SECRET_KEY",
+        "GITHUB_RELEASES_TOKEN"
       ]
     },
     "lint": {
