@@ -131,85 +131,6 @@ function SkillTags({ skills }: { skills: Role["skills"] }) {
   )
 }
 
-/**
- * One position. Rendered inside an organization group, so the organization's
- * name and logo are deliberately absent here — they belong to the group header.
- */
-function RoleEntry({ role }: { role: Role | Education }) {
-  const dateRange = formatDateRange(
-    role.startDate,
-    role.endDate,
-    role.isCurrent
-  )
-  const employment =
-    "employmentType" in role && role.employmentType
-      ? EMPLOYMENT_LABELS[role.employmentType]
-      : null
-  const workMode =
-    "workMode" in role && role.workMode
-      ? WORK_MODE_LABELS[role.workMode]
-      : null
-
-  return (
-    <li
-      className={cn(
-        "relative pl-6",
-        // The rail and its node replace a numbered marker: this is a real
-        // chronological sequence, so the line carries the meaning.
-        "before:absolute before:top-2 before:left-0 before:size-3 before:rounded-full before:border-2 before:border-border",
-        role.isCurrent ? "before:bg-primary" : "before:bg-card"
-      )}
-    >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h4 className="font-heading text-lg font-black">{role.role}</h4>
-        <p
-          className={cn(
-            "text-sm font-bold",
-            role.isCurrent && "text-secondary"
-          )}
-        >
-          {dateRange}
-        </p>
-      </div>
-
-      <MetaLine
-        items={[
-          employment,
-          workMode,
-          role.location,
-          "credential" in role ? role.credential : null,
-        ]}
-      />
-
-      {role.summary && (
-        <p className="mt-3 text-sm leading-relaxed text-body-foreground md:text-base">
-          {role.summary}
-        </p>
-      )}
-
-      {role.highlights && role.highlights.length > 0 && (
-        <ul className="mt-3 flex flex-col gap-2">
-          {role.highlights.map((highlight) => (
-            <li
-              key={highlight}
-              className="flex gap-2.5 text-sm leading-relaxed text-body-foreground"
-            >
-              <span
-                aria-hidden="true"
-                className="mt-2 size-1.5 shrink-0 rounded-full bg-border"
-              />
-              <span>{highlight}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <SkillTags skills={"skills" in role ? role.skills : null} />
-      <RoleLinks links={role.links} />
-    </li>
-  )
-}
-
 type OrganizationGroup = {
   key: string
   name: string | null
@@ -254,82 +175,160 @@ function groupByOrganization(
   }, [])
 }
 
+/**
+ * One role/education entry: a pull-quote-style heading, generous body copy,
+ * and a thin left rule beside the highlight list. Rendered inside an
+ * organization group, so the organization's name/logo/date marker are
+ * deliberately absent here — they belong to the sticky column in
+ * `OrganizationBlock`.
+ */
+function RoleEntry({ role }: { role: Role | Education }) {
+  const employment =
+    "employmentType" in role && role.employmentType
+      ? EMPLOYMENT_LABELS[role.employmentType]
+      : null
+  const workMode =
+    "workMode" in role && role.workMode
+      ? WORK_MODE_LABELS[role.workMode]
+      : null
+
+  return (
+    <div>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h4 className="font-heading text-2xl font-black text-balance sm:text-3xl">
+          {role.role}
+        </h4>
+        {role.isCurrent && (
+          <span className="font-heading text-sm font-bold text-secondary">
+            Current
+          </span>
+        )}
+      </div>
+
+      <p className="mt-1 text-sm font-bold text-muted-foreground">
+        {formatDateRange(role.startDate, role.endDate, role.isCurrent)}
+      </p>
+
+      <MetaLine
+        items={[
+          employment,
+          workMode,
+          role.location,
+          "credential" in role ? role.credential : null,
+        ]}
+      />
+
+      {role.summary && (
+        <p className="mt-4 text-lg leading-relaxed text-body-foreground">
+          {role.summary}
+        </p>
+      )}
+
+      {role.highlights && role.highlights.length > 0 && (
+        <ul className="mt-4 flex flex-col gap-3 border-l-2 border-border pl-4">
+          {role.highlights.map((highlight) => (
+            <li
+              key={highlight}
+              className="text-base leading-relaxed text-body-foreground"
+            >
+              {highlight}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="mt-4">
+        <SkillTags skills={"skills" in role ? role.skills : null} />
+        <RoleLinks links={role.links} />
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Two-column per-organization row: a sticky logo/date marker on the left,
+ * the organization's roles stacked on the right. The `<Reveal>` wrapping
+ * this (in `ExperienceGroupList` below) needs `fade` rather than the default
+ * slide+fade, since it's an ancestor of the `lg:sticky` marker column — same
+ * reasoning as the home page's `<Experience>` section further down this
+ * file, and `[data-reveal-fade]` in `packages/ui/src/styles/globals.css`.
+ */
 function OrganizationBlock({ group }: { group: OrganizationGroup }) {
   const span = spanOf(group.roles)
   const tenure = formatDuration(span.startDate, span.endDate, span.isCurrent)
-  const showTenure = group.roles.length > 1 && tenure
 
   return (
-    <article
-      className={cn(
-        "rounded-lg border-3 border-border bg-card",
-        "shadow-lg",
-        "p-5 md:p-7"
-      )}
-    >
-      <header>
-        <div className="flex items-start gap-4">
-          <OrganizationLogoMark
-            logo={group.logo}
-            name={group.name}
-            website={group.website}
-          />
-          <div className="min-w-0 flex-1">
-            <h3 className="font-heading text-xl font-black sm:text-2xl">
-              {group.website ? (
-                <a
-                  href={group.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() =>
-                    trackLinkClick({
-                      platform: "organization",
-                      url: group.website ?? "",
-                      placement: "experience",
-                    })
-                  }
-                  className="underline-offset-4 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
-                >
-                  {group.name}
-                </a>
-              ) : (
-                group.name
-              )}
-            </h3>
-            <MetaLine
-              items={[
-                showTenure ? tenure : null,
-                formatDateRange(span.startDate, span.endDate, span.isCurrent),
-              ]}
-            />
-          </div>
-        </div>
-
-        {/*
-          Full width rather than beside the logo. Sharing the logo's row leaves
-          roughly 60% of an already-narrow phone viewport for prose, which wraps
-          the description to a few words per line.
-        */}
+    <div className="grid grid-cols-1 gap-8 border-b-2 border-border py-10 first:pt-0 last:border-b-0 lg:grid-cols-[minmax(0,260px)_1fr] lg:gap-16">
+      <div className="lg:sticky lg:top-28 lg:self-start">
+        <OrganizationLogoMark
+          logo={group.logo}
+          name={group.name}
+          website={group.website}
+          size={64}
+        />
+        <h3 className="mt-4 font-heading text-2xl font-black">
+          {group.website ? (
+            <a
+              href={group.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() =>
+                trackLinkClick({
+                  platform: "organization",
+                  url: group.website ?? "",
+                  placement: "experience",
+                })
+              }
+              className="underline-offset-4 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+            >
+              {group.name}
+            </a>
+          ) : (
+            group.name
+          )}
+        </h3>
+        <p className="mt-1 text-sm font-bold text-muted-foreground">
+          {formatDateRange(span.startDate, span.endDate, span.isCurrent)}
+        </p>
+        {group.roles.length > 1 && tenure && (
+          <p className="text-sm text-muted-foreground">{tenure}</p>
+        )}
         {group.description && (
           <p className="mt-3 text-sm leading-relaxed text-body-foreground">
             {group.description}
           </p>
         )}
-      </header>
+      </div>
 
-      <ul
-        className={cn(
-          "mt-6 flex flex-col gap-7",
-          // A single shared rail behind every role in this organization.
-          group.roles.length > 1 &&
-            "relative before:absolute before:top-2 before:bottom-2 before:left-[5px] before:w-0.5 before:bg-border/25"
-        )}
-      >
+      <div className="flex flex-col gap-10">
         {group.roles.map((role) => (
           <RoleEntry key={role._id} role={role} />
         ))}
-      </ul>
-    </article>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Groups `roles` by organization and reveals each group as it scrolls into
+ * view, one after another.
+ */
+function ExperienceGroupList({ roles }: { roles: Array<Role | Education> }) {
+  const groups = groupByOrganization(roles)
+  const { ref, state, Provider } = useRevealGroup<HTMLDivElement>("in-view")
+
+  if (groups.length === 0) return null
+
+  return (
+    <Provider state={state}>
+      <div ref={ref} className="flex flex-col">
+        {groups.map((group, index) => (
+          <Reveal key={group.key} delay={index * CARD_STAGGER_STEP_S} fade>
+            <OrganizationBlock group={group} />
+          </Reveal>
+        ))}
+      </div>
+    </Provider>
   )
 }
 
@@ -339,9 +338,9 @@ interface ExperienceTimelineProps {
 }
 
 /**
- * The full timeline, with no section/heading/motion wrapper — used on /experience,
- * which supplies its own `h1`. Mirrors the `ServicesGrid` split in
- * `services.tsx`.
+ * The full timeline, with no section/heading/motion wrapper — used on /work,
+ * which supplies its own `h1`. Two-column editorial layout per organization:
+ * a sticky logo/date marker beside the roles.
  *
  * Education renders as its own block below the roles rather than being
  * interleaved: v1 listed the degree as a dated experience row, which
@@ -351,35 +350,29 @@ export function ExperienceTimeline({
   experiences,
   education,
 }: ExperienceTimelineProps) {
-  const groups = groupByOrganization(experiences ?? [])
-  const educationGroups = groupByOrganization(education ?? [])
+  const roles = experiences ?? []
+  const educationRoles = education ?? []
 
   return (
-    <div className="flex flex-col gap-12">
-      {groups.length > 0 && (
+    <div className="flex flex-col gap-14">
+      {roles.length > 0 && (
         // Navbar clearance for this anchor comes from `scroll-padding-top` on
         // `html` (packages/ui/src/styles/globals.css), not a local scroll margin.
-        <div id="work" className="flex flex-col gap-6">
-          {groups.map((group) => (
-            <OrganizationBlock key={group.key} group={group} />
-          ))}
+        <div id="work">
+          <ExperienceGroupList roles={roles} />
         </div>
       )}
 
-      {educationGroups.length > 0 && (
+      {educationRoles.length > 0 && (
         <section id="education" aria-labelledby="education-heading">
           <h2
             id="education-heading"
-            className="mb-6 flex items-center gap-2.5 font-heading text-2xl font-black sm:text-3xl"
+            className="mb-2 flex items-center gap-2.5 font-heading text-2xl font-black sm:text-3xl"
           >
             <GraduationCapIcon className="size-7" aria-hidden="true" />
             Education
           </h2>
-          <div className="flex flex-col gap-6">
-            {educationGroups.map((group) => (
-              <OrganizationBlock key={group.key} group={group} />
-            ))}
-          </div>
+          <ExperienceGroupList roles={educationRoles} />
         </section>
       )}
     </div>
