@@ -1,6 +1,5 @@
 import { ScrollTextIcon } from "lucide-react"
 
-import { cn } from "@workspace/ui/lib/utils"
 import type { PUBLICATIONS_QUERY_RESULT } from "@workspace/sanity/types"
 
 import { formatMonthYear } from "@/lib/dates"
@@ -11,7 +10,9 @@ interface PublicationsProps {
 }
 
 /**
- * The published-work callout at the foot of /experience.
+ * The published-work callout at the foot of /work. Thin rule dividers rather
+ * than bordered cards, matching the editorial layout of `ExperienceTimeline`
+ * above it (`components/sections/experience.tsx`).
  *
  * A Server Component — nothing here animates or holds state, so it stays off
  * the client bundle unlike the timeline above it.
@@ -23,13 +24,13 @@ export function Publications({ publications }: PublicationsProps) {
     <section id="publications" aria-labelledby="publications-heading">
       <h2
         id="publications-heading"
-        className="mb-6 flex items-center gap-2.5 font-heading text-2xl font-black sm:text-3xl"
+        className="mb-2 flex items-center gap-2.5 font-heading text-2xl font-black sm:text-3xl"
       >
         <ScrollTextIcon className="size-7" aria-hidden="true" />
         Published work
       </h2>
 
-      <ul className="flex flex-col gap-6">
+      <ul className="flex flex-col divide-y-2 divide-border">
         {publications.map((publication) => {
           const published = formatMonthYear(publication.publishedAt)
           const href =
@@ -37,14 +38,8 @@ export function Publications({ publications }: PublicationsProps) {
             (publication.doi ? `https://doi.org/${publication.doi}` : null)
 
           return (
-            <li
-              key={publication._id}
-              className={cn(
-                "rounded-lg border-3 border-border bg-card p-5 md:p-7",
-                "shadow-lg"
-              )}
-            >
-              <h3 className="font-heading text-lg font-black text-balance sm:text-xl">
+            <li key={publication._id} className="py-8 first:pt-8">
+              <h3 className="font-heading text-2xl font-black text-balance sm:text-3xl">
                 {href ? (
                   <TrackedLink
                     platform="publication"
@@ -66,7 +61,7 @@ export function Publications({ publications }: PublicationsProps) {
               </h3>
 
               {(publication.venue || published) && (
-                <p className="mt-1.5 text-sm text-muted-foreground">
+                <p className="mt-2 text-sm font-bold text-muted-foreground">
                   {publication.venue}
                   {publication.venue && published && (
                     <span aria-hidden="true"> · </span>
@@ -76,13 +71,13 @@ export function Publications({ publications }: PublicationsProps) {
               )}
 
               {publication.authors && publication.authors.length > 0 && (
-                <p className="mt-3 text-sm leading-relaxed text-body-foreground">
+                <p className="mt-3 text-base leading-relaxed text-body-foreground">
                   {publication.authors.join(", ")}
                 </p>
               )}
 
               {publication.abstract && (
-                <p className="mt-3 text-sm leading-relaxed text-body-foreground">
+                <p className="mt-3 text-lg leading-relaxed text-body-foreground">
                   {publication.abstract}
                 </p>
               )}
