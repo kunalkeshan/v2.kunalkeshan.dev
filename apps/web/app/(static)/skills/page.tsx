@@ -7,6 +7,7 @@ import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import { SKILLS_QUERY } from "@workspace/sanity/query"
 
 import { HighlightText } from "@/components/highlight-text"
+import { PageHero } from "@/components/page-hero"
 import { SkillsFiltered } from "@/components/sections/skills-filtered"
 import { JsonLd } from "@/components/shared/json-ld"
 import {
@@ -53,17 +54,20 @@ export default async function SkillsPage() {
         ])}
       />
       <Container>
-        <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
-          A good workman never blames his tools
-          {"—"}
-          <HighlightText variant="secondary">
-            but a great one collects them
-          </HighlightText>
-        </h1>
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg">
-          Everything I&apos;ve picked up and used in practice, grouped by
-          category.
-        </p>
+        <PageHero
+          heading={
+            <>
+              A good workman never blames his tools
+              {"—"}
+              <HighlightText variant="secondary">
+                but a great one collects them
+              </HighlightText>
+            </>
+          }
+          headingClassName="font-heading text-4xl leading-tight font-black sm:text-5xl"
+          subtext="Everything I've picked up and used in practice, grouped by category."
+          subtextClassName="mt-3 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg"
+        />
 
         <div className="mt-10">
           <Suspense

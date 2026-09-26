@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Container } from "@workspace/ui/components/container"
 
 import { HighlightText } from "@/components/highlight-text"
+import { PageHero } from "@/components/page-hero"
 import { JsonLd } from "@/components/shared/json-ld"
 import { getTokenGroups, BORDER_WIDTHS } from "@/lib/style-guide/tokens"
 import { buildBreadcrumbListJsonLd, buildWebPageJsonLd } from "@/lib/structured-data"
@@ -42,18 +43,29 @@ export default function StyleGuidePage() {
         <StyleGuideLayout>
           <div className="space-y-16">
             <header id="overview" className="scroll-mt-32">
-              <h1 className="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl">
-                The design system,{" "}
-                <HighlightText variant="primary">rendered live</HighlightText>
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg">
-                Every color, shadow, radius, and component in{" "}
-                <code className="rounded-sm bg-muted px-1 py-0.5 font-mono text-sm">
-                  @workspace/ui
-                </code>
-                , read from the real source rather than hand-copied — click any
-                swatch or component to copy its token or usage snippet.
-              </p>
+              <PageHero
+                heading={
+                  <>
+                    The design system,{" "}
+                    <HighlightText variant="primary">
+                      rendered live
+                    </HighlightText>
+                  </>
+                }
+                headingClassName="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl"
+                subtext={
+                  <>
+                    Every color, shadow, radius, and component in{" "}
+                    <code className="rounded-sm bg-muted px-1 py-0.5 font-mono text-sm">
+                      @workspace/ui
+                    </code>
+                    , read from the real source rather than hand-copied —
+                    click any swatch or component to copy its token or usage
+                    snippet.
+                  </>
+                }
+                subtextClassName="mt-4 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg"
+              />
             </header>
 
             <RegistryGuide />

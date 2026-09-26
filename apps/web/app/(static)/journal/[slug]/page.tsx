@@ -28,6 +28,7 @@ import {
 } from "@workspace/sanity/query"
 
 import { SITE_CONFIG } from "@/config/site"
+import { PageHero } from "@/components/page-hero"
 import { postPortableTextComponents } from "@/components/blog/post-portable-text-components"
 import { PostFooterLicense } from "@/components/blog/post-footer-license"
 import { PostSidebar } from "@/components/blog/post-sidebar"
@@ -217,9 +218,10 @@ export default async function JournalEntryPage({
           </div>
         )}
 
-        <h1 className="mt-3 font-heading text-4xl leading-tight font-black sm:text-5xl">
-          {entry.title}
-        </h1>
+        <PageHero
+          heading={entry.title}
+          headingClassName="mt-3 font-heading text-4xl leading-tight font-black sm:text-5xl"
+        />
 
         <div className="mt-4 flex flex-wrap items-center gap-3 text-sm font-semibold text-muted-foreground">
           {authorPhotoUrl && (

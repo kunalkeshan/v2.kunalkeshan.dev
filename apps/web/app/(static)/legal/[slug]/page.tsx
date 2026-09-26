@@ -23,6 +23,7 @@ import {
 } from "@workspace/sanity/query"
 
 import { portableTextComponents } from "@/components/sanity/portable-text-components"
+import { PageHero } from "@/components/page-hero"
 import { JsonLd } from "@/components/shared/json-ld"
 import { buildBreadcrumbListJsonLd, buildWebPageJsonLd } from "@/lib/structured-data"
 import {
@@ -123,15 +124,12 @@ export default async function LegalDocumentPage({
           </BreadcrumbList>
         </Breadcrumb>
 
-        <h1 className="mt-3 font-heading text-4xl leading-tight font-black sm:text-5xl">
-          {doc.title}
-        </h1>
-
-        {doc.description && (
-          <p className="mt-4 text-base leading-relaxed text-body-foreground md:text-lg">
-            {doc.description}
-          </p>
-        )}
+        <PageHero
+          heading={doc.title}
+          headingClassName="mt-3 font-heading text-4xl leading-tight font-black sm:text-5xl"
+          subtext={doc.description}
+          subtextClassName="mt-4 text-base leading-relaxed text-body-foreground md:text-lg"
+        />
 
         <article className="mt-10">
           <PortableText

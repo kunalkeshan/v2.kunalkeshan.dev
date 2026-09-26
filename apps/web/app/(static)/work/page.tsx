@@ -11,6 +11,7 @@ import {
 } from "@workspace/sanity/query"
 
 import { HighlightText } from "@/components/highlight-text"
+import { PageHero } from "@/components/page-hero"
 import { ExperienceTimeline } from "@/components/sections/experience"
 import { Publications } from "@/components/sections/publications"
 import { ResumeCta } from "@/components/sections/resume-cta"
@@ -94,14 +95,19 @@ export default async function ExperiencePage() {
         ])}
       />
       <Container>
-        <h1 className="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl">
-          It&apos;s dangerous to go alone,{" "}
-          <HighlightText variant="secondary">take this resume</HighlightText>
-        </h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg">
-          Everywhere I&apos;ve worked, what I actually built there, and the
-          tools each role left me with.
-        </p>
+        <PageHero
+          heading={
+            <>
+              It&apos;s dangerous to go alone,{" "}
+              <HighlightText variant="secondary">
+                take this resume
+              </HighlightText>
+            </>
+          }
+          headingClassName="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl"
+          subtext="Everywhere I've worked, what I actually built there, and the tools each role left me with."
+          subtextClassName="mt-4 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg"
+        />
 
         <div className="mt-10">
           <SectionNav items={sectionNavItems} />

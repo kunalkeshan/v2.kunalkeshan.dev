@@ -585,6 +585,30 @@ part didn't change conceptually, it just moved out of `motion`'s `initial`/`anim
   doesn't, since both icons can stay mounted and cross-fade via opacity with nothing to
   ever unmount).
 
+**`apps/web/components/page-hero.tsx` — the shared static-page hero.** Every static
+page's `<h1>` + intro paragraph (`/services`, `/about`, `/work`, `/skills`, `/projects`,
+`/certifications`, `/legal`, `/journal`, `/blog`, `/tags/[tag]`, `/style-guide`, and the
+title on each detail page — `/projects/[slug]`, `/blog/[slug]`, `/journal/[slug]`,
+`/legal/[slug]`) uses `<PageHero heading={...} headingClassName={...} subtext={...}
+subtextClassName={...} />` rather than a bare `<h1>`/`<p>`. It wires up the same
+`useRevealGroup("mount")` + `<Reveal delay={0}>`/`<Reveal delay={0.12}>` pattern `Hero`
+and `ContactHero` hand-roll for their own bespoke layouts — those two stay bespoke
+because they compose more than a text pair (buttons, an image, a form); every other
+static page's hero *is* just the text pair, so it's centralized here instead of
+copy-pasting the same two-hook wiring across a dozen pages. `headingClassName`/
+`subtextClassName` are required/optional pass-throughs, not baked-in defaults, since the
+pages it replaces disagree in small, deliberate ways (`text-balance` on some, `mt-3` vs
+`mt-4`, `max-w-2xl` vs none) that a shared class string would silently flatten.
+
+The standalone `/services` page is the one case where the content *below* the hero also
+joins the mount sequence: `ServicesGrid` takes an optional `mode` (default `"in-view"`,
+unchanged for the home page's `Services` strip) and `delayOffset` prop, and `/services`
+passes `mode="mount"` `delayOffset={0.24}` so its cards continue the hero's own delay
+sequence instead of waiting on a scroll that, on that page, may never happen. No other
+page's below-the-hero content (filtered grids, `PostsGrid`, etc.) was changed — they keep
+whatever reveal behavior (or lack of one) they already had; only the hero text itself was
+missing this pattern.
+
 **Reduced motion is now handled entirely in CSS**, not per-component
 `useReducedMotion()` checks — one `@media (prefers-reduced-motion: reduce)` block in
 `packages/ui/src/styles/globals.css` (alongside the marquee's own) zeroes out every

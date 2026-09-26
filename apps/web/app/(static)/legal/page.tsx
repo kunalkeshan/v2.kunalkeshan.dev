@@ -9,6 +9,7 @@ import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import { LEGAL_DOCUMENTS_QUERY } from "@workspace/sanity/query"
 
 import { HighlightText } from "@/components/highlight-text"
+import { PageHero } from "@/components/page-hero"
 import { JsonLd } from "@/components/shared/json-ld"
 import { buildBreadcrumbListJsonLd, buildWebPageJsonLd } from "@/lib/structured-data"
 import {
@@ -50,13 +51,17 @@ export default async function LegalPage() {
         ])}
       />
       <Container>
-        <h1 className="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl">
-          The fine print,{" "}
-          <HighlightText variant="primary">plainly stated</HighlightText>
-        </h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg">
-          Privacy policy, terms, and any other legal documents for this site.
-        </p>
+        <PageHero
+          heading={
+            <>
+              The fine print,{" "}
+              <HighlightText variant="primary">plainly stated</HighlightText>
+            </>
+          }
+          headingClassName="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl"
+          subtext="Privacy policy, terms, and any other legal documents for this site."
+          subtextClassName="mt-4 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg"
+        />
 
         <div className="mt-10">
           {legalDocs && legalDocs.length > 0 ? (
