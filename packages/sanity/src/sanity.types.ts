@@ -236,6 +236,7 @@ export type Project = {
     | "open-source"
     | "research"
     | "college"
+    | "hackathon"
   status?: "live" | "in-development" | "unlaunched" | "archived"
   tagline?: string
   summary?: string
@@ -1736,6 +1737,7 @@ export type FEATURED_PROJECTS_QUERY_RESULT = Array<{
   kind:
     | "college"
     | "freelance"
+    | "hackathon"
     | "open-source"
     | "personal"
     | "professional"
@@ -1840,6 +1842,7 @@ export type PROJECTS_QUERY_RESULT = Array<{
   kind:
     | "college"
     | "freelance"
+    | "hackathon"
     | "open-source"
     | "personal"
     | "professional"
@@ -1958,6 +1961,7 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
   kind:
     | "college"
     | "freelance"
+    | "hackathon"
     | "open-source"
     | "personal"
     | "professional"
@@ -2219,6 +2223,7 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
     kind:
       | "college"
       | "freelance"
+      | "hackathon"
       | "open-source"
       | "personal"
       | "professional"

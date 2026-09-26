@@ -1261,6 +1261,10 @@
             {
               "type": "string",
               "value": "college"
+            },
+            {
+              "type": "string",
+              "value": "hackathon"
             }
           ]
         },
