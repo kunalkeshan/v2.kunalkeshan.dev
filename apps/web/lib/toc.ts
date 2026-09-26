@@ -1,9 +1,22 @@
-import type { BlockContent } from "@workspace/sanity/types"
-
 export interface TocEntry {
   id: string
   text: string
   level: 2 | 3
+}
+
+/**
+ * A block content array mixes text blocks and non-text members (images).
+ * This only reads text-block fields, so it's typed against that minimal
+ * shape rather than the generated `BlockContent` union — which now differs
+ * per query depending on whether the embedded image is dereferenced
+ * (`asset->`), and would otherwise need this file to track that per call
+ * site even though it never touches the image member at all.
+ */
+interface PortableTextLikeBlock {
+  _type: string
+  _key: string
+  style?: string
+  children?: readonly { text?: string | null }[]
 }
 
 /**
@@ -27,7 +40,9 @@ export function headingId(key: string): string {
  * down by one for display (h2 style -> rendered <h3>), but the TOC only
  * cares about the author's intent, not the final tag name.
  */
-export function extractToc(body: BlockContent | null | undefined): TocEntry[] {
+export function extractToc(
+  body: readonly PortableTextLikeBlock[] | null | undefined
+): TocEntry[] {
   if (!body) return []
 
   const entries: TocEntry[] = []

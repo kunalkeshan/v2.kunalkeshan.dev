@@ -151,7 +151,15 @@ export const LEGAL_DOCUMENT_BY_SLUG_QUERY = defineQuery(`
     title,
     slug,
     description,
-    content,
+    content[] {
+      ...,
+      _type == "image" => {
+        asset->,
+        hotspot,
+        crop,
+        alt
+      }
+    },
     _createdAt,
     _updatedAt,
     seo {
@@ -519,7 +527,15 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(`
     status,
     tagline,
     summary,
-    body,
+    body[] {
+      ...,
+      _type == "image" => {
+        asset->,
+        hotspot,
+        crop,
+        alt
+      }
+    },
     archived,
     icon {
       asset->,
@@ -568,6 +584,38 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(`
       _id,
       name,
       category
+    },
+    collaborators[] {
+      contribution,
+      person-> {
+        _id,
+        name,
+        photo {
+          asset->,
+          hotspot,
+          crop,
+          alt
+        },
+        position,
+        organization-> {
+          _id,
+          name
+        },
+        organizationName
+      }
+    },
+    relatedProjects[]-> {
+      _id,
+      title,
+      slug,
+      tagline,
+      kind,
+      coverImage {
+        asset->,
+        hotspot,
+        crop,
+        alt
+      }
     },
     links[] {
       label,
@@ -746,7 +794,15 @@ const WRITING_DETAIL_FIELDS = `
   slug,
   excerpt,
   publishedAt,
-  body,
+  body[] {
+    ...,
+    _type == "image" => {
+      asset->,
+      hotspot,
+      crop,
+      alt
+    }
+  },
   coverImage {
     asset->,
     hotspot,

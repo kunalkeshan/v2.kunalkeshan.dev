@@ -30,7 +30,9 @@ import {
 } from "@workspace/sanity/query"
 
 import { portableTextComponents } from "@/components/sanity/portable-text-components"
+import { ProjectCollaborators } from "@/components/sections/project-collaborators"
 import { ProjectGallery } from "@/components/sections/project-gallery"
+import { RelatedProjects } from "@/components/sections/related-projects"
 import { JsonLd } from "@/components/shared/json-ld"
 import { TrackedLink } from "@/components/shared/tracked-link"
 import { formatDateRange } from "@/lib/dates"
@@ -328,24 +330,41 @@ export default async function ProjectPage({
               </div>
             )}
 
+            <ProjectCollaborators collaborators={project.collaborators} />
+
+            <RelatedProjects projects={project.relatedProjects} />
+
             <ProjectGallery gallery={project.gallery} title={project.title} />
           </div>
 
           {/*
-            `lg:h-fit` matters: as a flex child this would otherwise stretch to
-            the full row height, leaving the sticky panel inside it no room to
-            travel — sticky silently does nothing. Carried over from v1, which
-            had the same `lg:h-fit` on its Information panel. Sticky is gated
-            behind `lg:` throughout, so on mobile the panel is static and (via
+            No `h-fit` here, matching blog/journal: as a flex child the aside
+            stretches to the main column's full height (the row's default
+            `items-stretch`), giving the sticky div below room to travel
+            across a case study of any length. With `h-fit` the aside shrinks
+            to the sticky content's own height, leaving it almost nowhere to
+            travel — sticky silently does nothing. Sticky is gated behind
+            `lg:` throughout, so on mobile the panel is static and (via
             `flex-col-reverse`) sits above the prose.
           */}
-          <aside className="lg:h-fit lg:w-80 lg:shrink-0">
+          <aside className="lg:w-80 lg:shrink-0">
             {/*
               One sticky column holding two separate cards: the sticky lives on
               this wrapper rather than on each card, so Information and Links
               travel and settle together with the gap between them intact.
+
+              `lg:z-10` keeps this above the fixed, `z-50`-adjacent navbar's
+              visual footprint as it scrolls into the sticky offset — without
+              it the cards can render underneath the navbar instead of
+              settling below it. `max-h-[calc(100vh-8rem-0.5rem)]` +
+              `overflow-y-auto` caps the stack at viewport height and scrolls
+              internally instead of ever growing taller than the screen. The
+              `-mx-2 -mb-2 p-2` pair pads the scroll container by the cards'
+              own hard offset `shadow-lg` and pulls the padding back out, so
+              the shadow isn't clipped at the scroll edge while the visible
+              column still lines up with `aside`'s width.
             */}
-            <div className="flex flex-col gap-5 lg:sticky lg:top-32">
+            <div className="flex flex-col gap-5 lg:sticky lg:top-32 lg:z-10 lg:-mx-2 lg:-mb-2 lg:max-h-[calc(100vh-8rem-0.5rem)] lg:overflow-y-auto lg:overflow-x-hidden lg:p-2">
               <div className="rounded-lg border-3 border-border bg-card p-5 shadow-lg">
                 <h2 className="font-heading text-lg font-black">Information</h2>
 

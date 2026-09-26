@@ -47,18 +47,17 @@ export const personType = defineType({
       type: "image",
       options: { hotspot: true },
       description:
-        "Headshot, shown as a circular portrait beside their testimonial. Square images work best — anything else is cropped to fill the circle, so set the hotspot over their face.",
+        "Headshot, shown as a circular portrait beside their testimonial or as a project collaborator. Square images work best — anything else is cropped to fill the circle, so set the hotspot over their face. Optional: a project collaborator without a photo on hand falls back to an initials avatar.",
       fields: [
         defineField({
           name: "alt",
           title: "Alt text",
           type: "string",
           description:
-            "Describe the photo for screen readers. Example: 'Portrait photograph of Rajarajan K'.",
+            "Describe the photo for screen readers. Example: 'Portrait photograph of Rajarajan K'. Required only if a photo is set.",
           validation: (Rule) => Rule.required(),
         }),
       ],
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "position",

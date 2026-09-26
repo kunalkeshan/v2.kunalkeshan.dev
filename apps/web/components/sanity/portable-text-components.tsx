@@ -1,8 +1,6 @@
-import React from "react";
-import Image from "next/image";
 import { type PortableTextComponents } from "@portabletext/react";
 
-import { urlFor } from "@workspace/sanity/image";
+import { PortableTextImage } from "@/components/sanity/portable-text-image";
 
 /**
  * Reusable PortableText components configuration for Sanity block content.
@@ -19,29 +17,15 @@ import { urlFor } from "@workspace/sanity/image";
  */
 export const portableTextComponents: PortableTextComponents = {
   types: {
-    image: ({ value }) => {
-      if (!value?.asset) return null;
-
-      const imageUrl = urlFor(value.asset)
-        .format("webp")
-        .quality(80)
-        .width(1200)
-        .height(800)
-        .url();
-
-      return (
-        <div className="my-8">
-          <Image
-            src={imageUrl}
-            alt={(value as { alt?: string }).alt || ""}
-            width={1200}
-            height={800}
-            className="w-full h-auto rounded-lg"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
-          />
-        </div>
-      );
-    },
+    // `@portabletext/react` calls every `types`/`marks` component with its
+    // full internal props object, including a `renderNode` function — and
+    // a function can't cross the server→client boundary. This thin wrapper
+    // stays server-safe and forwards only the plain, serializable `value`
+    // into `PortableTextImage` (a client component), which owns the actual
+    // rendering: real aspect ratio via the dereferenced asset's
+    // `metadata.dimensions` (no forced height, so nothing is cropped — see
+    // that file), plus a click-to-zoom lightbox matching the Gallery.
+    image: ({ value }) => <PortableTextImage value={value} />,
   },
   block: {
     // h1 style → renders as h2
