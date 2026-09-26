@@ -91,6 +91,17 @@ export function useReveal<T extends HTMLElement>(mode: "mount" | "in-view") {
       return
     }
 
+    // `rootMargin` extends the intersection root well past the physical
+    // viewport edges. Without it, a fast fling on a smooth high-refresh-rate
+    // display can carry an element through the entire viewport *between* two
+    // observer samples — the callback only fires on a change in
+    // intersection state, so an element that was never sampled while
+    // intersecting stays `"hidden"` even though it visually passed through
+    // (reported on /projects: the "current" grid stayed blank after a quick
+    // scroll to the bottom, while the archived grid below it — resting in
+    // view when the fling settled — revealed normally). Expanding the root
+    // gives every scroll several samples' worth of runway to catch the
+    // crossing before the element reaches the real edge.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
@@ -98,7 +109,7 @@ export function useReveal<T extends HTMLElement>(mode: "mount" | "in-view") {
           observer.disconnect()
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: "20% 0px" }
     )
 
     observer.observe(node)

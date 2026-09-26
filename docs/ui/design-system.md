@@ -568,6 +568,15 @@ part didn't change conceptually, it just moved out of `motion`'s `initial`/`anim
   one-shot `IntersectionObserver` (the scroll-reveal case — every section that used to
   import `sectionReveal`). Spread the returned `ref`/`data-reveal={state}` onto the
   element; the CSS below owns the actual animation.
+
+  The `"in-view"` observer uses `rootMargin: "20% 0px"`, not the bare viewport —
+  without it, a fast fling on a smooth high-refresh-rate display can carry an element
+  through the whole physical viewport *between* two observer samples, so it's never
+  recorded as intersecting and stays stuck `"hidden"` (reported on `/projects`: the
+  current-work grid stayed blank after a quick scroll to the bottom, while the archived
+  grid below it — resting in view when the fling settled — revealed normally).
+  Expanding the root gives every scroll several samples' worth of runway to catch the
+  crossing before the element reaches the real edge.
 - `apps/web/hooks/use-delayed-unmount.ts` — the one genuine gap CSS can't cover on its
   own: animating an *unmount*. Keeps an outgoing element mounted for its exit
   transition's duration before telling the caller to stop rendering it. Used by
