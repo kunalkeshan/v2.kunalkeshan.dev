@@ -109,7 +109,13 @@ export async function generateMetadata({
   // See blog/[slug]/page.tsx's generateMetadata for why `images` is omitted
   // via spread rather than set to `undefined` when there's no override.
   const overrideImage = entry.ogImage?.asset
-    ? urlFor(entry.ogImage).width(1200).height(630).fit("crop").url()
+    ? urlFor(entry.ogImage)
+        .width(1200)
+        .height(630)
+        .fit("crop")
+        .format("jpg")
+        .quality(85)
+        .url()
     : undefined
 
   return {

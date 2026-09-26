@@ -1,26 +1,10 @@
 import { ImageResponse } from "next/og"
 
 import { loadOgFonts } from "./fonts"
+import { OG_TOKENS as TOKENS } from "./tokens"
 
 export const OG_IMAGE_SIZE = { width: 1200, height: 630 }
 export const OG_IMAGE_CONTENT_TYPE = "image/png"
-
-// Raw hex values, not Tailwind classes — ImageResponse renders via Satori,
-// not the browser, so it never sees globals.css. Copied from the light-mode
-// :root tokens in packages/ui/src/styles/globals.css (design-system.md's
-// "Colors" table); the image always renders light-mode regardless of the
-// visiting browser's theme, matching how a generated social-preview image
-// has no user session to read a preference from.
-const TOKENS = {
-  background: "#faf9f6",
-  foreground: "#0b0b0b",
-  card: "#ffffff",
-  primary: "#ffa500",
-  primaryForeground: "#0b0b0b",
-  secondary: "#1c92ff",
-  border: "#0b0b0b",
-  mutedForeground: "#5c5c5c",
-}
 
 interface WritingOgImageProps {
   title: string
@@ -28,6 +12,8 @@ interface WritingOgImageProps {
   tagNames: string[]
   dateLabel: string
   readingTimeLabel: string
+  /** Same raster-forced-URL contract as `project-og-image.tsx`. Omitted entirely when unset. */
+  siteLogoUrl: string | undefined
 }
 
 /**
@@ -53,6 +39,7 @@ function WritingOgImage({
   tagNames,
   dateLabel,
   readingTimeLabel,
+  siteLogoUrl,
 }: WritingOgImageProps) {
   const visibleTags = tagNames.slice(0, 4)
   return (
@@ -72,7 +59,13 @@ function WritingOgImage({
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
+          // Centered, with a fixed `gap` to the footer below — not
+          // `justify-content: space-between` against the card's full
+          // height, which stretched the gap above the footer divider to
+          // whatever was left over, so it grew or shrank with title/tag
+          // count instead of reading as one consistent rhythm.
+          justifyContent: "center",
+          gap: "40px",
           backgroundColor: TOKENS.card,
           border: `6px solid ${TOKENS.border}`,
           borderRadius: "16px",
@@ -132,15 +125,36 @@ function WritingOgImage({
             paddingTop: "32px",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              fontSize: "32px",
-              fontWeight: 700,
-              color: TOKENS.secondary,
-            }}
-          >
-            {siteName}
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            {siteLogoUrl ? (
+              // Same treatment as the navbar's site logo (`Logo` in
+              // packages/ui/src/components/logo.tsx): circular, bordered,
+              // cropped to fill — so the mark reads as the same "brand"
+              // element wherever it shows up.
+              // eslint-disable-next-line @next/next/no-img-element -- Satori (next/og) renders via its own image pipeline, not next/image.
+              <img
+                src={siteLogoUrl}
+                width={44}
+                height={44}
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "9999px",
+                  border: `3px solid ${TOKENS.border}`,
+                  objectFit: "cover",
+                }}
+              />
+            ) : null}
+            <div
+              style={{
+                display: "flex",
+                fontSize: "32px",
+                fontWeight: 700,
+                color: TOKENS.secondary,
+              }}
+            >
+              {siteName}
+            </div>
           </div>
           <div
             style={{

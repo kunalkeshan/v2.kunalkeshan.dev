@@ -105,6 +105,50 @@ Adding `seo` to another document type follows the same three-step pattern: add t
 `docs/runbooks/sanity-workflow.md`), then wire both into that document's `generateMetadata`
 and sitemap entry.
 
+## Open Graph images
+
+Every dynamic detail page (`/blog/[slug]`, `/journal/[slug]`, `/projects/[slug]`) always
+ships a working `og:image`/`twitter:image` — either a manual per-document override, or an
+auto-generated branded card, never nothing. The site-wide default
+(`(static)/layout.tsx`, from `siteConfig.ogImage`/`twitterImage`) follows the same
+raster-format rule below, but has no generated-card fallback of its own — it's the last
+resort under everything else here.
+
+**The pattern, per collection:**
+
+- **`post`/`journalEntry`** (`writingFields.ts`) have a dedicated `ogImage` field, separate
+  from `coverImage`, for a manual social-image override. `generateMetadata` in
+  `blog|journal/[slug]/page.tsx` uses it when set; when it's *not* set, the `images` key is
+  **omitted from the returned object entirely** (never present-but-`undefined`) so Next.js's
+  file-convention `opengraph-image.tsx` for that route segment fills in automatically. That
+  file always renders a generated card via the shared `renderWritingOgImage` template
+  (`apps/web/lib/og/writing-og-image.tsx`) — title, tags, date, reading time, no thumbnail.
+- **`project`** has no manual override field — its `opengraph-image.tsx` is *always*
+  reached, unconditionally, and `generateMetadata` never sets an `images` key at all. Its
+  template (`apps/web/lib/og/project-og-image.tsx`, `renderProjectOgImage`) additionally
+  composites the project's actual thumbnail (`coverImage`, or `icon` as a smaller fallback)
+  into the card — a screenshot/logo is more identifying for a project than it would be for a
+  post, and rendering through `next/og`'s `ImageResponse` guarantees PNG output regardless of
+  what format the source asset happens to be (see below).
+
+**Adding a new Sanity collection with its own detail page** should follow the `project`
+half of this pattern unless it also needs a manual per-document override (in which case,
+follow the `post`/`journalEntry` half instead): a route-level `opengraph-image.tsx` that
+always generates a card, and `generateMetadata` that never sets `openGraph.images`/
+`twitter.images` at all.
+
+**Force a raster format on every Sanity-derived OG/Twitter image URL** — append
+`.format("jpg").quality(85)` (or another raster format) to the `urlFor(...)` chain
+whenever its result feeds an `og:image`/`twitter:image` tag, or an `<img>` inside a
+generated card. A source asset can be an SVG (a logo, an illustration) and Sanity's image
+API does **not** rasterize one just because width/height/crop params are present — the
+response keeps `content-type: image/svg+xml` unless a format is explicitly forced. Most
+social crawlers (WhatsApp, Facebook, X/Twitter, LinkedIn, iMessage) silently drop an
+`og:image` that resolves to SVG, producing a blank link-preview image with no error
+anywhere — this is exactly what broke `/projects/[slug]` before the fix documented here.
+This rule applies everywhere a Sanity image feeds a social-image tag, not just inside a
+generated card — including the sitewide default in `(static)/layout.tsx`.
+
 ## Sitemap
 
 `apps/web/app/sitemap.ts` is split **per collection** via Next's native
@@ -167,3 +211,7 @@ urge to inline full post bodies.
 - `curl <site>/llms.txt` and `curl <site>/robots.txt`.
 - In Studio, toggle a document's `seo.noindex` on and confirm it drops out of its sitemap
   chunk and the page's rendered `<meta name="robots">` shows `noindex`.
+- `curl -s <page-url> | grep -oE '<meta property="og:image"[^>]*>'` — confirm the URL it
+  points at resolves with `content-type: image/png` or `image/jpeg` (never `image/svg+xml`),
+  and that a dynamic detail page's tag points at its own `/opengraph-image` route rather
+  than a raw `cdn.sanity.io/...` asset URL when there's no manual override set.
