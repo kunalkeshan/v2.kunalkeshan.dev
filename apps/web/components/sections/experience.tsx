@@ -28,13 +28,19 @@ import { useRevealGroup } from "@/hooks/use-reveal"
 import { Reveal } from "@/components/reveal"
 import { CARD_STAGGER_STEP_S } from "@/lib/reveal-stagger"
 import { trackLinkClick } from "@/lib/analytics"
+import {
+  groupByOrganization,
+  type Education,
+  type OrganizationGroup,
+  type Role,
+} from "@/lib/group-by-organization"
 
-type Role = EXPERIENCES_QUERY_RESULT[number]
-type Education = EDUCATION_QUERY_RESULT[number]
+export type { Education, OrganizationGroup, Role }
+export { groupByOrganization }
+
 type FeaturedRole = FEATURED_EXPERIENCES_QUERY_RESULT[number]
-type OrganizationLogo = NonNullable<Role["organization"]>["logo"]
 
-const EMPLOYMENT_LABELS: Record<string, string> = {
+export const EMPLOYMENT_LABELS: Record<string, string> = {
   "full-time": "Full-time",
   "part-time": "Part-time",
   internship: "Internship",
@@ -43,13 +49,13 @@ const EMPLOYMENT_LABELS: Record<string, string> = {
   volunteer: "Volunteer",
 }
 
-const WORK_MODE_LABELS: Record<string, string> = {
+export const WORK_MODE_LABELS: Record<string, string> = {
   "on-site": "On-site",
   remote: "Remote",
   hybrid: "Hybrid",
 }
 
-const LINK_ICONS = {
+export const LINK_ICONS = {
   "live-site": ExternalLinkIcon,
   repo: GitBranchIcon,
   certificate: AwardIcon,
@@ -58,7 +64,13 @@ const LINK_ICONS = {
   publication: ScrollTextIcon,
 } as const
 
-function MetaLine({ items }: { items: Array<string | null | undefined> }) {
+/**
+ * Exported (along with the labels/icons/grouping above) so the temporary
+ * `/work/preview/*` variants in `components/work-previews/` can reuse the
+ * same formatting and grouping logic instead of duplicating it. Purely
+ * additive — nothing here changes for the existing callers below.
+ */
+export function MetaLine({ items }: { items: Array<string | null | undefined> }) {
   const shown = items.filter((item): item is string => Boolean(item))
   if (shown.length === 0) return null
 
@@ -74,7 +86,7 @@ function MetaLine({ items }: { items: Array<string | null | undefined> }) {
   )
 }
 
-function RoleLinks({ links }: { links: Role["links"] }) {
+export function RoleLinks({ links }: { links: Role["links"] }) {
   if (!links || links.length === 0) return null
 
   return (
@@ -114,7 +126,7 @@ function RoleLinks({ links }: { links: Role["links"] }) {
   )
 }
 
-function SkillTags({ skills }: { skills: Role["skills"] }) {
+export function SkillTags({ skills }: { skills: Role["skills"] }) {
   if (!skills || skills.length === 0) return null
 
   return (
@@ -208,50 +220,6 @@ function RoleEntry({ role }: { role: Role | Education }) {
       <RoleLinks links={role.links} />
     </li>
   )
-}
-
-type OrganizationGroup = {
-  key: string
-  name: string | null
-  website: string | null
-  description: string | null
-  logo: OrganizationLogo
-  roles: Array<Role | Education>
-}
-
-/**
- * Collapses consecutive roles at the same organization into one group.
- *
- * Consecutive rather than global, so the Studio's drag order stays the source
- * of truth — moving a role away from its siblings splits the group rather than
- * silently teleporting it back. Three organizations here hold several roles
- * each, which is exactly why `organization` is its own document type.
- */
-function groupByOrganization(
-  roles: Array<Role | Education>
-): OrganizationGroup[] {
-  return roles.reduce<OrganizationGroup[]>((groups, role) => {
-    const previous = groups[groups.length - 1]
-    const orgId = role.organization?._id
-
-    if (previous && orgId && previous.key === orgId) {
-      previous.roles.push(role)
-      return groups
-    }
-
-    groups.push({
-      key: orgId ?? role._id,
-      name: role.organization?.name ?? null,
-      website: role.organization?.website ?? null,
-      description:
-        role.organization && "description" in role.organization
-          ? role.organization.description
-          : null,
-      logo: role.organization?.logo ?? null,
-      roles: [role],
-    })
-    return groups
-  }, [])
 }
 
 function OrganizationBlock({ group }: { group: OrganizationGroup }) {

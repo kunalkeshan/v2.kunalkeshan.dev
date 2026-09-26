@@ -6,6 +6,10 @@ import {
   BookOpenIcon,
   HelpCircleIcon,
   SparklesIcon,
+  LayoutGridIcon,
+  Rows3Icon,
+  AlignLeftIcon,
+  ListIcon,
 } from "lucide-react"
 
 export type LinkItemType = {
@@ -45,6 +49,33 @@ export const workLinks: LinkItemType[] = [
     href: "/skills",
     description: "The full stack of tools and technologies I work with",
     icon: <SparklesIcon />,
+  },
+  // Temporary — /work redesign comparison. Remove these 4 entries (and the
+  // "Work" dropdown's 2-column grid tweak in desktop-nav.tsx) once a variant
+  // is picked and the losers are deleted. See the plan this was built from.
+  {
+    label: "Preview: Cards",
+    href: "/work/preview/cards",
+    description: "/work redesign preview — bordered card timeline",
+    icon: <LayoutGridIcon />,
+  },
+  {
+    label: "Preview: Blocks",
+    href: "/work/preview/blocks",
+    description: "/work redesign preview — heavier company blocks",
+    icon: <Rows3Icon />,
+  },
+  {
+    label: "Preview: Editorial",
+    href: "/work/preview/editorial",
+    description: "/work redesign preview — two-column editorial layout",
+    icon: <AlignLeftIcon />,
+  },
+  {
+    label: "Preview: Dense rail",
+    href: "/work/preview/dense",
+    description: "/work redesign preview — today's rail, denser styling",
+    icon: <ListIcon />,
   },
 ]
 

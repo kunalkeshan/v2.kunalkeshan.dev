@@ -49,7 +49,10 @@ export function DesktopNav() {
             Work
           </NavigationMenuTrigger>
           <NavigationMenuContent className="pr-1.5 pb-1.5">
-            <div className="grid w-72 gap-2 rounded-lg border-3 border-border bg-card p-2 shadow-lg">
+            {/* Temporarily 2 columns while the 4 "Preview: …" /work entries
+                are in `workLinks` (8 items total) — revert to `w-72` with no
+                `grid-cols-2` once those are removed. */}
+            <div className="grid w-72 gap-2 rounded-lg border-3 border-border bg-card p-2 shadow-lg sm:w-[38rem] sm:grid-cols-2">
               {workLinks.map((item) => (
                 <NavigationMenuLink
                   key={item.href}
