@@ -924,13 +924,33 @@ edge. Three rules make that work:
 3. **Clip again further out.** The section carries `overflow-hidden` so the overhang can
    never widen the page into a horizontal scrollbar.
 
-**Fixed `min-height` for uneven content.** The migrated quotes span 334–975 characters
-(2.9x). A self-sizing card changes height on every slide change and shoves the page around
-mid-read. Reserve height for the longest entry per breakpoint instead: some whitespace
-under the shortest quotes buys a section whose geometry never moves, and nothing is
-clamped behind a "read more". This is a floor, not a fixed height — a longer quote added
-later still grows the card. (Contrast the values grid above, where the fix for uneven copy
-is a column flow; that works because those cards tile, and carousel slides don't.)
+**Auto-height for uneven content, with a per-breakpoint floor.** The migrated quotes span
+334–975 characters (2.9x). A naive self-sizing card changes height discontinuously on every
+slide change and shoves the page around mid-read — but a *fixed* height sized for the
+longest quote (the section's original approach) left the shortest quotes sitting in a mostly
+empty box, which reads as a layout bug rather than a design choice.
+
+The fix: measure the active slide's own natural content height (`useActiveSlideHeight` in
+`testimonials.tsx`, a `ResizeObserver` re-pointed at whichever slide is selected — every
+slide stays mounted since Embla pages by transform, not by swapping DOM nodes) and animate
+a wrapping `[data-testimonial-height]` element's `height` to match on every slide change
+(`--dur-reveal`/`--ease-out-quint`, in `globals.css`, switched off under
+`prefers-reduced-motion` alongside every other transition in that file). The wrapper is
+`overflow-y-hidden` so off-screen slides that are naturally taller don't inflate it — that's
+invisible anyway since they're already clipped out of the horizontal viewport.
+
+A small `min-h-*` floor per breakpoint still exists, but no longer to contain the longest
+quote — auto-height already handles that, growing the card past its floor for anything
+longer, same as before. The floor exists only where something else needs a minimum: at
+`lg`/`xl` the portrait is `absolute`, not stacked in flow, so it doesn't contribute to the
+card's own height at all, and the card there is `block` rather than `flex`, so
+`justify-center` has nothing to center against — a floor close to the portrait's own size
+lets a short quote leave the portrait overhanging the card top/bottom by a little (already
+this design's language, not a new effect) instead of sitting in a mostly-empty box. Below
+`lg` the portrait is in flow and always contributes to height directly; the floor there only
+guards against a pathological one-liner looking collapsed. (Contrast the values grid above,
+where the fix for uneven copy is a column flow; that works because those cards tile, and
+carousel slides don't.)
 
 **Dot indicators must be windowed** (`@workspace/ui/components/carousel-dots`). A
 dot-per-slide row is fine at ten and unusable at a hundred. `CarouselDots` renders a

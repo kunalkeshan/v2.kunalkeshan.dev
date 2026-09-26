@@ -39,20 +39,37 @@ type Testimonial = FEATURED_TESTIMONIALS_QUERY_RESULT[number]
 const PRELOAD_RADIUS = 1
 
 /**
- * The card reserves height for the longest quote rather than sizing to its
- * content.
+ * A floor, not a target height — real sizing now comes from
+ * `useActiveSlideHeight` below, which measures each card's own natural
+ * content height and animates the carousel's height wrapper to match on every
+ * slide change (see `[data-testimonial-height]` in globals.css). That's what
+ * fixed the v1-era "glitchy" page-shove problem this floor used to solve
+ * alone: the page no longer jumps discontinuously, it eases to the new
+ * height, so a shorter quote no longer has to sit inside a box sized for the
+ * longest one (334–975 characters, a 2.9x spread) and look half-empty.
  *
- * The migrated quotes span 334–975 characters, a 2.9x spread. A self-sizing
- * card would change height on every slide change and shove the rest of the page
- * up or down mid-read — a large part of what read as "glitchy" in v1. Reserving
- * the space costs some whitespace under the shortest quotes and buys a section
- * whose geometry never moves. Clamping the text instead was rejected: it would
- * hide most of the longest testimonial behind a toggle.
+ * The floor still exists for two reasons that have nothing to do with the
+ * longest quote:
+ * - `lg`/`xl` absolutely-position the portrait over the card (see
+ *   `TestimonialCard`) rather than stacking it in flow, so it doesn't
+ *   contribute to the card's natural height at all, and — unlike the stacked
+ *   layout below `lg` — the card there is `block`, not `flex`, so
+ *   `justify-center` on the quote/caption block has nothing to center
+ *   against: a short quote's slack collects below it, not around it. 20rem is
+ *   close to the `lg` portrait's own size (18rem) rather than padded well
+ *   past it, so a short quote at `lg`/`xl` lets the portrait overhang the
+ *   card top and bottom by a little instead of sitting in a mostly-empty box
+ *   — the overhang is already this design's language (see the portrait's own
+ *   comment in `TestimonialCard`), not a new effect.
+ * - Below `lg` the portrait sits in flow (stacked, not absolute), so it
+ *   always contributes to the natural height directly — the floor there
+ *   only guards against a pathologically short one-liner looking collapsed,
+ *   not against the portrait overhanging anything.
  *
- * These are floors, not fixed heights — a longer quote added later still grows
- * the card rather than overflowing it.
+ * A longer quote than any of these still grows the card past its floor
+ * rather than overflowing it, exactly as before.
  */
-const cardMinHeight = "min-h-[34rem] sm:min-h-[30rem] lg:min-h-[24rem]"
+const cardMinHeight = "min-h-[22rem] sm:min-h-[24rem] lg:min-h-[20rem]"
 
 /**
  * The box a company logo is fitted into, in CSS pixels at the `md` breakpoint.
@@ -242,6 +259,47 @@ interface TestimonialsCarouselProps {
 }
 
 /**
+ * Measures the currently active slide's own rendered height, so the carousel
+ * can animate to it instead of every slide sharing one height sized for the
+ * longest quote.
+ *
+ * Embla pages by translating a flex row, not by mounting/unmounting slides —
+ * every slide stays in the DOM at all times. A plain flex row's height is the
+ * max of ALL its children regardless of which one is scrolled into view, so
+ * this only ever needs to watch one element: whichever slide is currently
+ * selected. A `ResizeObserver` is re-pointed at that element on every index
+ * change, which also catches any reflow of the active slide itself (a
+ * breakpoint crossing, a webfont swap) for free, not just navigation.
+ */
+function useActiveSlideHeight(selectedIndex: number) {
+  const elementsRef = React.useRef<(HTMLElement | null)[]>([])
+  const [height, setHeight] = React.useState<number | undefined>(undefined)
+
+  const registerSlide = React.useCallback(
+    (index: number) => (el: HTMLElement | null) => {
+      elementsRef.current[index] = el
+    },
+    []
+  )
+
+  React.useEffect(() => {
+    const el = elementsRef.current[selectedIndex]
+    if (!el) return
+
+    setHeight(el.offsetHeight)
+
+    const observer = new ResizeObserver(() => {
+      setHeight(el.offsetHeight)
+    })
+    observer.observe(el)
+
+    return () => observer.disconnect()
+  }, [selectedIndex])
+
+  return { registerSlide, height }
+}
+
+/**
  * The slide list, split out so it can read `selectedIndex` from the carousel's
  * own context rather than the section duplicating that state with a second
  * `select` subscription.
@@ -249,35 +307,56 @@ interface TestimonialsCarouselProps {
 function TestimonialSlides({ testimonials }: TestimonialsCarouselProps) {
   const { selectedIndex } = useCarousel()
   const total = testimonials.length
+  const { registerSlide, height } = useActiveSlideHeight(selectedIndex)
 
   return (
     /*
-     * The portrait overhangs its card to the right, so the viewport can't use a
-     * plain `overflow-hidden` — that would shave the circle off at the slide
-     * boundary. `overflow-visible` is wrong too: it leaks the neighbouring
-     * slides into view. So clip horizontally only, and let the card's reserved
-     * right margin give the overhang somewhere to land.
+     * Clips vertically to the active slide's own measured height (animated via
+     * `[data-testimonial-height]` in globals.css) instead of every slide
+     * sharing the tallest one's height — see `useActiveSlideHeight` above.
+     * Off-screen slides that are naturally taller than this simply have their
+     * excess clipped here, which is invisible anyway since they're already
+     * scrolled out of the horizontal viewport.
+     *
+     * `overflow-y-hidden` only, never the shorthand `overflow-hidden`: the
+     * portrait's horizontal overhang below is untouched, still governed
+     * entirely by `CarouselContent`'s own `overflow-x-clip`.
      */
-    <CarouselContent viewportClassName="overflow-x-clip overflow-y-visible">
-      {testimonials.map((testimonial, index) => {
-        // Distance measured around the loop, so slide 0's "previous" neighbour
-        // is the last slide and gets preloaded too.
-        const rawDistance = Math.abs(index - selectedIndex)
-        const distance = Math.min(rawDistance, total - rawDistance)
+    <div
+      data-testimonial-height
+      style={height !== undefined ? { height } : undefined}
+      className="overflow-y-hidden"
+    >
+      {/*
+       * The portrait overhangs its card to the right, so the viewport can't use
+       * a plain `overflow-hidden` — that would shave the circle off at the
+       * slide boundary. `overflow-visible` is wrong too: it leaks the
+       * neighbouring slides into view. So clip horizontally only, and let the
+       * card's reserved right margin give the overhang somewhere to land.
+       */}
+      <CarouselContent viewportClassName="overflow-x-clip overflow-y-visible">
+        {testimonials.map((testimonial, index) => {
+          // Distance measured around the loop, so slide 0's "previous"
+          // neighbour is the last slide and gets preloaded too.
+          const rawDistance = Math.abs(index - selectedIndex)
+          const distance = Math.min(rawDistance, total - rawDistance)
 
-        return (
-          // Keyed by _id, never by author name: two of these testimonials share
-          // an author, and v1 keyed its lookup by name — which made one of that
-          // author's quotes unreachable.
-          <CarouselItem key={testimonial._id}>
-            <TestimonialCard
-              testimonial={testimonial}
-              eager={distance <= PRELOAD_RADIUS}
-            />
-          </CarouselItem>
-        )
-      })}
-    </CarouselContent>
+          return (
+            // Keyed by _id, never by author name: two of these testimonials
+            // share an author, and v1 keyed its lookup by name — which made
+            // one of that author's quotes unreachable.
+            <CarouselItem key={testimonial._id}>
+              <div ref={registerSlide(index)}>
+                <TestimonialCard
+                  testimonial={testimonial}
+                  eager={distance <= PRELOAD_RADIUS}
+                />
+              </div>
+            </CarouselItem>
+          )
+        })}
+      </CarouselContent>
+    </div>
   )
 }
 
