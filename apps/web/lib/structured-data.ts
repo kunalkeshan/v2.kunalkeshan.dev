@@ -158,6 +158,9 @@ export function buildCreativeWorkJsonLd(
   const sameAs = (project?.links ?? [])
     .map((link) => link.url)
     .filter((url): url is string => Boolean(url));
+  const contributors = (project?.collaborators ?? [])
+    .map((entry) => entry.person?.name)
+    .filter((name): name is string => Boolean(name));
 
   return {
     "@context": "https://schema.org",
@@ -175,6 +178,12 @@ export function buildCreativeWorkJsonLd(
     ...(sameAs.length > 0 && { sameAs }),
     ...(project?.organization?.name && {
       creator: { "@type": "Person", "@id": `${SITE_CONFIG.URL}/about#person` },
+    }),
+    ...(contributors.length > 0 && {
+      contributor: contributors.map((name) => ({
+        "@type": "Person" as const,
+        name,
+      })),
     }),
   };
 }

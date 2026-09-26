@@ -20,6 +20,7 @@ const apiVersion =
 const previewOrigin =
   process.env.SANITY_STUDIO_PREVIEW_ORIGIN || "http://localhost:3000";
 
+import { createRelatedProjectsSync } from "./actions/syncRelatedProjectsAction";
 import { resolve } from "./presentation/resolve";
 import { schema } from "./schemaTypes";
 import { structure } from "./structure";
@@ -45,4 +46,19 @@ export default defineConfig({
       },
     }),
   ],
+  document: {
+    // Only `project`'s own publish action gets the `relatedProjects` sync
+    // (see `./actions/syncRelatedProjectsAction.ts`) — every other schema
+    // type's actions pass through untouched.
+    actions: (prev, context) => {
+      if (context.schemaType !== "project") return prev;
+
+      const withRelatedProjectsSync = createRelatedProjectsSync(
+        context.getClient({ apiVersion })
+      );
+      return prev.map((action) =>
+        action.action === "publish" ? withRelatedProjectsSync(action) : action
+      );
+    },
+  },
 });

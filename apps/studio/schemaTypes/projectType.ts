@@ -24,6 +24,7 @@ export const PROJECT_KINDS = [
   { title: "Personal", value: "personal" },
   { title: "Open source", value: "open-source" },
   { title: "Research", value: "research" },
+  { title: "College", value: "college" },
 ] as const;
 
 export const PROJECT_STATUSES = [
@@ -103,7 +104,7 @@ export const projectType = defineType({
       },
       initialValue: "personal",
       description:
-        "The engagement type, shown as the orange badge on the card. Professional = built inside a full-time or contract role (link that role under Connections); Freelance = independent paid client work; Personal = your own side project; Open source = public repo built for others to use; Research = academic or published work.",
+        "The engagement type, shown as the orange badge on the card. Professional = built inside a full-time or contract role (link that role under Connections); Freelance = independent paid client work; Personal = your own side project; Open source = public repo built for others to use; Research = academic or published work; College = built as coursework or campus life during your degree.",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -248,6 +249,64 @@ export const projectType = defineType({
       of: [{ type: "reference", to: [{ type: "skill" }] }],
       description:
         "References existing Skill documents rather than free text, so a skill renamed once is renamed everywhere. The first four appear as chips on the card; all of them show on the project page and feed the tech filters on /projects.",
+    }),
+    defineField({
+      name: "collaborators",
+      title: "Collaborators",
+      type: "array",
+      group: "references",
+      description:
+        "People who helped build this project, each with what they contributed. References existing Person documents, so the same person (a professor, a designer, a research assistant) is authored once and reused across projects.",
+      of: [
+        {
+          type: "object",
+          name: "collaborator",
+          fields: [
+            defineField({
+              name: "person",
+              title: "Person",
+              type: "reference",
+              to: [{ type: "person" }],
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "contribution",
+              title: "Contribution",
+              type: "string",
+              description:
+                "What they did on this project. Example: 'Trained the classification model', 'UI design'.",
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: {
+              title: "person.name",
+              subtitle: "contribution",
+              media: "person.photo",
+            },
+          },
+        },
+      ],
+    }),
+    defineField({
+      name: "relatedProjects",
+      title: "Related projects",
+      type: "array",
+      group: "references",
+      description:
+        "Other projects worth cross-linking (shared codebase, same theme, a follow-up build). Kept in sync automatically on publish: adding this project here also adds the reverse link on the other project, and removing it here removes the reverse link too.",
+      of: [{ type: "reference", to: [{ type: "project" }] }],
+      validation: (Rule) =>
+        Rule.custom((refs: { _ref?: string }[] | undefined, context) => {
+          const currentId = (context.document?._id ?? "").replace(
+            /^drafts\./,
+            ""
+          );
+          const referencesSelf = (refs ?? []).some(
+            (ref) => ref._ref === currentId
+          );
+          return referencesSelf ? "A project can't relate to itself" : true;
+        }),
     }),
 
     defineField({
