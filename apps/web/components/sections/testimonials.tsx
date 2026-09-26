@@ -155,9 +155,13 @@ function TestimonialCard({
       )}
     >
       {/* Decorative — the blockquote already conveys this is a quote. Straddles
-          the card's top-left corner, as on the reference. */}
+          the card's top-left corner, as on the reference. `data-testimonial-overhang`
+          lets `useActiveSlideHeight` below measure how far this pokes above the
+          card's own box, so the height wrapper can reserve room for it instead of
+          clipping it. */}
       <span
         aria-hidden="true"
+        data-testimonial-overhang
         className="absolute -top-7 left-6 z-10 flex size-14 items-center justify-center rounded-full bg-foreground text-background md:-top-8 md:left-10 md:size-16"
       >
         <Quote className="size-6 fill-current md:size-7" />
@@ -228,6 +232,12 @@ function TestimonialCard({
        */}
       {photoUrl && (
         <div
+          // Also `data-testimonial-overhang`, same reason as the quote badge above:
+          // at `lg`/`xl` this circle is absolutely positioned and can overhang the
+          // card's top and bottom (see the comment above), which
+          // `useActiveSlideHeight` needs to know about. Below `lg` it sits in flow
+          // and measures as ~0 overhang here, so no breakpoint branching is needed.
+          data-testimonial-overhang
           className={cn(
             "mt-8 size-40 shrink-0 self-center overflow-hidden rounded-full border-3 border-border bg-muted sm:size-48",
             // Absolutely positioned at lg, not a flex child with negative
@@ -270,10 +280,21 @@ interface TestimonialsCarouselProps {
  * selected. A `ResizeObserver` is re-pointed at that element on every index
  * change, which also catches any reflow of the active slide itself (a
  * breakpoint crossing, a webfont swap) for free, not just navigation.
+ *
+ * Also measures how far any `[data-testimonial-overhang]` descendant (the
+ * quote badge, the `lg`/`xl` portrait) pokes above/below the card's own box.
+ * Both are absolutely positioned, so they never contribute to `offsetHeight`
+ * on their own — without this, `TestimonialSlides`' clip box would be sized
+ * flush with the card and cut them off. The overhang elements are observed
+ * too, not just the card: their *size* (not just position) changes at a
+ * breakpoint (e.g. the badge's `size-14` → `md:size-16`), which can resize
+ * them without necessarily resizing the card itself.
  */
 function useActiveSlideHeight(selectedIndex: number) {
   const elementsRef = React.useRef<(HTMLElement | null)[]>([])
-  const [height, setHeight] = React.useState<number | undefined>(undefined)
+  const [box, setBox] = React.useState<
+    { height: number; topOverhang: number; bottomOverhang: number } | undefined
+  >(undefined)
 
   const registerSlide = React.useCallback(
     (index: number) => (el: HTMLElement | null) => {
@@ -286,17 +307,34 @@ function useActiveSlideHeight(selectedIndex: number) {
     const el = elementsRef.current[selectedIndex]
     if (!el) return
 
-    setHeight(el.offsetHeight)
+    const measure = () => {
+      const cardRect = el.getBoundingClientRect()
+      let topOverhang = 0
+      let bottomOverhang = 0
 
-    const observer = new ResizeObserver(() => {
-      setHeight(el.offsetHeight)
-    })
+      el.querySelectorAll<HTMLElement>("[data-testimonial-overhang]").forEach(
+        (overhangEl) => {
+          const rect = overhangEl.getBoundingClientRect()
+          topOverhang = Math.max(topOverhang, cardRect.top - rect.top)
+          bottomOverhang = Math.max(bottomOverhang, rect.bottom - cardRect.bottom)
+        }
+      )
+
+      setBox({ height: el.offsetHeight, topOverhang, bottomOverhang })
+    }
+
+    measure()
+
+    const observer = new ResizeObserver(measure)
     observer.observe(el)
+    el.querySelectorAll<HTMLElement>("[data-testimonial-overhang]").forEach(
+      (overhangEl) => observer.observe(overhangEl)
+    )
 
     return () => observer.disconnect()
   }, [selectedIndex])
 
-  return { registerSlide, height }
+  return { registerSlide, box }
 }
 
 /**
@@ -307,7 +345,7 @@ function useActiveSlideHeight(selectedIndex: number) {
 function TestimonialSlides({ testimonials }: TestimonialsCarouselProps) {
   const { selectedIndex } = useCarousel()
   const total = testimonials.length
-  const { registerSlide, height } = useActiveSlideHeight(selectedIndex)
+  const { registerSlide, box } = useActiveSlideHeight(selectedIndex)
 
   return (
     /*
@@ -321,10 +359,28 @@ function TestimonialSlides({ testimonials }: TestimonialsCarouselProps) {
      * `overflow-y-hidden` only, never the shorthand `overflow-hidden`: the
      * portrait's horizontal overhang below is untouched, still governed
      * entirely by `CarouselContent`'s own `overflow-x-clip`.
+     *
+     * The box is grown by `topOverhang`/`bottomOverhang` so the quote badge and
+     * (at `lg`/`xl`) the portrait aren't clipped by the line above — but a
+     * negative margin cancels each padding on the same side, so the extra room
+     * is added to the clip box itself without shifting the card, or anything
+     * before/after this element, on screen. Only `height` needs to animate
+     * (see globals.css): the overhang is constant per breakpoint, not per
+     * slide, so margin/padding don't change on a slide swap.
      */
     <div
       data-testimonial-height
-      style={height !== undefined ? { height } : undefined}
+      style={
+        box !== undefined
+          ? {
+              height: box.height + box.topOverhang + box.bottomOverhang,
+              marginTop: -box.topOverhang,
+              paddingTop: box.topOverhang,
+              marginBottom: -box.bottomOverhang,
+              paddingBottom: box.bottomOverhang,
+            }
+          : undefined
+      }
       className="overflow-y-hidden"
     >
       {/*
