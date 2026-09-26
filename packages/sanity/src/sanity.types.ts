@@ -298,6 +298,12 @@ export type Project = {
     _key: string
   }>
   githubRepo?: string
+  additionalRepos?: Array<{
+    repo?: string
+    label?: string
+    _type: "additionalRepo"
+    _key: string
+  }>
   startDate?: string
   completedAt?: string
   featured?: boolean
@@ -1722,7 +1728,7 @@ export type PUBLICATIONS_QUERY_RESULT = Array<{
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: FEATURED_PROJECTS_QUERY
-// Query: *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    "hasBody": defined(body),    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    organization-> {      _id,      name,      website    },    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt  }
+// Query: *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    "hasBody": defined(body),    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    organization-> {      _id,      name,      website    },    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    },    githubRepo,    additionalRepos[] {      repo,      label    },    startDate,    completedAt  }
 export type FEATURED_PROJECTS_QUERY_RESULT = Array<{
   _id: string
   title: string | null
@@ -1816,13 +1822,17 @@ export type FEATURED_PROJECTS_QUERY_RESULT = Array<{
       | null
   }> | null
   githubRepo: string | null
+  additionalRepos: Array<{
+    repo: string | null
+    label: string | null
+  }> | null
   startDate: string | null
   completedAt: string | null
 }>
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: PROJECTS_QUERY
-// Query: *[_type == "project"] | order(orderRank asc) {    _id,    title,    slug,    kind,    status,    tagline,    summary,    "hasBody": defined(body),    archived,    featured,    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    organization-> {      _id,      name,      website    },    relatedExperience-> {      _id,      role,      employmentType    },    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt  }
+// Query: *[_type == "project"] | order(orderRank asc) {    _id,    title,    slug,    kind,    status,    tagline,    summary,    "hasBody": defined(body),    archived,    featured,    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    organization-> {      _id,      name,      website    },    relatedExperience-> {      _id,      role,      employmentType    },    skills[]-> {      _id,      name    },    links[] {      label,      url,      type    },    githubRepo,    additionalRepos[] {      repo,      label    },    startDate,    completedAt  }
 export type PROJECTS_QUERY_RESULT = Array<{
   _id: string
   title: string | null
@@ -1930,13 +1940,17 @@ export type PROJECTS_QUERY_RESULT = Array<{
       | null
   }> | null
   githubRepo: string | null
+  additionalRepos: Array<{
+    repo: string | null
+    label: string | null
+  }> | null
   startDate: string | null
   completedAt: string | null
 }>
 
 // Source: ../../packages/sanity/src/query.ts
 // Variable: PROJECT_BY_SLUG_QUERY
-// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    body[] {      ...,      _type == "image" => {        asset->,        hotspot,        crop,        alt      }    },    archived,    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    gallery[] {      asset->,      hotspot,      crop,      alt,      caption    },    organization-> {      _id,      name,      website,      description,      logo {        asset->,        hotspot,        crop,        alt      }    },    relatedExperience-> {      _id,      role,      employmentType,      startDate,      endDate,      isCurrent,      organization-> {        _id,        name      }    },    skills[]-> {      _id,      name,      category    },    collaborators[] {      contribution,      person-> {        _id,        name,        photo {          asset->,          hotspot,          crop,          alt        },        position,        organization-> {          _id,          name        },        organizationName      }    },    relatedProjects[]-> {      _id,      title,      slug,      tagline,      kind,      coverImage {        asset->,        hotspot,        crop,        alt      }    },    links[] {      label,      url,      type    },    githubRepo,    startDate,    completedAt,    _updatedAt,    seo {      metaTitle,      noindex    }  }
+// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    slug,    kind,    status,    tagline,    summary,    body[] {      ...,      _type == "image" => {        asset->,        hotspot,        crop,        alt      }    },    archived,    icon {      asset->,      hotspot,      crop,      alt    },    coverImage {      asset->,      hotspot,      crop,      alt    },    gallery[] {      asset->,      hotspot,      crop,      alt,      caption    },    organization-> {      _id,      name,      website,      description,      logo {        asset->,        hotspot,        crop,        alt      }    },    relatedExperience-> {      _id,      role,      employmentType,      startDate,      endDate,      isCurrent,      organization-> {        _id,        name      }    },    skills[]-> {      _id,      name,      category    },    collaborators[] {      contribution,      person-> {        _id,        name,        photo {          asset->,          hotspot,          crop,          alt        },        position,        organization-> {          _id,          name        },        organizationName      }    },    relatedProjects[]-> {      _id,      title,      slug,      tagline,      kind,      coverImage {        asset->,        hotspot,        crop,        alt      }    },    links[] {      label,      url,      type    },    githubRepo,    additionalRepos[] {      repo,      label    },    startDate,    completedAt,    _updatedAt,    seo {      metaTitle,      noindex    }  }
 export type PROJECT_BY_SLUG_QUERY_RESULT = {
   _id: string
   title: string | null
@@ -2252,6 +2266,10 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
       | null
   }> | null
   githubRepo: string | null
+  additionalRepos: Array<{
+    repo: string | null
+    label: string | null
+  }> | null
   startDate: string | null
   completedAt: string | null
   _updatedAt: string
@@ -3205,9 +3223,9 @@ declare global {
     '\n  *[_type == "certification" && archived != true] | order(orderRank asc) {\n    _id,\n    title,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    issuedAt,\n    credentialId,\n    verifyUrl\n  }\n': CERTIFICATIONS_QUERY_RESULT
     '\n  *[_type == "certification" && archived == true] | order(orderRank asc) {\n    _id,\n    title,\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    issuedAt,\n    credentialId,\n    verifyUrl\n  }\n': ARCHIVED_CERTIFICATIONS_QUERY_RESULT
     '\n  *[_type == "publication"] | order(orderRank asc) {\n    _id,\n    title,\n    venue,\n    publishedAt,\n    authors,\n    doi,\n    url,\n    abstract\n  }\n': PUBLICATIONS_QUERY_RESULT
-    '\n  *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': FEATURED_PROJECTS_QUERY_RESULT
-    '\n  *[_type == "project"] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    archived,\n    featured,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt\n  }\n': PROJECTS_QUERY_RESULT
-    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    body[] {\n      ...,\n      _type == "image" => {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    archived,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    gallery[] {\n      asset->,\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType,\n      startDate,\n      endDate,\n      isCurrent,\n      organization-> {\n        _id,\n        name\n      }\n    },\n    skills[]-> {\n      _id,\n      name,\n      category\n    },\n    collaborators[] {\n      contribution,\n      person-> {\n        _id,\n        name,\n        photo {\n          asset->,\n          hotspot,\n          crop,\n          alt\n        },\n        position,\n        organization-> {\n          _id,\n          name\n        },\n        organizationName\n      }\n    },\n    relatedProjects[]-> {\n      _id,\n      title,\n      slug,\n      tagline,\n      kind,\n      coverImage {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    startDate,\n    completedAt,\n    _updatedAt,\n    seo {\n      metaTitle,\n      noindex\n    }\n  }\n': PROJECT_BY_SLUG_QUERY_RESULT
+    '\n  *[_type == "project" && featured == true && archived != true] | order(orderRank asc) [0...6] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    additionalRepos[] {\n      repo,\n      label\n    },\n    startDate,\n    completedAt\n  }\n': FEATURED_PROJECTS_QUERY_RESULT
+    '\n  *[_type == "project"] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    "hasBody": defined(body),\n    archived,\n    featured,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType\n    },\n    skills[]-> {\n      _id,\n      name\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    additionalRepos[] {\n      repo,\n      label\n    },\n    startDate,\n    completedAt\n  }\n': PROJECTS_QUERY_RESULT
+    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    kind,\n    status,\n    tagline,\n    summary,\n    body[] {\n      ...,\n      _type == "image" => {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    archived,\n    icon {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    gallery[] {\n      asset->,\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      description,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    relatedExperience-> {\n      _id,\n      role,\n      employmentType,\n      startDate,\n      endDate,\n      isCurrent,\n      organization-> {\n        _id,\n        name\n      }\n    },\n    skills[]-> {\n      _id,\n      name,\n      category\n    },\n    collaborators[] {\n      contribution,\n      person-> {\n        _id,\n        name,\n        photo {\n          asset->,\n          hotspot,\n          crop,\n          alt\n        },\n        position,\n        organization-> {\n          _id,\n          name\n        },\n        organizationName\n      }\n    },\n    relatedProjects[]-> {\n      _id,\n      title,\n      slug,\n      tagline,\n      kind,\n      coverImage {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    },\n    links[] {\n      label,\n      url,\n      type\n    },\n    githubRepo,\n    additionalRepos[] {\n      repo,\n      label\n    },\n    startDate,\n    completedAt,\n    _updatedAt,\n    seo {\n      metaTitle,\n      noindex\n    }\n  }\n': PROJECT_BY_SLUG_QUERY_RESULT
     '\n  *[_type == "project" && defined(slug.current)] | order(orderRank asc) {\n    _id,\n    title,\n    slug,\n    coverImage {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    _updatedAt,\n    seo {\n      noindex\n    }\n  }\n': PROJECT_SLUGS_QUERY_RESULT
     '\n  *[_type == "testimonial"] | order(orderRank asc) {\n    \n  _id,\n  quote,\n  context,\n  givenAt,\n  author-> {\n    _id,\n    name,\n    position,\n    website,\n    organizationName,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    }\n  }\n\n  }\n': TESTIMONIALS_QUERY_RESULT
     '\n  *[_type == "testimonial" && featured == true] | order(orderRank asc) {\n    \n  _id,\n  quote,\n  context,\n  givenAt,\n  author-> {\n    _id,\n    name,\n    position,\n    website,\n    organizationName,\n    photo {\n      asset->,\n      hotspot,\n      crop,\n      alt\n    },\n    organization-> {\n      _id,\n      name,\n      website,\n      logo {\n        asset->,\n        hotspot,\n        crop,\n        alt\n      }\n    }\n  }\n\n  }\n': FEATURED_TESTIMONIALS_QUERY_RESULT

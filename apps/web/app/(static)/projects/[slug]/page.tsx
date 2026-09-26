@@ -188,6 +188,13 @@ export default async function ProjectPage({
   const links = (project.links ?? []).filter((link) => link.url)
   const [primaryLink, ...secondaryLinks] = links
 
+  // Repos beyond the primary `githubRepo` (which drives the star badge above)
+  // — plain chip links, no star count, rendered alongside the secondary links.
+  const additionalRepos = (project.additionalRepos ?? []).filter(
+    (entry): entry is { repo: string; label: string | null } =>
+      Boolean(entry.repo)
+  )
+
   const kindLabel = project.kind ? PROJECT_KIND_LABELS[project.kind] : null
   const statusLabel = project.status
     ? PROJECT_STATUS_LABELS[project.status]
@@ -414,7 +421,7 @@ export default async function ProjectPage({
                 a wall of colour with no hierarchy, and nothing reading as the
                 primary action.
               */}
-              {links.length > 0 && (
+              {(links.length > 0 || additionalRepos.length > 0) && (
                 <div className="rounded-lg border-3 border-border bg-card p-5 shadow-lg">
                   <h2 className="font-heading text-lg font-black">Links</h2>
 
@@ -448,7 +455,8 @@ export default async function ProjectPage({
                     </TrackedLink>
                   )}
 
-                  {secondaryLinks.length > 0 && (
+                  {(secondaryLinks.length > 0 ||
+                    additionalRepos.length > 0) && (
                     <ul className="mt-3 flex flex-wrap gap-2">
                       {secondaryLinks.map((link) => {
                         if (!link.url) return null
@@ -478,6 +486,58 @@ export default async function ProjectPage({
                               >
                                 <Icon className="size-3.5" aria-hidden="true" />
                                 {link.label ?? "Link"}
+                              </a>
+                            </TrackedLink>
+                          </li>
+                        )
+                      })}
+
+                      {/*
+                        Repos beyond the primary one: same chip shell as the
+                        secondary links above, but the repo's `owner/name` is
+                        always shown (monospace) so the actual repo stays
+                        identifiable even when a label is set — unlike a free-
+                        text link label, it never goes stale or ambiguous.
+                      */}
+                      {additionalRepos.map((entry) => {
+                        const href = `https://github.com/${entry.repo}`
+
+                        return (
+                          <li key={entry.repo}>
+                            <TrackedLink
+                              platform="repo"
+                              url={href}
+                              placement="project_detail"
+                              position="secondary"
+                            >
+                              <a
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={cn(
+                                  "inline-flex items-center gap-1.5 rounded-sm border-2 border-border bg-background px-2.5 py-1",
+                                  "text-xs font-bold",
+                                  "shadow-sm transition-[translate,transform,box-shadow] duration-press ease-snap",
+                                  "hover:translate-x-0.5 hover:translate-y-0.5 hover:bg-muted hover:shadow-none",
+                                  "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+                                )}
+                              >
+                                <GitBranchIcon
+                                  className="size-3.5 shrink-0"
+                                  aria-hidden="true"
+                                />
+                                {entry.label ? (
+                                  <span className="flex flex-col items-start leading-tight">
+                                    <span>{entry.label}</span>
+                                    <span className="font-mono text-[10px] font-normal text-muted-foreground">
+                                      {entry.repo}
+                                    </span>
+                                  </span>
+                                ) : (
+                                  <span className="font-mono">
+                                    {entry.repo}
+                                  </span>
+                                )}
                               </a>
                             </TrackedLink>
                           </li>
