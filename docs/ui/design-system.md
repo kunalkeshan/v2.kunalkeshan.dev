@@ -985,6 +985,19 @@ guards against a pathological one-liner looking collapsed. (Contrast the values 
 where the fix for uneven copy is a column flow; that works because those cards tile, and
 carousel slides don't.)
 
+**Don't let the clip box cut off an intentional overhang.** The quote badge and the `lg`/
+`xl` portrait are both `absolute`, so neither contributes to `el.offsetHeight` — measuring
+only the card's own box and clipping flush to it (as above) silently cut off both decorative
+elements' overhang, since the wrapper's top/bottom edges landed exactly where the card's did.
+The fix: mark both elements `data-testimonial-overhang`, and have `useActiveSlideHeight`
+measure how far each one's `getBoundingClientRect()` extends past the card's own on the top
+and bottom. `TestimonialSlides` then grows `[data-testimonial-height]`'s own box by that
+amount — but pairs each side's added `padding` with an equal negative `margin` on the same
+side, so the box is tall enough to contain the overhang without shifting the card (or
+anything before/after it in flow) on screen. Below `lg`, where the portrait sits in flow and
+never overhangs, this measures ~0 for it and the wrapper behaves exactly as it did before —
+no breakpoint branching needed.
+
 **Dot indicators must be windowed** (`@workspace/ui/components/carousel-dots`). A
 dot-per-slide row is fine at ten and unusable at a hundred. `CarouselDots` renders a
 fixed-width window (default 5) that slides with the active index, shrinking only the

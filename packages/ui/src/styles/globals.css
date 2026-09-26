@@ -741,7 +741,14 @@
  * `testimonials.tsx`). Same `--dur-reveal`/`--ease-out-quint` timing as the
  * navbar morph above, so a slide swap resizes the card smoothly instead of
  * snapping — and, like every other transition in this file, is switched off
- * wholesale by the `prefers-reduced-motion` block above. */
+ * wholesale by the `prefers-reduced-motion` block above.
+ *
+ * The same inline style also sets `margin`/`padding` on this element to
+ * reserve room for any `[data-testimonial-overhang]` descendant (the quote
+ * badge, the `lg`/`xl` portrait) that pokes outside the card's own box, so
+ * this element's own `overflow-y-hidden` doesn't clip them — see
+ * `useActiveSlideHeight` in `testimonials.tsx`. Only `height` needs to
+ * animate here: the overhang is constant per breakpoint, not per slide. */
 [data-testimonial-height] {
   transition: height var(--dur-reveal) var(--ease-out-quint);
 }
