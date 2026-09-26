@@ -44,6 +44,10 @@ export const PROJECT_LINK_TYPES = [
   { title: "Paper", value: "paper" },
 ] as const;
 
+// Shared by `githubRepo` and `additionalRepos[].repo` so both fields accept
+// exactly the same "owner/name" shape.
+const GITHUB_OWNER_REPO_PATTERN = /^[\w.-]+\/[\w.-]+$/;
+
 /**
  * One project — shipped product work, a freelance build, a personal side
  * project, an open-source repo, or a research artifact.
@@ -315,7 +319,7 @@ export const projectType = defineType({
       type: "array",
       group: "meta",
       description:
-        "Outbound links shown as buttons in the Information panel on the project page. Leave the repository link off for private client work.",
+        "Outbound links shown as buttons in the Information panel on the project page. Leave the repository link off for private client work. For an actual GitHub repo, prefer GitHub repository / Additional repositories below — they auto-build the URL and (for the primary one) show a star count.",
       of: [
         {
           type: "object",
@@ -365,12 +369,56 @@ export const projectType = defineType({
       type: "string",
       group: "meta",
       description:
-        "Owner and name only — 'kunalkeshan/Shiryoku', not a full URL. Used to fetch the star count at build time, which appears on the card. Leave empty for private repos; the badge is simply hidden.",
+        "The primary repo. Owner and name only — 'kunalkeshan/Shiryoku', not a full URL. Used to fetch the star count at build time, which appears on the card. Leave empty for private repos; the badge is simply hidden. For any other repos this project spans, use Additional repositories below — those never show a star count.",
       validation: (Rule) =>
-        Rule.regex(/^[\w.-]+\/[\w.-]+$/, {
+        Rule.regex(GITHUB_OWNER_REPO_PATTERN, {
           name: "owner/name",
           invert: false,
         }).warning("Expected the 'owner/name' form, e.g. kunalkeshan/Shiryoku"),
+    }),
+    defineField({
+      name: "additionalRepos",
+      title: "Additional repositories",
+      type: "array",
+      group: "meta",
+      description:
+        "Other repos this project spans (e.g. a companion CLI or mobile app) beyond the primary GitHub repository above. Shown as plain links on the project page — no star count, unlike the primary repo.",
+      of: [
+        {
+          type: "object",
+          name: "additionalRepo",
+          fields: [
+            defineField({
+              name: "repo",
+              title: "Repository",
+              type: "string",
+              description:
+                "Owner and name only — 'kunalkeshan/foo-cli', not a full URL.",
+              validation: (Rule) =>
+                Rule.required().regex(GITHUB_OWNER_REPO_PATTERN, {
+                  name: "owner/name",
+                  invert: false,
+                }),
+            }),
+            defineField({
+              name: "label",
+              title: "Label",
+              type: "string",
+              description:
+                "Optional short label shown next to the repo name, e.g. 'CLI tool', 'Mobile app'. Leave empty to just show the repo name.",
+            }),
+          ],
+          preview: {
+            select: {
+              title: "label",
+              subtitle: "repo",
+            },
+            prepare({ title, subtitle }) {
+              return { title: title || subtitle, subtitle: title && subtitle };
+            },
+          },
+        },
+      ],
     }),
     defineField({
       name: "startDate",

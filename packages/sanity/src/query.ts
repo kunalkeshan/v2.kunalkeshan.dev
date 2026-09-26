@@ -454,6 +454,10 @@ export const FEATURED_PROJECTS_QUERY = defineQuery(`
       type
     },
     githubRepo,
+    additionalRepos[] {
+      repo,
+      label
+    },
     startDate,
     completedAt
   }
@@ -508,6 +512,10 @@ export const PROJECTS_QUERY = defineQuery(`
       type
     },
     githubRepo,
+    additionalRepos[] {
+      repo,
+      label
+    },
     startDate,
     completedAt
   }
@@ -623,6 +631,10 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(`
       type
     },
     githubRepo,
+    additionalRepos[] {
+      repo,
+      label
+    },
     startDate,
     completedAt,
     _updatedAt,
