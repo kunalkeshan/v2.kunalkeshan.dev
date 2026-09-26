@@ -41,7 +41,12 @@ function AccordionTrigger({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "group/accordion-trigger relative flex flex-1 items-start justify-between rounded-md border-2 border-transparent py-3.5 text-left font-heading text-sm font-black outline-none transition-all focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-disabled:pointer-events-none aria-disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4",
+          // `gap-4`: `justify-between` + the icon's own `ml-auto` only push
+          // the icon to the far edge — neither guarantees a minimum
+          // distance from the text. Without an explicit gap, a question
+          // long enough to nearly fill the row (common on narrow mobile
+          // widths) leaves the icon crowding the text with no buffer.
+          "group/accordion-trigger relative flex flex-1 items-start justify-between gap-4 rounded-md border-2 border-transparent py-3.5 text-left font-heading text-sm font-black outline-none transition-all focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-disabled:pointer-events-none aria-disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4",
           className
         )}
         {...props}
