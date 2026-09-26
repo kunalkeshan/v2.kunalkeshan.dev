@@ -6,6 +6,7 @@ import { createCollectionTag } from "@workspace/sanity/cache-tags"
 import { SERVICES_QUERY } from "@workspace/sanity/query"
 
 import { HighlightText } from "@/components/highlight-text"
+import { PageHero } from "@/components/page-hero"
 import { ServicesGrid } from "@/components/sections/services"
 import { JsonLd } from "@/components/shared/json-ld"
 import { buildBreadcrumbListJsonLd, buildServiceJsonLd } from "@/lib/structured-data"
@@ -43,18 +44,21 @@ export default async function ServicesPage() {
         ])}
       />
       <Container>
-        <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
-          Modern problems, require{" "}
-          <HighlightText variant="primary">modern services</HighlightText>
-        </h1>
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg">
-          What I can help you build, whether you need something from
-          scratch or a project that needs to go further.
-        </p>
+        <PageHero
+          heading={
+            <>
+              Modern problems, require{" "}
+              <HighlightText variant="primary">modern services</HighlightText>
+            </>
+          }
+          headingClassName="font-heading text-4xl leading-tight font-black sm:text-5xl"
+          subtext="What I can help you build, whether you need something from scratch or a project that needs to go further."
+          subtextClassName="mt-3 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg"
+        />
       </Container>
 
       <Container className="mt-10">
-        <ServicesGrid services={services} />
+        <ServicesGrid services={services} mode="mount" delayOffset={0.24} />
       </Container>
     </main>
   )

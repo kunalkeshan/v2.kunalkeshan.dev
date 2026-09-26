@@ -30,6 +30,7 @@ import {
 } from "@workspace/sanity/query"
 
 import { portableTextComponents } from "@/components/sanity/portable-text-components"
+import { PageHero } from "@/components/page-hero"
 import { ProjectCollaborators } from "@/components/sections/project-collaborators"
 import { ProjectGallery } from "@/components/sections/project-gallery"
 import { RelatedProjects } from "@/components/sections/related-projects"
@@ -271,15 +272,12 @@ export default async function ProjectPage({
           )}
         </div>
 
-        <h1 className="mt-3 font-heading text-4xl leading-tight font-black sm:text-5xl">
-          {project.title}
-        </h1>
-
-        {project.tagline && (
-          <p className="mt-4 max-w-2xl leading-relaxed text-body-foreground md:text-lg">
-            {project.tagline}
-          </p>
-        )}
+        <PageHero
+          heading={project.title}
+          headingClassName="mt-3 font-heading text-4xl leading-tight font-black sm:text-5xl"
+          subtext={project.tagline}
+          subtextClassName="mt-4 max-w-2xl leading-relaxed text-body-foreground md:text-lg"
+        />
 
         {coverUrl && (
           // A bordered image wrapper — the one place the resting-`shadow-xl`

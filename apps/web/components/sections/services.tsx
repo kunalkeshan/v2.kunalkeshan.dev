@@ -17,6 +17,21 @@ type Service = NonNullable<SERVICES_QUERY_RESULT>[number]
 
 interface ServicesGridProps {
   services: SERVICES_QUERY_RESULT
+  /**
+   * Defaults to `"in-view"` (its original, self-contained behavior — see the
+   * doc comment below). The standalone `/services` page passes `"mount"` so
+   * the cards join the page hero's mount-entrance sequence instead of
+   * waiting for a scroll that, on that page, may never need to happen.
+   */
+  mode?: "mount" | "in-view"
+  /**
+   * Added to every card's stagger delay. The standalone `/services` page
+   * uses this to continue the page hero's own `delay={0}`/`delay={0.12}`
+   * sequence (passing `0.24`) rather than restarting the stagger from 0,
+   * which would read as a second, disconnected reveal firing at the same
+   * moment as the heading's.
+   */
+  delayOffset?: number
 }
 
 /**
@@ -122,19 +137,26 @@ function ContactCard() {
  * `/services` page, which supplies its own `<h1>` and intro copy instead of
  * this component's heading.
  *
- * Owns its own `useRevealGroup("in-view")` rather than inheriting one from a
- * parent section: the standalone `/services` page renders this with no
- * reveal-triggering ancestor at all, so relying on a parent `Provider` would
- * leave every card permanently at `data-reveal="hidden"` there (`Reveal`
- * falls back to `"hidden"`, not "always visible", when rendered outside any
- * `Provider` — see `apps/web/components/reveal.tsx`). On the home page this
- * means the heading (`Services`, below) and the grid are two independently
- * triggered reveals rather than one shared trigger — negligible in practice
- * since they sit right next to each other and typically cross the viewport
- * threshold within the same scroll frame.
+ * Owns its own `useRevealGroup` rather than inheriting one from a parent
+ * section — it needs a trigger regardless of ancestor, since the standalone
+ * `/services` page renders this with no reveal-triggering ancestor at all
+ * pre-`PageHero` (`Reveal` falls back to `"hidden"`, not "always visible",
+ * when rendered outside any `Provider` — see `apps/web/components/reveal.tsx`).
+ * Defaults to `"in-view"` for the home page's `Services` strip below, where
+ * the heading and the grid are two independently scroll-triggered reveals
+ * rather than one shared trigger — negligible in practice since they sit
+ * right next to each other and typically cross the viewport threshold within
+ * the same scroll frame. The standalone `/services` page passes `mode="mount"`
+ * with a `delayOffset` continuing its `PageHero`'s own delay sequence, since
+ * that page's grid is reliably within the initial viewport rather than
+ * something to wait on a scroll for.
  */
-export function ServicesGrid({ services }: ServicesGridProps) {
-  const { ref, state, Provider } = useRevealGroup<HTMLDivElement>("in-view")
+export function ServicesGrid({
+  services,
+  mode = "in-view",
+  delayOffset = 0,
+}: ServicesGridProps) {
+  const { ref, state, Provider } = useRevealGroup<HTMLDivElement>(mode)
 
   if (!services || services.length === 0) return null
 
@@ -145,11 +167,14 @@ export function ServicesGrid({ services }: ServicesGridProps) {
         className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
       >
         {services.map((service, index) => (
-          <Reveal key={service._id} delay={index * CARD_STAGGER_STEP_S}>
+          <Reveal
+            key={service._id}
+            delay={delayOffset + index * CARD_STAGGER_STEP_S}
+          >
             <ServiceCard service={service} />
           </Reveal>
         ))}
-        <Reveal delay={services.length * CARD_STAGGER_STEP_S}>
+        <Reveal delay={delayOffset + services.length * CARD_STAGGER_STEP_S}>
           <ContactCard />
         </Reveal>
       </div>

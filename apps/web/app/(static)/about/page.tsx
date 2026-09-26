@@ -12,6 +12,7 @@ import {
 } from "@workspace/sanity/query"
 
 import { HighlightText } from "@/components/highlight-text"
+import { PageHero } from "@/components/page-hero"
 import AboutStory from "@/components/sections/about-story"
 import SkillsMarquee from "@/components/sections/skills-marquee"
 import Values from "@/components/sections/values"
@@ -96,15 +97,19 @@ export default async function AboutPage() {
         ])}
       />
       <Container>
-        <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
-          {about?.aboutPageHeadingLead}{" "}
-          <HighlightText variant="primary">
-            {about?.aboutPageHeadingHighlight}
-          </HighlightText>
-        </h1>
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg">
-          {about?.aboutPageIntro}
-        </p>
+        <PageHero
+          heading={
+            <>
+              {about?.aboutPageHeadingLead}{" "}
+              <HighlightText variant="primary">
+                {about?.aboutPageHeadingHighlight}
+              </HighlightText>
+            </>
+          }
+          headingClassName="font-heading text-4xl leading-tight font-black sm:text-5xl"
+          subtext={about?.aboutPageIntro}
+          subtextClassName="mt-3 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg"
+        />
       </Container>
 
       <AboutStory

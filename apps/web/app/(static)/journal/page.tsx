@@ -11,6 +11,7 @@ import {
 } from "@workspace/sanity/query"
 
 import { HighlightText } from "@/components/highlight-text"
+import { PageHero } from "@/components/page-hero"
 import { PostsGrid } from "@/components/blog/post-card"
 import { PostListingControls } from "@/components/blog/post-listing-controls"
 import { PostPagination } from "@/components/blog/post-pagination"
@@ -100,13 +101,16 @@ export default async function JournalPage({ searchParams }: JournalPageProps) {
         ])}
       />
       <Container>
-        <h1 className="font-heading text-4xl leading-tight font-black sm:text-5xl">
-          The <HighlightText variant="secondary">journal</HighlightText>
-        </h1>
-        <p className="mt-4 max-w-2xl leading-relaxed text-body-foreground md:text-lg">
-          Shorter, less polished, and more personal than the blog — written
-          closer to when things actually happened.
-        </p>
+        <PageHero
+          heading={
+            <>
+              The <HighlightText variant="secondary">journal</HighlightText>
+            </>
+          }
+          headingClassName="font-heading text-4xl leading-tight font-black sm:text-5xl"
+          subtext="Shorter, less polished, and more personal than the blog — written closer to when things actually happened."
+          subtextClassName="mt-4 max-w-2xl leading-relaxed text-body-foreground md:text-lg"
+        />
 
         <div className="mt-10">
           <Suspense

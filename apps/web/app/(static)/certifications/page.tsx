@@ -9,6 +9,7 @@ import {
 } from "@workspace/sanity/query"
 
 import { HighlightText } from "@/components/highlight-text"
+import { PageHero } from "@/components/page-hero"
 import {
   ArchivedCertifications,
   CertificationsGrid,
@@ -80,14 +81,19 @@ export default async function CertificationsPage() {
         ])}
       />
       <Container>
-        <h1 className="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl">
-          Achievement unlocked:{" "}
-          <HighlightText variant="secondary">the paper trail</HighlightText>
-        </h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg">
-          Courses and certifications completed over the years, from SQL
-          fundamentals to the latest AI tooling.
-        </p>
+        <PageHero
+          heading={
+            <>
+              Achievement unlocked:{" "}
+              <HighlightText variant="secondary">
+                the paper trail
+              </HighlightText>
+            </>
+          }
+          headingClassName="font-heading text-4xl leading-tight font-black text-balance sm:text-5xl"
+          subtext="Courses and certifications completed over the years, from SQL fundamentals to the latest AI tooling."
+          subtextClassName="mt-4 max-w-2xl text-base leading-relaxed text-body-foreground md:text-lg"
+        />
 
         <div className="mt-10">
           <SectionNav items={sectionNavItems} />
