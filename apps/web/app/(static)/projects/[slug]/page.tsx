@@ -105,13 +105,14 @@ export async function generateMetadata({
 
   if (!project) return {}
 
-  const image = project.coverImage?.asset
-    ? urlFor(project.coverImage).width(1200).height(630).fit("crop").url()
-    : undefined
-
   const title = project.seo?.metaTitle || project.title || "Project"
   const description = project.summary ?? project.tagline ?? undefined
 
+  // No `images` key here at all (not even set to `undefined`) — that lets
+  // Next merge in this segment's file-convention opengraph-image.tsx, which
+  // always generates the branded card (see that file: project has no manual
+  // ogImage override field the way blog/journal do, so this route has no
+  // other way to get an image).
   return {
     title,
     description,
@@ -121,14 +122,12 @@ export async function generateMetadata({
       title,
       description,
       type: "article",
-      images: image ? [{ url: image, width: 1200, height: 630 }] : undefined,
     },
     twitter: {
       // v1 shipped `summary`, which crops the cover to a small square thumbnail.
       card: "summary_large_image",
       title,
       description,
-      images: image ? [image] : undefined,
     },
   }
 }

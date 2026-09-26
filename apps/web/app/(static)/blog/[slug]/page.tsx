@@ -109,7 +109,13 @@ export async function generateMetadata({
   // the file-convention image for this segment, so the key is omitted
   // entirely (via spread) rather than included with an undefined value.
   const overrideImage = post.ogImage?.asset
-    ? urlFor(post.ogImage).width(1200).height(630).fit("crop").url()
+    ? urlFor(post.ogImage)
+        .width(1200)
+        .height(630)
+        .fit("crop")
+        .format("jpg")
+        .quality(85)
+        .url()
     : undefined
 
   return {

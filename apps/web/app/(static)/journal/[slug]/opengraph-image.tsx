@@ -1,5 +1,6 @@
 import { sanityFetch } from "@workspace/sanity/live"
 import { createCollectionTag, createDocumentTag } from "@workspace/sanity/cache-tags"
+import { urlFor } from "@workspace/sanity/image"
 import { JOURNAL_ENTRY_BY_SLUG_QUERY, SITE_CONFIG_QUERY } from "@workspace/sanity/query"
 
 import { readingTime } from "@/lib/reading-time"
@@ -42,6 +43,15 @@ export default async function Image({
 
   const title = entry?.title ?? "Journal"
   const siteName = siteConfig?.heroName ?? "Kunal Keshan"
+  const siteLogoUrl = siteConfig?.logo?.asset
+    ? urlFor(siteConfig.logo)
+        .width(112)
+        .height(112)
+        .fit("crop")
+        .format("jpg")
+        .quality(85)
+        .url()
+    : undefined
   const tagNames = (entry?.tags ?? [])
     .map((tag) => tag.name)
     .filter((name): name is string => Boolean(name))
@@ -60,5 +70,6 @@ export default async function Image({
     tagNames,
     dateLabel,
     readingTimeLabel,
+    siteLogoUrl,
   })
 }
