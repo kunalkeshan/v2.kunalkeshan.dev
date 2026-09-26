@@ -132,6 +132,11 @@ const Footer = ({ siteConfig, legalLinks }: Props) => {
                   Style Guide
                 </Link>
               </li>
+              <li>
+                <Link href="/changelog" className="hover:text-foreground">
+                  Changelog
+                </Link>
+              </li>
               {rickrollUrl && (
                 <li suppressHydrationWarning>
                   <button

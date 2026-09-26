@@ -4,7 +4,7 @@ Each app under `apps/*` is versioned and released independently — there is no 
 
 ## The flow
 
-1. A human (not CI) publishes a **GitHub Release** through the GitHub UI or `gh release create`, tagged `<app-dir>-vX.Y.Z` — e.g. `web-v1.2.3` for a release of `apps/web`. Write real release notes; GitHub Releases *are* the changelog here — there is no separate `CHANGELOG.md` file to maintain.
+1. A human (not CI) publishes a **GitHub Release** through the GitHub UI or `gh release create`, tagged `<app-dir>-vX.Y.Z` — e.g. `web-v1.2.3` for a release of `apps/web`. Write real release notes; GitHub Releases *are* the changelog here — there is no separate `CHANGELOG.md` file to maintain. `apps/web` surfaces these at `/changelog` directly from the GitHub API — see `docs/feature/changelog.md`.
 2. Publishing the release fires `.github/workflows/sync-version.yml` (`on: release: published`). It:
    - Parses the tag into `<app-prefix>` and `<version>`.
    - Runs `pnpm --filter <app-prefix> version <version> --no-git-tag-version --allow-same-version`, which bumps `apps/<app-prefix>/package.json`'s `"version"` field.

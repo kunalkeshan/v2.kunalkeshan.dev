@@ -13,6 +13,7 @@ Per-feature deep dives — what the feature does, where its code lives, and any 
 
 - [`sanity-cms.md`](./feature/sanity-cms.md) — content modeling, the Studio app, and how `apps/web` consumes it
 - [`command-menu.md`](./feature/command-menu.md) — keyboard shortcut, searchable destinations, and optional portfolio actions
+- [`changelog.md`](./feature/changelog.md) — the `/changelog` page, why it reads GitHub Releases directly instead of a new content type, and its pagination/markdown-rendering approach
 
 ## Content docs (`docs/content/`)
 
