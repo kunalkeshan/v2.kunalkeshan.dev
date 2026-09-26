@@ -25,6 +25,7 @@ export const PROJECT_KINDS = [
   { title: "Open source", value: "open-source" },
   { title: "Research", value: "research" },
   { title: "College", value: "college" },
+  { title: "Hackathon", value: "hackathon" },
 ] as const;
 
 export const PROJECT_STATUSES = [
@@ -108,7 +109,7 @@ export const projectType = defineType({
       },
       initialValue: "personal",
       description:
-        "The engagement type, shown as the orange badge on the card. Professional = built inside a full-time or contract role (link that role under Connections); Freelance = independent paid client work; Personal = your own side project; Open source = public repo built for others to use; Research = academic or published work; College = built as coursework or campus life during your degree.",
+        "The engagement type, shown as the orange badge on the card. Professional = built inside a full-time or contract role (link that role under Connections); Freelance = independent paid client work; Personal = your own side project; Open source = public repo built for others to use; Research = academic or published work; College = built as coursework or campus life during your degree; Hackathon = built during a timeboxed hackathon or hack day, usually with a team under competition rules.",
       validation: (Rule) => Rule.required(),
     }),
     defineField({

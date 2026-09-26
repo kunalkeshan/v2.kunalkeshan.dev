@@ -14,6 +14,7 @@ export const PROJECT_KIND_ORDER = [
   "open-source",
   "research",
   "college",
+  "hackathon",
 ] as const
 
 export type ProjectKind = (typeof PROJECT_KIND_ORDER)[number]
@@ -25,6 +26,7 @@ export const PROJECT_KIND_LABELS: Record<string, string> = {
   "open-source": "Open source",
   research: "Research",
   college: "College",
+  hackathon: "Hackathon",
 }
 
 export const PROJECT_STATUS_LABELS: Record<string, string> = {
