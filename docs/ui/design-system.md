@@ -668,6 +668,15 @@ it, confirmed by spying on `document.startViewTransition` against the installed 
 19.3.0. Unsupported browsers degrade to a normal instant update — this is a documented
 property of the React component itself, not something this repo layers on top.
 
+The browser's own *default* root crossfade is neutralized (`::view-transition-old(root)`,
+`::view-transition-new(root)` — `animation: none` — alongside `role-fade-in` in
+`globals.css`), because every route's own content already choreographs its own
+mount-entrance via `[data-reveal]` (`Hero`/`ContactHero`/`PageHero`). Leaving the default
+crossfade running stacked two independently-timed animation systems on every navigation,
+which read as sections flickering rather than one deliberate entrance. `<ViewTransition>`
+itself stays wired up for a future deliberate, explicitly-named transition (e.g. a shared
+element morph) — only the un-named default fallback is disabled.
+
 ## `InputGroup` — icon-decorated inputs (`@workspace/ui/components/input-group`)
 
 For a text input with a leading/trailing icon (a search icon, a submit button, a clear

@@ -626,6 +626,27 @@
   animation: role-fade-in 0.25s ease-out both;
 }
 
+/* Neutralizes the browser's own default root crossfade from
+ * `apps/web/components/layouts/view-transition-wrapper.tsx`'s
+ * `<ViewTransition>` (wrapping route content for page-to-page navigation).
+ * Every route's own content — `Hero`/`ContactHero`/`PageHero` — already
+ * choreographs its own mount-entrance via `[data-reveal]` (staggered
+ * fade+translateY, ~600ms). Without this rule, the View Transitions API's
+ * *default* UA-stylesheet crossfade (~250ms opacity fade of the whole
+ * outgoing/incoming DOM snapshot) runs at the same time as that reveal —
+ * two independently-timed animation systems overlapping on every
+ * navigation, which read as sections flickering/misbehaving rather than
+ * the single deliberate entrance the reveal system already provides on a
+ * fresh page load. `animation: none` here only removes the *default*,
+ * un-named root crossfade; it doesn't disable `<ViewTransition>` itself,
+ * so a future deliberate, explicitly-named transition (e.g. a shared
+ * element morph between a project card and its detail page, per
+ * https://react.dev/reference/react/ViewTransition) still works. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
 /* Mobile nav sheet — staggered fade/slide-in of each link when the sheet
  * opens. `--stagger-index` is set inline per item (0, 1, 2, …); the 100ms
  * base delay + 50ms-per-item step matches the old
