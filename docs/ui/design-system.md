@@ -656,8 +656,26 @@ marquee's existing `@keyframes`/`@utility` pattern):
   plain `active:scale-96` Tailwind utility now, gated by `motion-reduce:` the same way
   `cardLift` is elsewhere in this codebase — no wrapper element needed at all.
 
-Still no dedicated page-transition/route system — that remains genuinely out of scope
-until a real cross-route transition is actually requested.
+**Cross-route transitions.** `apps/web/components/layouts/view-transition-wrapper.tsx`
+wraps React's native `<ViewTransition>` component (backed by the browser's View
+Transitions API), applied once around route content (`{children}` in
+`app/(static)/layout.tsx`) — deliberately *not* around `<Navbar>`/`<Footer>`, so neither
+is a transition participant on every navigation. It needs no `next.config.ts` flag; see
+that file's doc comment. `<ViewTransition>` only activates for real Transitions (route
+navigation, `useTransition`, `<Suspense>`, `useDeferredValue`) — a plain `setState`
+(e.g. `Hero`'s own 2.6s role-text rotation, a `setInterval` + `setState`) never triggers
+it, confirmed by spying on `document.startViewTransition` against the installed React
+19.3.0. Unsupported browsers degrade to a normal instant update — this is a documented
+property of the React component itself, not something this repo layers on top.
+
+The browser's own *default* root crossfade is neutralized (`::view-transition-old(root)`,
+`::view-transition-new(root)` — `animation: none` — alongside `role-fade-in` in
+`globals.css`), because every route's own content already choreographs its own
+mount-entrance via `[data-reveal]` (`Hero`/`ContactHero`/`PageHero`). Leaving the default
+crossfade running stacked two independently-timed animation systems on every navigation,
+which read as sections flickering rather than one deliberate entrance. `<ViewTransition>`
+itself stays wired up for a future deliberate, explicitly-named transition (e.g. a shared
+element morph) — only the un-named default fallback is disabled.
 
 ## `InputGroup` — icon-decorated inputs (`@workspace/ui/components/input-group`)
 
