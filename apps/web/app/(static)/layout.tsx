@@ -110,12 +110,10 @@ export default async function RootLayout({
   return (
     <>
       <Providers rickrollAudioUrl={siteConfig?.rickrollAudio?.asset?.url ?? null}>
-        <ViewTransitionWrapper>
-          <Navbar siteConfig={siteConfig} />
-          {children}
-          <Footer siteConfig={siteConfig} legalLinks={legalLinks} />
-          <Toaster richColors />
-        </ViewTransitionWrapper>
+        <Navbar siteConfig={siteConfig} />
+        <ViewTransitionWrapper>{children}</ViewTransitionWrapper>
+        <Footer siteConfig={siteConfig} legalLinks={legalLinks} />
+        <Toaster richColors />
       </Providers>
       <SanityLive />
       {isDraftMode && (

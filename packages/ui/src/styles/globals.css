@@ -606,8 +606,11 @@
 
 /* Hero role-text crossfade (the rotating role under the hero name) — small,
  * frequent retrigger (every 2.6s), so it's a `@keyframes` restarted by
- * changing the element's `key` (forces React to remount the node, which
- * restarts the CSS animation), not a `[data-reveal]` state flip. */
+ * `hero.tsx` toggling this class off and back on (with a forced reflow in
+ * between) on the same node, not a `[data-reveal]` state flip. Previously
+ * restarted via `key={activeRole}` forcing React to unmount/remount the
+ * node — switched away from that so the rotation never unmounts/remounts
+ * a DOM node sitting inside the hero's `md:sticky` column on every tick. */
 @keyframes role-fade-in {
   from {
     opacity: 0;

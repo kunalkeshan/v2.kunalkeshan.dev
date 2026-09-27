@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Briefcase, MailIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -25,6 +25,7 @@ const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
   const prefersReducedMotion = usePrefersReducedMotion()
   const [roleIndex, setRoleIndex] = useState(0)
   const { ref, state, Provider } = useRevealGroup<HTMLDivElement>("mount")
+  const roleRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     if (prefersReducedMotion || roles.length <= 1) return
@@ -37,6 +38,19 @@ const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
   }, [prefersReducedMotion, roles.length])
 
   const activeRole = prefersReducedMotion ? roles[0] : roles[roleIndex]
+
+  // Retrigger the crossfade in place rather than remounting the node (the
+  // old `key={activeRole}` approach): toggling the class off, forcing a
+  // reflow, then back on restarts the same CSS animation without ever
+  // unmounting/remounting the span. See the CSS comment on
+  // `role-fade-in`/`animate-role-fade-in` for why this matters.
+  useEffect(() => {
+    const el = roleRef.current
+    if (!el) return
+    el.classList.remove("animate-role-fade-in")
+    void el.offsetWidth
+    el.classList.add("animate-role-fade-in")
+  }, [activeRole])
 
   return (
     <section className="pt-28 pb-16 md:pt-36 md:pb-24">
@@ -54,7 +68,7 @@ const Hero = ({ name, roles, imageUrl, imageAlt }: HeroProps) => {
 
                   <div className="mt-2">
                     <span
-                      key={activeRole}
+                      ref={roleRef}
                       aria-hidden="true"
                       className="animate-role-fade-in inline-block font-heading text-2xl font-bold text-foreground md:text-3xl"
                     >
