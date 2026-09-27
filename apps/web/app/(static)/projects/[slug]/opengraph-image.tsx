@@ -68,27 +68,26 @@ export default async function Image({
 
   // Cover image (screenshot/artwork) first, icon (logo mark) as a smaller
   // fallback — same precedence as which one reads as "the" image for a
-  // project elsewhere in the app. Cropped to fill for a cover image; a
-  // square icon is instead scaled to fit (never cropped) so the mark is
-  // never cut off, matching how the icon renders elsewhere in the app.
-  const thumbnailFit = project?.coverImage?.asset ? "cover" : "contain"
-  const thumbnailUrl = project?.coverImage?.asset
-    ? urlFor(project.coverImage)
-        .width(1000)
-        .height(1260)
-        .fit("crop")
+  // project elsewhere in the app. Always scaled to fit (never cropped): cover
+  // art here is arbitrarily shaped (landscape illustrations, screenshots,
+  // square logos), while this panel is a fixed portrait column, so a forced
+  // crop reliably chops off most of a landscape source's width. `fit=max`
+  // (no upscale, no crop) + a solid `bg` fill (for any transparent source)
+  // is the same treatment the icon fallback always used.
+  const thumbnailImage = project?.coverImage?.asset
+    ? project.coverImage
+    : project?.icon?.asset
+      ? project.icon
+      : undefined
+  const thumbnailUrl = thumbnailImage
+    ? urlFor(thumbnailImage)
+        .width(700)
+        .fit("max")
         .format("jpg")
+        .bg("faf9f6")
         .quality(85)
         .url()
-    : project?.icon?.asset
-      ? urlFor(project.icon)
-          .width(700)
-          .fit("max")
-          .format("jpg")
-          .bg("faf9f6")
-          .quality(85)
-          .url()
-      : undefined
+    : undefined
 
   return renderProjectOgImage({
     title,
@@ -97,7 +96,6 @@ export default async function Image({
     kindLabel,
     statusLabel,
     thumbnailUrl,
-    thumbnailFit,
     siteLogoUrl,
   })
 }
