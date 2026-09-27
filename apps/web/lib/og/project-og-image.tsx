@@ -18,13 +18,6 @@ interface ProjectOgImageProps {
    * source assets aren't guaranteed to be raster (see the caller).
    */
   thumbnailUrl: string | undefined
-  /**
-   * "cover" for a landscape cover image (crops to fill the panel, matching
-   * the card treatment elsewhere); "contain" for a square icon/logo mark
-   * (centered, nothing cut off — a logo cropped to a portrait rect would
-   * usually lose part of the mark).
-   */
-  thumbnailFit: "cover" | "contain"
   /** Same raster-forced-URL contract as `thumbnailUrl`. Omitted entirely when unset. */
   siteLogoUrl: string | undefined
 }
@@ -48,7 +41,6 @@ function ProjectOgImage({
   kindLabel,
   statusLabel,
   thumbnailUrl,
-  thumbnailFit,
   siteLogoUrl,
 }: ProjectOgImageProps) {
   return (
@@ -84,7 +76,7 @@ function ProjectOgImage({
               height: "100%",
               backgroundColor: TOKENS.background,
               borderRight: `6px solid ${TOKENS.border}`,
-              padding: thumbnailFit === "contain" ? "48px" : "0",
+              padding: "48px",
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- Satori (next/og) renders via its own image pipeline, not next/image. */}
@@ -95,7 +87,7 @@ function ProjectOgImage({
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: thumbnailFit,
+                objectFit: "contain",
               }}
             />
           </div>
