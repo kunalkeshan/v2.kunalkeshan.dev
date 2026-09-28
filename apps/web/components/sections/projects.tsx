@@ -89,9 +89,10 @@ export interface ProjectCardProps {
   compact?: boolean
   /**
    * Text-left / image-right, the way v1's project cards and Paperfolio's are
-   * built. Used on /projects, where two cards per row leaves each one wide
-   * enough to carry a side-by-side split. The home strip runs 3-up, which is
-   * too narrow for it, so it keeps the stacked image-on-top layout.
+   * built. Used on /projects, which stays one full-width card per row below
+   * `lg` and goes two per row from `lg` up — either way there's enough width
+   * to carry a side-by-side split. The home strip runs 3-up, which is too
+   * narrow for it, so it keeps the stacked image-on-top layout.
    */
   split?: boolean
 }
@@ -103,8 +104,12 @@ export function ProjectCard({
   split,
 }: ProjectCardProps) {
   const slug = project.slug?.current
+  // Width-only, no `.height()`/`.fit("crop")`: cropping the source here would
+  // throw away pixels before `object-contain` below ever sees them, no matter
+  // how the container's aspect ratio is tuned. Letting the full image through
+  // and letterboxing it in CSS is the only way to never lose part of it.
   const coverUrl = project.coverImage?.asset
-    ? urlFor(project.coverImage).width(640).height(400).fit("crop").url()
+    ? urlFor(project.coverImage).width(1200).url()
     : undefined
 
   const kindLabel = project.kind ? PROJECT_KIND_LABELS[project.kind] : null
@@ -174,14 +179,15 @@ export function ProjectCard({
           split
             ? "border-b-2 border-border sm:w-2/5 sm:shrink-0 sm:self-start sm:border-b-0 sm:border-l-2"
             : "border-b-2 border-border",
-          // A fixed 4:3 panel on split cards, *not* `aspect-auto`. Letting the
+          // A fixed panel on split cards, *not* `aspect-auto`. Letting the
           // panel size itself meant a portrait-ish source dictated the whole
           // card's height — Zion Taxi rendered about twice as tall as a
           // coverless card next to it, with the text column stretched and a
           // large void under its CTA. A fixed box makes every card in the list
-          // the same height whether or not it has a cover.
+          // the same height whether or not it has a cover. 16:9 rather than
+          // 4:3 keeps the two-per-row `lg:` layout from running tall.
           split
-            ? "aspect-[16/10] sm:aspect-[4/3]"
+            ? "aspect-video"
             : compact
               ? "aspect-[2/1]"
               : "aspect-[16/10]"
@@ -191,17 +197,22 @@ export function ProjectCard({
           <Image
             src={coverUrl}
             alt={project.coverImage?.alt ?? ""}
-            width={640}
-            height={400}
-            sizes="(min-width: 1024px) 480px, (min-width: 640px) 40vw, 100vw"
+            width={1200}
+            height={750}
+            sizes={
+              split
+                ? "(min-width: 1024px) 260px, (min-width: 640px) 40vw, 100vw"
+                : "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            }
             className={cn(
               "h-full w-full",
-              // `contain` on split cards: at 40% of a full-width card the panel
-              // rarely matches the asset's ratio, and `cover` was slicing the
-              // edges off illustrations. Letterboxing onto the muted ground
-              // shows the whole image instead. Stacked cards keep `cover`,
-              // where the panel's fixed 16:10 does match the source.
-              split ? "object-contain p-4" : "object-cover",
+              // `contain` everywhere: the fixed-ratio panel rarely matches the
+              // source asset exactly, and `cover` was slicing pieces off it
+              // (worst on split cards, at 40% of a full-width card). Paired
+              // with the uncropped `coverUrl` above, letterboxing onto the
+              // muted ground is now the *only* place any fitting happens, so
+              // the whole image always survives intact.
+              "object-contain p-4",
               "scale-100 transform-gpu will-change-transform",
               "transition-transform duration-press ease-snap group-hover:scale-110",
               "motion-reduce:transition-none motion-reduce:group-hover:scale-100"
@@ -393,10 +404,11 @@ export function ProjectsGrid({
         ref={ref}
         className={cn(
           "grid grid-cols-1 gap-6",
-          // Split cards stay one per row: each is then full page width, so
-          // the 60/40 halves are both wide enough to work. Stacked cards
-          // tile.
-          !split && "sm:grid-cols-2",
+          // Split cards stay one per row below `lg`, where each is full page
+          // width so the 60/40 halves are both wide enough to work. From `lg`
+          // up there's enough width to run two per row instead. Stacked cards
+          // tile from `sm` up.
+          split ? "lg:grid-cols-2" : "sm:grid-cols-2",
           // `compact` (the Earlier-work strip) always runs 3-up regardless,
           // since those cards carry less content.
           !split && (compact || columns === 3) && "lg:grid-cols-3"
