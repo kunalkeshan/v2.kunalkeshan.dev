@@ -81,6 +81,32 @@ function StarBadge({ stars }: { stars: number | undefined }) {
   )
 }
 
+/**
+ * Shared between the inline pill row (non-split cards) and the full-width
+ * footer row (split cards, at every width) — see the comments around both
+ * call sites in `ProjectCard`.
+ */
+function SkillPills({
+  skills,
+  className,
+}: {
+  skills: { _id: string; name: string | null }[]
+  className?: string
+}) {
+  return (
+    <ul className={cn("flex flex-wrap gap-1.5", className)}>
+      {skills.map((skill) => (
+        <li
+          key={skill._id}
+          className="rounded-sm border-2 border-border bg-background px-2 py-0.5 text-xs font-semibold"
+        >
+          {skill.name}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 export interface ProjectCardProps {
   project: ProjectCardData
   /** repo -> star count, from `fetchStars`. */
@@ -89,9 +115,10 @@ export interface ProjectCardProps {
   compact?: boolean
   /**
    * Text-left / image-right, the way v1's project cards and Paperfolio's are
-   * built. Used on /projects, where two cards per row leaves each one wide
-   * enough to carry a side-by-side split. The home strip runs 3-up, which is
-   * too narrow for it, so it keeps the stacked image-on-top layout.
+   * built. Used on /projects, which stays one full-width card per row below
+   * `lg` and goes two per row from `lg` up — either way there's enough width
+   * to carry a side-by-side split. The home strip runs 3-up, which is too
+   * narrow for it, so it keeps the stacked image-on-top layout.
    */
   split?: boolean
 }
@@ -103,8 +130,12 @@ export function ProjectCard({
   split,
 }: ProjectCardProps) {
   const slug = project.slug?.current
+  // Width-only, no `.height()`/`.fit("crop")`: cropping the source here would
+  // throw away pixels before `object-contain` below ever sees them, no matter
+  // how the container's aspect ratio is tuned. Letting the full image through
+  // and letterboxing it in CSS is the only way to never lose part of it.
   const coverUrl = project.coverImage?.asset
-    ? urlFor(project.coverImage).width(640).height(400).fit("crop").url()
+    ? urlFor(project.coverImage).width(1200).url()
     : undefined
 
   const kindLabel = project.kind ? PROJECT_KIND_LABELS[project.kind] : null
@@ -156,189 +187,209 @@ export function ProjectCard({
     .join("")
 
   return (
-    <article
-      className={cn(
-        cardShell,
-        // Split cards lay their two halves out side by side from `sm` up; the
-        // stacked default keeps `flex-col` from `cardShell`.
-        split && "sm:flex-row-reverse"
-      )}
-    >
+    <article className={cardShell}>
       {/*
-        Always rendered, cover or not, so every card in a mixed grid is the
-        same height. See `initials` above.
+        Split cards get a third, full-width row below this one for the skill
+        pills (see the `<ul>` after this div) — cramming them into the 60%
+        text column wrapped awkwardly, with leftover width sitting unused
+        under the image. `flex-1` so this row (not the pill row) absorbs any
+        extra height a grid row forces on a shorter card, the same way the
+        text column already did before the split.
       */}
       <div
         className={cn(
-          "overflow-hidden bg-muted",
-          split
-            ? "border-b-2 border-border sm:w-2/5 sm:shrink-0 sm:self-start sm:border-b-0 sm:border-l-2"
-            : "border-b-2 border-border",
-          // A fixed 4:3 panel on split cards, *not* `aspect-auto`. Letting the
-          // panel size itself meant a portrait-ish source dictated the whole
-          // card's height — Zion Taxi rendered about twice as tall as a
-          // coverless card next to it, with the text column stretched and a
-          // large void under its CTA. A fixed box makes every card in the list
-          // the same height whether or not it has a cover.
-          split
-            ? "aspect-[16/10] sm:aspect-[4/3]"
-            : compact
-              ? "aspect-[2/1]"
-              : "aspect-[16/10]"
+          "flex flex-1 flex-col",
+          // Split cards lay their two halves out side by side from `sm` up; the
+          // stacked default keeps `flex-col`.
+          split && "sm:flex-row-reverse"
         )}
       >
-        {coverUrl ? (
-          <Image
-            src={coverUrl}
-            alt={project.coverImage?.alt ?? ""}
-            width={640}
-            height={400}
-            sizes="(min-width: 1024px) 480px, (min-width: 640px) 40vw, 100vw"
-            className={cn(
-              "h-full w-full",
-              // `contain` on split cards: at 40% of a full-width card the panel
-              // rarely matches the asset's ratio, and `cover` was slicing the
-              // edges off illustrations. Letterboxing onto the muted ground
-              // shows the whole image instead. Stacked cards keep `cover`,
-              // where the panel's fixed 16:10 does match the source.
-              split ? "object-contain p-4" : "object-cover",
-              "scale-100 transform-gpu will-change-transform",
-              "transition-transform duration-press ease-snap group-hover:scale-110",
-              "motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-            )}
-          />
-        ) : (
-          <div
-            className={cn(
-              "flex h-full w-full items-center justify-center p-8",
-              "scale-100 transform-gpu will-change-transform",
-              "transition-transform duration-press ease-snap group-hover:scale-105",
-              "motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-            )}
-          >
-            {iconUrl ? (
+        {/*
+          Always rendered, cover or not, so every card in a mixed grid is the
+          same height. See `initials` above.
+        */}
+        <div
+          className={cn(
+            "overflow-hidden bg-muted",
+            split
+              ? "border-b-2 border-border sm:w-2/5 sm:shrink-0 sm:self-start sm:border-b-0 sm:border-l-2"
+              : "border-b-2 border-border",
+            // A fixed panel on split cards, *not* `aspect-auto`. Letting the
+            // panel size itself meant a portrait-ish source dictated the whole
+            // card's height — Zion Taxi rendered about twice as tall as a
+            // coverless card next to it, with the text column stretched and a
+            // large void under its CTA. A fixed box makes every card in the list
+            // the same height whether or not it has a cover. 16:9 rather than
+            // 4:3 keeps the two-per-row `lg:` layout from running tall.
+            split
+              ? "aspect-video"
+              : compact
+                ? "aspect-[2/1]"
+                : "aspect-[16/10]"
+          )}
+        >
+          {coverUrl ? (
+            <Image
+              src={coverUrl}
+              alt={project.coverImage?.alt ?? ""}
+              width={1200}
+              height={750}
+              sizes={
+                split
+                  ? "(min-width: 1024px) 260px, (min-width: 640px) 40vw, 100vw"
+                  : "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              }
+              className={cn(
+                "h-full w-full",
+                // `contain` everywhere: the fixed-ratio panel rarely matches the
+                // source asset exactly, and `cover` was slicing pieces off it
+                // (worst on split cards, at 40% of a full-width card). Paired
+                // with the uncropped `coverUrl` above, letterboxing onto the
+                // muted ground is now the *only* place any fitting happens, so
+                // the whole image always survives intact.
+                "object-contain p-4",
+                "scale-100 transform-gpu will-change-transform",
+                "transition-transform duration-press ease-snap group-hover:scale-110",
+                "motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              )}
+            />
+          ) : (
+            <div
+              className={cn(
+                "flex h-full w-full items-center justify-center p-8",
+                "scale-100 transform-gpu will-change-transform",
+                "transition-transform duration-press ease-snap group-hover:scale-105",
+                "motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              )}
+            >
+              {iconUrl ? (
+                <Image
+                  src={iconUrl}
+                  alt={project.icon?.alt ?? ""}
+                  width={240}
+                  height={240}
+                  sizes="160px"
+                  className="max-h-20 w-auto max-w-40 object-contain opacity-90"
+                />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="font-heading text-5xl font-black text-muted-foreground/35"
+                >
+                  {initials}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div
+          className={cn(
+            "flex flex-1 flex-col",
+            compact ? "p-4" : "p-5",
+            // Deliberately not `justify-center`: on a split card the height comes
+            // from the image column, and centring the text left a large gap
+            // between the chips and the CTA. Content packs to the top and any
+            // slack falls below the whole block, where it reads as padding.
+            split && "sm:w-3/5"
+          )}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            {/*
+              Free-floating: no border, background or padding, and only the
+              height is fixed. A boxed square cropped wordmark logos and read as
+              a chip rather than a brand mark.
+              Hidden when the panel above is already showing this same icon,
+              so it isn't displayed twice on one card.
+            */}
+            {iconUrl && coverUrl && (
               <Image
                 src={iconUrl}
                 alt={project.icon?.alt ?? ""}
                 width={240}
-                height={240}
-                sizes="160px"
-                className="max-h-20 w-auto max-w-40 object-contain opacity-90"
+                height={56}
+                sizes="120px"
+                className="h-7 w-auto max-w-30 shrink-0 object-contain object-left"
               />
-            ) : (
-              <span
-                aria-hidden="true"
-                className="font-heading text-5xl font-black text-muted-foreground/35"
-              >
-                {initials}
-              </span>
             )}
+            {kindLabel && <MetaBadge tone="primary">{kindLabel}</MetaBadge>}
+            {statusLabel && <MetaBadge>{statusLabel}</MetaBadge>}
+            <span className="ml-auto">
+              <StarBadge stars={starCount} />
+            </span>
           </div>
-        )}
-      </div>
 
-      <div
-        className={cn(
-          "flex flex-1 flex-col",
-          compact ? "p-4" : "p-5",
-          // Deliberately not `justify-center`: on a split card the height comes
-          // from the image column, and centring the text left a large gap
-          // between the chips and the CTA. Content packs to the top and any
-          // slack falls below the whole block, where it reads as padding.
-          split && "sm:w-3/5"
-        )}
-      >
-        <div className="flex flex-wrap items-center gap-2">
-          {/*
-            Free-floating: no border, background or padding, and only the
-            height is fixed. A boxed square cropped wordmark logos and read as
-            a chip rather than a brand mark.
-            Hidden when the panel above is already showing this same icon,
-            so it isn't displayed twice on one card.
-          */}
-          {iconUrl && coverUrl && (
-            <Image
-              src={iconUrl}
-              alt={project.icon?.alt ?? ""}
-              width={240}
-              height={56}
-              sizes="120px"
-              className="h-7 w-auto max-w-30 shrink-0 object-contain object-left"
-            />
-          )}
-          {kindLabel && <MetaBadge tone="primary">{kindLabel}</MetaBadge>}
-          {statusLabel && <MetaBadge>{statusLabel}</MetaBadge>}
-          <span className="ml-auto">
-            <StarBadge stars={starCount} />
-          </span>
-        </div>
-
-        <h3
-          className={cn(
-            "mt-3 font-heading font-black",
-            compact ? "text-lg" : "text-xl"
-          )}
-        >
-          {isLinked ? (
-            <Link
-              href={`/projects/${slug}`}
-              className={cn(
-                "underline-offset-4 hover:underline",
-                "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
-                // Stretches the link over the whole card so the entire surface
-                // is clickable, while the nested links below opt back out.
-                "after:absolute after:inset-0 after:content-['']"
-              )}
-            >
-              {project.title}
-            </Link>
-          ) : (
-            project.title
-          )}
-        </h3>
-
-        {attribution && (
-          <p className="mt-1 text-sm font-semibold text-muted-foreground">
-            {attribution}
-          </p>
-        )}
-
-        {project.tagline && (
-          <p className="mt-2 text-sm leading-relaxed text-body-foreground">
-            {project.tagline}
-          </p>
-        )}
-
-        {skills.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-1.5">
-            {skills.map((skill) => (
-              <li
-                key={skill._id}
-                className="rounded-sm border-2 border-border bg-background px-2 py-0.5 text-xs font-semibold"
+          <h3
+            className={cn(
+              "mt-3 font-heading font-black",
+              compact ? "text-lg" : "text-xl"
+            )}
+          >
+            {isLinked ? (
+              <Link
+                href={`/projects/${slug}`}
+                className={cn(
+                  "underline-offset-4 hover:underline",
+                  "focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
+                  // Stretches the link over the whole card so the entire surface
+                  // is clickable, while the nested links below opt back out.
+                  "after:absolute after:inset-0 after:content-['']"
+                )}
               >
-                {skill.name}
-              </li>
-            ))}
-          </ul>
-        )}
+                {project.title}
+              </Link>
+            ) : (
+              project.title
+            )}
+          </h3>
 
-        {/*
-          No `mt-auto` on a split card: pinning the CTA to the bottom edge is
-          what opened the gap under the chips. Stacked cards keep it, so their
-          CTAs line up across a row.
-        */}
-        <div className={cn(!split && "mt-auto")}>
-          {isLinked && (
-            <p className="mt-4 flex items-center gap-2 font-heading text-sm font-bold">
-              {project.hasBody ? "Read case study" : `More about ${project.title}`}
-              <ArrowRightIcon
-                className="size-4 transition-transform duration-press ease-snap group-hover:translate-x-1 motion-reduce:group-hover:translate-x-0"
-                aria-hidden="true"
-              />
+          {attribution && (
+            <p className="mt-1 text-sm font-semibold text-muted-foreground">
+              {attribution}
             </p>
           )}
+
+          {project.tagline && (
+            <p className="mt-2 text-sm leading-relaxed text-body-foreground">
+              {project.tagline}
+            </p>
+          )}
+
+          {/*
+            Non-split cards keep their pills inline, here, above the CTA. Split
+            cards render them in the full-width footer row below instead —
+            cramming them into this 60% column wrapped awkwardly, with the
+            width under the image sitting unused. See that `<ul>` below.
+          */}
+          {!split && skills.length > 0 && (
+            <SkillPills skills={skills} className="mt-4" />
+          )}
+
+          {/*
+            No `mt-auto` on a split card: pinning the CTA to the bottom edge is
+            what opened the gap under the chips. Stacked cards keep it, so their
+            CTAs line up across a row.
+          */}
+          <div className={cn(!split && "mt-auto")}>
+            {isLinked && (
+              <p className="mt-4 flex items-center gap-2 font-heading text-sm font-bold">
+                {project.hasBody ? "Read case study" : `More about ${project.title}`}
+                <ArrowRightIcon
+                  className="size-4 transition-transform duration-press ease-snap group-hover:translate-x-1 motion-reduce:group-hover:translate-x-0"
+                  aria-hidden="true"
+                />
+              </p>
+            )}
+          </div>
         </div>
       </div>
+
+      {split && skills.length > 0 && (
+        <SkillPills
+          skills={skills}
+          className="border-t-2 border-border px-5 py-4"
+        />
+      )}
     </article>
   )
 }
@@ -393,10 +444,11 @@ export function ProjectsGrid({
         ref={ref}
         className={cn(
           "grid grid-cols-1 gap-6",
-          // Split cards stay one per row: each is then full page width, so
-          // the 60/40 halves are both wide enough to work. Stacked cards
-          // tile.
-          !split && "sm:grid-cols-2",
+          // Split cards stay one per row below `lg`, where each is full page
+          // width so the 60/40 halves are both wide enough to work. From `lg`
+          // up there's enough width to run two per row instead. Stacked cards
+          // tile from `sm` up.
+          split ? "lg:grid-cols-2" : "sm:grid-cols-2",
           // `compact` (the Earlier-work strip) always runs 3-up regardless,
           // since those cards carry less content.
           !split && (compact || columns === 3) && "lg:grid-cols-3"
