@@ -4,20 +4,43 @@
  * case-study image lightbox (portable-text-image.tsx) keeps YARL's defaults.
  * Colours/shadows come from the shared tokens in packages/ui globals.css, so
  * dark mode inverts automatically.
+ *
+ * Layout rule: YARL floats the toolbar, prev/next arrows and caption bar over
+ * the slide. Here the slide gets per-side padding (gutters) sized to those
+ * controls, so the image never sits underneath them. Gutters shrink on phones;
+ * on short landscape screens the toolbar moves into the right gutter and the
+ * thumbnail strip is dropped so the image keeps most of the height.
  */
 .gallery-lightbox {
-  --yarl__color_backdrop: color-mix(in oklab, var(--background) 97%, transparent);
+  /* Gutters, overridden per breakpoint below. */
+  --gl-top: 72px;
+  --gl-x: 72px;
+  --gl-bottom: 72px;
+
+  --yarl__color_backdrop: var(--background);
   --yarl__color_button: var(--foreground);
   --yarl__color_button_active: var(--primary);
   --yarl__color_button_disabled: var(--muted-foreground);
   --yarl__slide_title_color: var(--foreground);
   --yarl__slide_description_color: var(--foreground);
+  --yarl__slide_description_max_lines: 2;
+  --yarl__navigation_button_padding: 8px;
   --yarl__thumbnails_thumbnail_border_color: var(--border);
   --yarl__thumbnails_thumbnail_active_border_color: var(--primary);
   --yarl__thumbnails_thumbnail_border_radius: 6px;
   --yarl__thumbnails_thumbnail_border: 2px;
-  --yarl__thumbnails_container_background_color: transparent;
+  --yarl__thumbnails_thumbnail_padding: 0px;
+  --yarl__thumbnails_thumbnail_gap: 8px;
+  --yarl__thumbnails_thumbnail_width: 96px;
+  --yarl__thumbnails_thumbnail_height: 60px;
+  --yarl__thumbnails_container_padding: 8px;
+  --yarl__thumbnails_container_background_color: var(--background);
   font-family: var(--font-sans);
+}
+
+/* The slide's padding is the gutter that keeps controls off the image. */
+.gallery-lightbox .yarl__slide {
+  padding: var(--gl-top) var(--gl-x) var(--gl-bottom);
 }
 
 /* Toolbar / navigation buttons become bordered chips with a hard shadow. */
@@ -41,31 +64,40 @@
     0 0 0 2px var(--background),
     0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent);
 }
-.gallery-lightbox .yarl__navigation_prev,
+.gallery-lightbox .yarl__button:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+}
+.gallery-lightbox .yarl__navigation_prev {
+  left: 12px;
+}
 .gallery-lightbox .yarl__navigation_next {
-  margin-inline: 12px;
+  right: 12px;
 }
 .gallery-lightbox .yarl__toolbar {
   padding: 12px;
   gap: 8px;
 }
 
-/* The slide itself reads as a framed card. */
-.gallery-lightbox .yarl__slide_image {
+/* Only the main slide image is framed — thumbnails reuse the same class. */
+.gallery-lightbox .yarl__carousel .yarl__slide_image {
   border: 3px solid var(--border);
   border-radius: 10px;
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-lg);
 }
 
-/* Caption becomes a bordered bar instead of a translucent scrim. */
+/* Caption becomes a bordered bar that lives in the bottom gutter. */
 .gallery-lightbox .yarl__slide_captions_container {
+  padding: 10px 16px;
   background: var(--background);
   border-top: 3px solid var(--border);
   font-family: var(--font-heading);
+  font-size: 14px;
   font-weight: 700;
+  line-height: 1.35;
 }
 
-/* Keyboard hint: desktop (hover-capable, wide) only. */
+/* Keyboard hint: desktop (hover-capable, wide) only, in the empty top-left. */
 .gallery-lightbox-keys {
   display: none;
 }
@@ -73,7 +105,7 @@
   .gallery-lightbox-keys {
     position: absolute;
     z-index: 1;
-    bottom: 140px; /* clears the thumbnails strip */
+    top: 18px;
     left: 16px;
     display: flex;
     align-items: center;
@@ -105,6 +137,86 @@
     font-size: 0.65rem;
     font-weight: 400;
     text-transform: none;
+  }
+}
+
+/* Phone portrait: tighter gutters, smaller tiles, swipe replaces the arrows. */
+@media (max-width: 767px) {
+  .gallery-lightbox {
+    --gl-top: 60px;
+    --gl-x: 12px;
+    --gl-bottom: 64px;
+    --yarl__icon_size: 24px;
+    --yarl__thumbnails_thumbnail_width: 64px;
+    --yarl__thumbnails_thumbnail_height: 40px;
+  }
+  .gallery-lightbox .yarl__toolbar {
+    padding: 8px;
+    gap: 6px;
+  }
+  .gallery-lightbox .yarl__slide_captions_container {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .gallery-lightbox .yarl__navigation_prev,
+  .gallery-lightbox .yarl__navigation_next {
+    --yarl__icon_size: 24px;
+  }
+  /* Narrow window + mouse keeps arrows, so give them room. */
+  @media (pointer: fine) {
+    .gallery-lightbox {
+      --gl-x: 56px;
+    }
+  }
+}
+
+/* Short viewports: drop the thumbnail strip so the image keeps the height. */
+@media (max-height: 500px) {
+  .gallery-lightbox {
+    --gl-top: 60px;
+    --gl-x: 56px;
+    --gl-bottom: 52px;
+    --yarl__icon_size: 24px;
+  }
+  .gallery-lightbox .yarl__thumbnails_container {
+    display: none;
+  }
+  .gallery-lightbox .yarl__slide_captions_container {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Short landscape on touch (phones): toolbar becomes a column in the right
+   gutter, so the whole height goes to the image. */
+@media (max-height: 500px) and (pointer: coarse) {
+  .gallery-lightbox {
+    --gl-top: 12px;
+    --gl-x: 12px;
+  }
+  .gallery-lightbox .yarl__toolbar {
+    top: 0;
+    bottom: 0;
+    left: auto;
+    right: 0;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 8px;
+    gap: 6px;
+  }
+  .gallery-lightbox .yarl__slide {
+    padding-right: 68px;
+  }
+}
+
+/* Touch has swipe and (portrait) the thumbnail strip, so drop the arrows. */
+@media (pointer: coarse) and (max-width: 767px), (pointer: coarse) and (max-height: 500px) {
+  .gallery-lightbox .yarl__navigation_prev,
+  .gallery-lightbox .yarl__navigation_next {
+    display: none;
+  }
+  .gallery-lightbox .yarl__slide {
+    padding-left: 12px;
   }
 }
 

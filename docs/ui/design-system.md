@@ -1074,6 +1074,13 @@ states the action ("View full size: …"). The lightbox is skinned by
 `components/sections/project-gallery.css`, scoped to `.gallery-lightbox`, using only the
 shared tokens (`--border`, `--shadow-*`, `--primary`).
 
+**Lightbox layout rule:** YARL floats the toolbar, arrows and caption over the slide, so
+the stylesheet pads `.yarl__slide` per side (`--gl-top/--gl-x/--gl-bottom`) to keep the
+image clear of every control. Phones get smaller gutters and tiles and lose the arrows on
+touch (swipe and the thumbnail strip remain); short landscape screens drop the thumbnail
+strip and, on touch, move the toolbar into the right gutter. The frame (border + shadow)
+is scoped to `.yarl__carousel .yarl__slide_image` because the thumbnails reuse that class.
+
 ## Related
 
 - [`font-stack.md`](./font-stack.md) — font loading convention and the `font-heading` →
