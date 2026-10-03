@@ -338,7 +338,11 @@ export default async function ProjectPage({
 
             <RelatedProjects projects={project.relatedProjects} />
 
-            <ProjectGallery gallery={project.gallery} title={project.title} />
+            <ProjectGallery
+              gallery={project.gallery}
+              title={project.title}
+              slug={slug}
+            />
           </div>
 
           {/*
