@@ -1062,6 +1062,18 @@ properties, so `colors.ts` can't `@import` or otherwise derive from this file �
 be updated by hand whenever the `:root` palette above changes. See
 `docs/runbooks/contact-form.md` for the full email-package layout.
 
+## Expandable image thumbnails (`project-gallery.tsx`)
+
+A thumbnail that opens a lightbox must say so, since Tailwind v4 resets `<button>` to
+`cursor: default`. The pattern: `cursor-zoom-in` on the button; a hover/focus overlay
+(`bg-foreground/40`) holding a `Badge` with the `Expand` icon and "Expand" text (fades via
+`duration-press ease-snap`, `motion-reduce:transition-none`, shown on `group-focus-visible`
+too); a permanent corner icon under `[@media(hover:none)]` for touch; and a one-line hint
+under the section heading. Decorative cues are `aria-hidden` — the button's `aria-label`
+states the action ("View full size: …"). The lightbox is skinned by
+`components/sections/project-gallery.css`, scoped to `.gallery-lightbox`, using only the
+shared tokens (`--border`, `--shadow-*`, `--primary`).
+
 ## Related
 
 - [`font-stack.md`](./font-stack.md) — font loading convention and the `font-heading` →

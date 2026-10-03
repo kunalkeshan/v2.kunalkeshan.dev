@@ -1,0 +1,118 @@
+/*
+ * Neobrutalist skin for the project-gallery lightbox (yet-another-react-lightbox).
+ * Scoped under `.gallery-lightbox` — the className passed to <Lightbox> — so the
+ * case-study image lightbox (portable-text-image.tsx) keeps YARL's defaults.
+ * Colours/shadows come from the shared tokens in packages/ui globals.css, so
+ * dark mode inverts automatically.
+ */
+.gallery-lightbox {
+  --yarl__color_backdrop: color-mix(in oklab, var(--background) 97%, transparent);
+  --yarl__color_button: var(--foreground);
+  --yarl__color_button_active: var(--primary);
+  --yarl__color_button_disabled: var(--muted-foreground);
+  --yarl__slide_title_color: var(--foreground);
+  --yarl__slide_description_color: var(--foreground);
+  --yarl__thumbnails_thumbnail_border_color: var(--border);
+  --yarl__thumbnails_thumbnail_active_border_color: var(--primary);
+  --yarl__thumbnails_thumbnail_border_radius: 6px;
+  --yarl__thumbnails_thumbnail_border: 2px;
+  --yarl__thumbnails_container_background_color: transparent;
+  font-family: var(--font-sans);
+}
+
+/* Toolbar / navigation buttons become bordered chips with a hard shadow. */
+.gallery-lightbox .yarl__button {
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  box-shadow: var(--shadow-sm);
+  filter: none;
+  transition:
+    translate 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gallery-lightbox .yarl__button:hover:not(:disabled) {
+  translate: 1px 1px;
+  box-shadow: 1px 1px 0 0 var(--border);
+}
+.gallery-lightbox .yarl__button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--background),
+    0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent);
+}
+.gallery-lightbox .yarl__navigation_prev,
+.gallery-lightbox .yarl__navigation_next {
+  margin-inline: 12px;
+}
+.gallery-lightbox .yarl__toolbar {
+  padding: 12px;
+  gap: 8px;
+}
+
+/* The slide itself reads as a framed card. */
+.gallery-lightbox .yarl__slide_image {
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-xl);
+}
+
+/* Caption becomes a bordered bar instead of a translucent scrim. */
+.gallery-lightbox .yarl__slide_captions_container {
+  background: var(--background);
+  border-top: 3px solid var(--border);
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+/* Keyboard hint: desktop (hover-capable, wide) only. */
+.gallery-lightbox-keys {
+  display: none;
+}
+@media (hover: hover) and (min-width: 768px) {
+  .gallery-lightbox-keys {
+    position: absolute;
+    z-index: 1;
+    bottom: 140px; /* clears the thumbnails strip */
+    left: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--background);
+    box-shadow: var(--shadow-sm);
+    color: var(--foreground);
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+  .gallery-lightbox-keys kbd {
+    display: inline-flex;
+    min-width: 20px;
+    min-height: 20px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    background: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 400;
+    text-transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-lightbox .yarl__button {
+    transition: none;
+  }
+  .gallery-lightbox .yarl__button:hover:not(:disabled) {
+    translate: 0 0;
+  }
+}

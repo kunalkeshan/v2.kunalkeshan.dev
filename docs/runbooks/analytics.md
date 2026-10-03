@@ -61,5 +61,6 @@ For server components that render a plain anchor and can't hold an `onClick` the
 | `components/sections/testimonials.tsx` | `trackLinkClick` (author website) | `testimonials` |
 | `components/sections/experience.tsx` | `trackLinkClick` (role links, organization website ×2) | `experience` |
 | `app/(static)/projects/[slug]/page.tsx` | `trackLinkClick` (primary + secondary links, via `TrackedLink`) | `project_detail` |
+| `components/sections/project-gallery.tsx` | `trackUiEvent` (`screenshot_open`, with `index` and `project` slug params, fired when a screenshot thumbnail is clicked) | `project_detail` |
 
 New interactive elements should extend this table — see the Definition of Done checklist item in `AGENTS.md`.
